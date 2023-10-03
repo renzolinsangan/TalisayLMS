@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
   exit();
 }
 
+$user_id = $_GET['user_id'];
 $class_id = $_GET['class_id'];
 $question_id = $_GET['question_id'];
 
@@ -14,7 +15,7 @@ $sql_get_teacher_id = "SELECT teacher_id FROM class_enrolled WHERE class_id=?";
 $stmt_get_teacher_id = $db->prepare($sql_get_teacher_id);
 $stmt_get_teacher_id->execute([$class_id]);
 $teacher_id = $stmt_get_teacher_id->fetchColumn();
-sadsadsadsa
+
 if ($teacher_id) {
   $sql_get_class_info = "SELECT class_name, first_name, last_name FROM class_enrolled WHERE teacher_id=?";
   $stmt_get_class_info = $db->prepare($sql_get_class_info);
@@ -144,7 +145,7 @@ if ($teacher_id) {
               </a>
             </div>
           </div>
-        <?php
+          <?php
         }
         ?>
         <?php if (!empty($link) && $link != 'null') {
@@ -168,7 +169,7 @@ if ($teacher_id) {
               </a>
             </div>
           </div>
-        <?php
+          <?php
         }
         ?>
         <?php if (!empty($youtube) && $youtube != 'null') { ?>
@@ -191,34 +192,27 @@ if ($teacher_id) {
               </a>
             </div>
           </div>
-        <?php
+          <?php
         }
         ?>
       </div>
-      <?php 
-      if(isset($_POST['question_submit']))
-      {
-        $question_answer=$_POST['question_answer'];
+      <?php
+      if (isset($_POST['question_submit'])) {
+        $question_answer = $_POST['question_answer'];
 
-        $sql="INSERT INTO student_question_course_answer (question_id, question_answer, class_id, teacher_id) VALUES (?, ?, ?, ?)";
-        $stmtinsert=$db->prepare($sql);
-        $result=$stmtinsert->execute([$question_id, $question_answer, $class_id, $teacher_id]);
+        $sql = "INSERT INTO student_question_course_answer (question_id, question_answer, user_id, class_id, teacher_id) VALUES (?, ?, ?, ?, ?)";
+        $stmtinsert = $db->prepare($sql);
+        $result = $stmtinsert->execute([$question_id, $question_answer, $user_id, $class_id, $teacher_id]);
 
-        if($result)
-        {
-          $sql="SELECT question_answer FROM student_question_course_answer WHERE class_id=? AND question_id=?";
-          $stmt=$db->prepare($sql);
-          $stmt->execute([$class_id, $question_id]);
-          $question_answer_data=$stmt->fetch(PDO::FETCH_ASSOC);
-
-          if($question_answer_data)
-          {
-            $question_answer=$question_answer_data['question_answer'];
-          }
-          
-          header("Location: question_course.php?class_id=$class_id&question_id=$question_id");
+        if ($result) {
+          header("Location: question_course.php?class_id=$class_id&question_id=$question_id&user_id=$user_id");
+          exit();
         }
       }
+      $sql = "SELECT question_answer FROM student_question_course_answer WHERE class_id=? AND question_id=?";
+      $stmt = $db->prepare($sql);
+      $stmt->execute([$class_id, $question_id]);
+      $question_answer_data = $stmt->fetch(PDO::FETCH_ASSOC);
       ?>
       <form action="" method="post">
         <div class="row justify-content-left align-items-center mt-5 mb-5">
@@ -227,11 +221,23 @@ if ($teacher_id) {
               <div class="card-body">
                 <div class="form-floating" style="margin: 10px;">
                   <textarea name="question_answer" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Your Answer"></textarea>
+                    placeholder="Your Answer" <?php if (isset($question_answer_data) && !empty($question_answer_data['question_answer'])) {
+                      echo 'disabled';
+                    } ?>><?php if (isset($question_answer_data) && !empty($question_answer_data['question_answer'])) {
+                       echo $question_answer_data['question_answer'];
+                     } ?></textarea>
+                  <div id="submittedAnswerContainer" style="display: none;">
+                    <textarea name="submitted_answer" class="form-control auto-resize"
+                      style="border: none; outline: none; box-shadow: none;"></textarea>
+                  </div>
                   <label for="floatingInput">Your Answer</label>
                 </div>
                 <div class="text-end mt-4" style="margin-right: 12px;">
-                  <button name="question_submit" class="btn btn-outline-secondary" type="submit">Submit</button>
+                  <?php if (isset($question_answer_data) && !empty($question_answer_data['question_answer'])) { ?>
+                    <button class="btn btn-outline-secondary" type="button" onclick="unsubmitAnswer()">Unsubmit</button>
+                  <?php } else { ?>
+                    <button name="question_submit" class="btn btn-outline-secondary" type="submit">Submit</button>
+                  <?php } ?>
                 </div>
               </div>
             </div>
@@ -246,14 +252,6 @@ if ($teacher_id) {
       window.location.href = `class_course.php?class_id=${classId}`;
     }
 
-    const textarea = document.querySelector(".auto-resize");
-    const initialHeight = textarea.scrollHeight + "px";
-
-    textarea.addEventListener("input", function () {
-      this.style.height = initialHeight;
-      this.style.height = (this.scrollHeight <= this.clientHeight) ? initialHeight : this.scrollHeight + "px";
-    });
-
     const textareas = document.querySelectorAll(".auto-resize");
 
     textareas.forEach((textarea) => {
@@ -264,6 +262,34 @@ if ($teacher_id) {
         this.style.height = (this.scrollHeight <= this.clientHeight) ? initialHeight : this.scrollHeight + "px";
       });
     });
+  </script>
+  <script>
+    const textarea = document.querySelector(".auto-resize");
+    const submittedAnswerContainer = document.getElementById("submittedAnswerContainer");
+    const submittedAnswerTextarea = submittedAnswerContainer.querySelector("textarea");
+
+    textarea.addEventListener("input", function () {
+      this.style.height = "auto";
+      this.style.height = this.scrollHeight + "px";
+    });
+
+    textarea.dispatchEvent(new Event("input"));
+
+    function submitAnswer(event) {
+      event.preventDefault();
+      var userAnswer = document.querySelector('textarea[name="question_answer"]');
+      submittedAnswerTextarea.value = userAnswer.value;
+      userAnswer.disabled = true;
+      submittedAnswerContainer.style.display = "block";
+    }
+
+    function unsubmitAnswer() {
+      var submittedAnswer = submittedAnswerTextarea.value;
+      var userAnswer = document.querySelector('textarea[name="question_answer"]');
+      userAnswer.value = submittedAnswer;
+      userAnswer.disabled = false;
+      submittedAnswerContainer.style.display = "none";
+    }
   </script>
   <script type="text/javascript" src="js/virtual-select.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

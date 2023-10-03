@@ -298,7 +298,7 @@ $stmt->closeCursor();
                     ?>
                     <div class="d-grid gap-2 col-13 mx-auto mb-4">
                       <a class="announce" type="button"
-                        href="material_course.php?class_id=<?php echo $class_id ?>&material_id=<?php echo $material_id ?>"
+                        href="material_course.php?class_id=<?php echo $class_id ?>&material_id=<?php echo $material_id ?>&user_id=<?php echo $user_id ?>"
                         style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         <div
                           style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
@@ -334,7 +334,7 @@ $stmt->closeCursor();
                     ?>
                     <div class="d-grid gap-2 col-13 mx-auto mb-4">
                       <a class="announce" type="button"
-                        href="question_course.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>"
+                        href="question_course.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>&user_id=<?php echo $user_id ?>"
                         style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         <div
                           style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
