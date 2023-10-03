@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    list-style: none;
+}
+
+.navbar {
+    height: 10vh;
+    border-bottom: 1px solid #ccc;
+}
+
+.go-back {
+    margin-bottom: 8px;
+    margin-left: 15px;
+    margin-right: 22px;
+    border: none;
+    background-color: transparent;
+    font-weight: normal;
+}
+
+.custom-icon {
+    color: darkslategrey;
+    font-size: 20px;
+    transform: scale(0.8);
+    font-weight: normal;
+}
+
+/* Wrapper */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.auto-resize {
+    min-height: 10px;
+    overflow: hidden;
+    resize: none;
+}
+
+.divider {
+    border-top: 2px solid #ccc;
+    margin-top: 2rem;
+}
+
+.border-end {
+    border-right: 1px solid #ccc;
+    /* Your border styles here */
+    display: none;
+    /* Hide the border by default */
+}
+
+#multipleSelect {
+    max-width: 100%;
+}
+
+.dropdown-menu .dropdown-item {
+    cursor: pointer;
+}
+
+.vscomp-toggle-button {
+    padding: 10px 30px 10px 10px;
+    border-radius: 5px;
+}
+
+.col-md-2+.col-md-2,
+.col-md-2+.col-md-2+.col-md-2 {
+    margin-left: auto;
+}
+
+@media (min-width: 768px) {
+    .border-end {
+        display: block;
+    }
+}

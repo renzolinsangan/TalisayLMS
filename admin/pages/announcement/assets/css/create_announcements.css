@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    list-style: none;
+}
+
+/* Wrapper */
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+/* Content */
+.content .container label {
+    color: green;
+    font-size: 18px;
+}
+
+.content .container input {
+    font-size: 15px;
+    padding: 10px;
+}
+
+.lightened-select option:disabled {
+    color: #999;
+    /* Lightened color for disabled option */
+}
+
+.lightened-select option {
+    color: #999;
+    /* Black color for all options */
+}
+
+.lightened-select option:checked {
+    color: #333;
+    /* Change this to the desired color for the selected option text */
+}
+
+.select-with-icon {
+    position: relative;
+}
+
+.select-icon {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 1rem;
+    /* Adjust the size as needed */
+    color: #555;
+    /* Adjust the color as needed */
+}
+
+/* Footer */
+.footer {
+    height: 5vh;
+    background-color: green;
+    flex-shrink: 0;
+}
