@@ -14,7 +14,7 @@ $sql_get_teacher_id = "SELECT teacher_id FROM class_enrolled WHERE class_id=?";
 $stmt_get_teacher_id = $db->prepare($sql_get_teacher_id);
 $stmt_get_teacher_id->execute([$class_id]);
 $teacher_id = $stmt_get_teacher_id->fetchColumn();
-
+sadsadsadsa
 if ($teacher_id) {
   $sql_get_class_info = "SELECT class_name, first_name, last_name FROM class_enrolled WHERE teacher_id=?";
   $stmt_get_class_info = $db->prepare($sql_get_class_info);
