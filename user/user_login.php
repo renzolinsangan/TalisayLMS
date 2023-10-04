@@ -14,7 +14,7 @@
         <div class="popup__background"></div>
         <div class="popup__content">
             <h3 class="popup__content__title">
-                <a href="homepage.php" class="close-button">
+                <a href="index.php" class="close-button">
                     <i class="bi bi-arrow-left-short"></i>
                 </a>
                 <form action="user_info.php" method="POST">
