@@ -72,7 +72,7 @@ $stmt->closeCursor();
   <!-- inject:css -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <link rel="stylesheet" href="assets/css/teacher_course.css">
+  <link rel="stylesheet" href="assets/css/courses.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -336,7 +336,7 @@ $stmt->closeCursor();
                       echo "<p class='course-teacher'>" . $firstName . " " . $lastName . "</p>";
                       ?>
 
-                      <div class="circle-image">
+                      <div class="circle-image" id="circle-image">
                         <img src="assets/image/<?php echo $profile ?>" alt="profile"
                           onerror="this.src='images/profile.png'">
                       </div>

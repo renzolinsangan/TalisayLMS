@@ -102,7 +102,7 @@ $stmt->closeCursor();
   <!-- inject:css -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <link rel="stylesheet" href="assets/css/course.css">
+  <link rel="stylesheet" href="assets/css/courses.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -378,14 +378,14 @@ $stmt->closeCursor();
                       $_SESSION['teacher_name'] = $firstName . " " . $lastName;
                       echo "<p class='course-teacher'>" . $firstName . " " . $lastName . "</p>";
                       ?>
-                      <div class="circle-image">
+                      <div class="circle-image" id="circle-image">
                         <img src="../teacher/assets/image/<?php echo $teacher_profile ?>" alt="profile"
                           onerror="this.src='images/profile.png'">
                       </div>
                     </div>
                   </a>
                   <div class="card-footer">
-                    <button class="unenroll" type="button" data-bs-toggle="modal"
+                    <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
                       data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
                       <h5>Unenroll <i class="bi bi-journal-x" style="font-size: 20px;"></i></h5>
                     </button>

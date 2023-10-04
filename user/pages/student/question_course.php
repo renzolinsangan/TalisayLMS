@@ -55,7 +55,7 @@ if ($teacher_id) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Talisay Senior High School LMS</title>
   <link rel="stylesheet" type="text/css" href="assets/css/virtual-select.min.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/question_course.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/course_question.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -107,7 +107,7 @@ if ($teacher_id) {
             <?php echo $formatted_due_date . ", " . $time ?>
           </p>
         </div>
-        <hr class="divider" style="border-top: 2px solid black; width: 90%; margin-top: 10px; margin-left: 15px;">
+        <div class="divider mb-3" id="divider"></div>
       </div>
       <div class="row justify-content-left align-items-center">
         <div class="col-md-9">
@@ -200,9 +200,9 @@ if ($teacher_id) {
       if (isset($_POST['question_submit'])) {
         $question_answer = $_POST['question_answer'];
 
-        $sql = "INSERT INTO student_question_course_answer (question_id, question_answer, user_id, class_id, teacher_id) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO student_question_course_answer (question_id, question_answer, user_id, class_id, teacher_id, point) VALUES (?, ?, ?, ?, ?, ?)";
         $stmtinsert = $db->prepare($sql);
-        $result = $stmtinsert->execute([$question_id, $question_answer, $user_id, $class_id, $teacher_id]);
+        $result = $stmtinsert->execute([$question_id, $question_answer, $user_id, $class_id, $teacher_id, $point]);
 
         if ($result) {
           header("Location: question_course.php?class_id=$class_id&question_id=$question_id&user_id=$user_id");
@@ -234,7 +234,7 @@ if ($teacher_id) {
                 </div>
                 <div class="text-end mt-4" style="margin-right: 12px;">
                   <?php if (isset($question_answer_data) && !empty($question_answer_data['question_answer'])) { ?>
-                    <button class="btn btn-outline-secondary" type="button" onclick="unsubmitAnswer()">Unsubmit</button>
+                    <button class="btn btn-outline-secondary" type="button" onclick="editAnswer()">Edit Answer</button>
                   <?php } else { ?>
                     <button name="question_submit" class="btn btn-outline-secondary" type="submit">Submit</button>
                   <?php } ?>
@@ -283,7 +283,7 @@ if ($teacher_id) {
       submittedAnswerContainer.style.display = "block";
     }
 
-    function unsubmitAnswer() {
+    function editAnswer() {
       var submittedAnswer = submittedAnswerTextarea.value;
       var userAnswer = document.querySelector('textarea[name="question_answer"]');
       userAnswer.value = submittedAnswer;
