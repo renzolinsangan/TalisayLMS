@@ -197,7 +197,7 @@ $stmt->close();
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="header-links">
+        <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
           <a href="student_report.php?user_id=<?php echo $teacher_id ?>" class="stem" style="margin-left: 5vh;">All</a>
           <?php
           $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';

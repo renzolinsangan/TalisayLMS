@@ -13,7 +13,7 @@ include("db_conn.php");
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="css/homepage.css">
+    <link rel="stylesheet" href="css/index.css">
     <link rel="shortcut icon" href="images/trace.svg" />
 </head>
 
@@ -32,7 +32,11 @@ include("db_conn.php");
     </nav>
 
     <!-- main -->
-    <section class="main"></section>
+    <section class="main">
+        <div class="card">
+
+        </div>
+    </section>
 
     <!-- TSHS School Tracks -->
     <section class="track">
@@ -86,68 +90,77 @@ include("db_conn.php");
     </section>
 
     <!-- Registered Section -->
-    <section class="count">
+    <div class="card section mt-3">
         <div class="container">
             <div class="row py-5">
-                <div class="col-lg-3 m-auto mt-5 text-center">
-                    <?php
-                    $dash_category_query = "SELECT * FROM user_account WHERE usertype = 'teacher'";
-                    $dash_category_query_run = mysqli_query($conn, $dash_category_query);
+                <div class="col-lg-3 m-auto mt-5 mb-5 text-center">
+                    <div class="card teacher">
+                        <?php
+                        $dash_category_query = "SELECT * FROM user_account WHERE usertype = 'teacher'";
+                        $dash_category_query_run = mysqli_query($conn, $dash_category_query);
 
-                    if ($category_total = mysqli_num_rows($dash_category_query_run)) {
-                        echo '<h1> ' . $category_total . ' </h1>';
-                    } else {
-                        echo '<h1>No Data</h1>';
-                    }
-                    ?>
-                    <h5 style="color: green; font-weight: bold;">Registered Teacher</h5>
+                        if ($category_total = mysqli_num_rows($dash_category_query_run)) {
+                            echo '<h1> ' . $category_total . ' </h1>';
+                        } else {
+                            echo '<h1>No Data</h1>';
+                        }
+                        ?>
+                        <h5 style="color: green; font-weight: bold;">Registered Teacher</h5>
+                    </div>
                 </div>
-                <div class="col-lg-3 m-auto mt-5 text-center">
-                    <?php
-                    $dash_category_query = "SELECT * FROM user_account WHERE usertype = 'student'";
-                    $dash_category_query_run = mysqli_query($conn, $dash_category_query);
+                <div class="col-lg-3 m-auto mt-5 mb-5 text-center">
+                    <div class="card student">
+                        <?php
+                        $dash_category_query = "SELECT * FROM user_account WHERE usertype = 'student'";
+                        $dash_category_query_run = mysqli_query($conn, $dash_category_query);
 
-                    if ($category_total = mysqli_num_rows($dash_category_query_run)) {
-                        echo '<h1> ' . $category_total . ' </h1>';
-                    } else {
-                        echo '<h1>0</h1>';
-                    }
-                    ?>
-                    <h5 style="color: green; font-weight: bold;">Registered Student</h5>
+                        if ($category_total = mysqli_num_rows($dash_category_query_run)) {
+                            echo '<h1> ' . $category_total . ' </h1>';
+                        } else {
+                            echo '<h1>0</h1>';
+                        }
+                        ?>
+                        <h5 style="color: green; font-weight: bold;">Registered Student</h5>
+                    </div>
                 </div>
-                <div class="col-lg-3 m-auto mt-5 text-center">
-                    <?php
-                    $dash_category_query = "SELECT * FROM user_account WHERE usertype = 'parent'";
-                    $dash_category_query_run = mysqli_query($conn, $dash_category_query);
+                <div class="col-lg-3 m-auto mt-5 mb-5 text-center">
+                    <div class="card parent">
+                        <?php
+                        $dash_category_query = "SELECT * FROM user_account WHERE usertype = 'parent'";
+                        $dash_category_query_run = mysqli_query($conn, $dash_category_query);
 
-                    if ($category_total = mysqli_num_rows($dash_category_query_run)) {
-                        echo '<h1> ' . $category_total . ' </h1>';
-                    } else {
-                        echo '<h1>0</h1>';
-                    }
-                    ?>
-                    <h5 style="color: green; font-weight: bold;">Registered Parent</h5>
+                        if ($category_total = mysqli_num_rows($dash_category_query_run)) {
+                            echo '<h1> ' . $category_total . ' </h1>';
+                        } else {
+                            echo '<h1>0</h1>';
+                        }
+                        ?>
+                        <h5 style="color: green; font-weight: bold;">Registered Parent</h5>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="footer">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-1" style="margin-right: -53px; margin-left: 185vh;">
-                    <a class="circle-icon" href="https://www.facebook.com/DepEdTayoTalisaySHS342218" target="_blank">
-                        <i class="bi bi-facebook"></i>
-                    </a>
-                </div>
-                <div class="col">
-                    <a class="circle-icon" href="https://www.youtube.com/watch?v=oNGrxTSJoFo&t=39s" target="_blank">
-                        <i class="bi bi-youtube"></i>
-                    </a>
+    <div class="footer">
+        <div class="container-fluid d-flex justify-content-end align-items-center">
+            <div class="col-md-1 mt-3">
+                <div class="row d-flex justify-content-between align-items-center">
+                    <div class="col-6">
+                        <a class="circle-icon" href="https://www.facebook.com/DepEdTayoTalisaySHS342218"
+                            target="_blank">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a class="circle-icon" href="https://www.youtube.com/watch?v=oNGrxTSJoFo&t=39s" target="_blank">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <script>
         $(document).ready(function () {
