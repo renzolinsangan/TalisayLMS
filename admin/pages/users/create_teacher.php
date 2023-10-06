@@ -8,7 +8,6 @@ if (!isset($_SESSION['id'])) {
 include_once("config.php");
 
 if (isset($_POST['submit'])) {
-    $id = $row['user_id'];
     $username = $_POST['username'];
     $password = $_POST['password'];
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);

@@ -19,6 +19,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         header("Location: admin_login.php?error=Username is Required!");
         exit();
     } else if (empty($pass)) {
+        $_SESSION['entered_username'] = $name; // Store the entered username
         header("Location: admin_login.php?error=Password is Required!");
         exit();
     } else {
@@ -41,6 +42,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             if ($_SESSION['name'] === "principal" || $_SESSION['name'] === "guidance") {
                 header("Location: index.php");
             } else {
+                $_SESSION['entered_username'] = $name; // Store the entered username
                 header("Location: admin_login.php?error=Incorrect Username or Password!");
             }
 

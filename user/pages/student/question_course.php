@@ -72,8 +72,11 @@ if ($teacher_id) {
         <p class="name text-body-secondary" style="margin-top: 10px; font-size: 22px; pointer-events: none;">
           <?php echo $first_name . " " . $last_name ?>
         </p>
-        <h3 class="greater" style="margin-left: 10px; margin-top: 5px; margin-right: 10px; pointer-events: none;">></h3>
-        <p class="classname text-body-secondary" style="margin-top: 10px; font-size: 22px; pointer-events: none;">
+        <h3 class="greater" style="margin-left: 10px; margin-top: 5px; margin-right: 10px; pointer-events: none;">&gt;
+        </h3>
+        <p class="classname text-body-secondary"
+          style="margin-top: 10px; font-size: 22px; pointer-events: none;">
+          <!-- Adjust max-width as needed -->
           <?php echo $class_name ?>
         </p>
       </div>
@@ -236,7 +239,8 @@ if ($teacher_id) {
                   <?php if (isset($question_answer_data) && !empty($question_answer_data['question_answer'])) { ?>
                     <button class="btn btn-outline-secondary" type="button" onclick="editAnswer()">Edit Answer</button>
                   <?php } else { ?>
-                    <button name="question_submit" class="btn btn-outline-secondary" type="submit">Submit</button>
+                    <button name="question_submit" class="btn btn-outline-secondary" type="submit"
+                      onclick="submitAnswer(event)">Submit</button>
                   <?php } ?>
                 </div>
               </div>
@@ -284,11 +288,16 @@ if ($teacher_id) {
     }
 
     function editAnswer() {
-      var submittedAnswer = submittedAnswerTextarea.value;
       var userAnswer = document.querySelector('textarea[name="question_answer"]');
-      userAnswer.value = submittedAnswer;
+      var currentValue = userAnswer.value;
+      var submittedAnswerTextarea = document.getElementById('floatingInput')
+      submittedAnswerTextarea.value = currentValue;
       userAnswer.disabled = false;
-      submittedAnswerContainer.style.display = "none";
+
+      var submittedAnswerContainer = document.getElementById('submittedAnswerContainer');
+      if (submittedAnswerContainer) {
+        submittedAnswerContainer.style.display = "none";
+      }
     }
   </script>
   <script type="text/javascript" src="js/virtual-select.min.js"></script>

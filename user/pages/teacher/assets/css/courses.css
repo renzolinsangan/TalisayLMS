@@ -15958,7 +15958,7 @@
 
   @media (max-width: 768px) {
     #circle-image {
-      margin-left: 49vh;
+      display: none;
     }
   }
   

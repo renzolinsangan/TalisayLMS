@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html>
 
@@ -32,7 +35,7 @@
                     ?>
 
                     <label>Username</label>
-                    <input type="text" name="username" class="bottom-border-input">
+                    <input type="text" name="username" class="bottom-border-input" <?php echo (isset($_GET['error']) && strpos($_GET['error'], 'Password') !== false) ? 'value="' . $_SESSION['entered_username'] . '"' : ''; ?>>
 
                     <label>Password</label>
                     <input type="password" name="password" class="bottom-border-input" style="margin-bottom: -7px;">

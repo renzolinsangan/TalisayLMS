@@ -19,6 +19,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         header("Location: user_login.php?error=Username is Required!");
         exit();
     } else if (empty($pass)) {
+        $_SESSION['entered_username'] = $name; // Store the entered username
         header("Location: user_login.php?error=Password is Required!");
         exit();
     } else {
@@ -32,7 +33,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
         if ($row) {
             // Check if the stored password has a specific prefix indicating it's hashed
-            if (password_verify($pass, $row['password']) || strpos($row['password'], '$2y$') === 0) {
+            if (password_verify($pass, $row['password'])) {
                 // Password is either hashed and verified or plaintext, proceed with login
                 // Set the usertype and first name/last name in the session variables
                 $_SESSION['usertype'] = $row['usertype'];
@@ -55,9 +56,32 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                     header("Location: user_login.php?error=Invalid usertype");
                 }
                 exit();
+            } 
+            else if (($pass === $row['password'])){
+                $_SESSION['usertype'] = $row['usertype'];
+                $_SESSION['user_id'] = $row['user_id'];
+                $_SESSION['first_name'] = $row['firstname'];
+                $_SESSION['last_name'] = $row['lastname'];
+
+                // Close the connection
+                $stmt->close();
+                $conn->close();
+
+                // Redirect to the appropriate page based on the user's usertype
+                if ($_SESSION['usertype'] === "teacher") {
+                    header("Location: pages/teacher/index.php");
+                } elseif ($_SESSION['usertype'] === "student") {
+                    header("Location: pages/student/index.php");
+                } elseif ($_SESSION['usertype'] === "parent") {
+                    header("Location: pages/teacher/index.php");
+                } else {
+                    header("Location: user_login.php?error=Invalid usertype");
+                }
+                exit();
             } else {
                 // Passwords don't match, handle login failure
-                header("Location: user_login.php?error=Incorrect Username or Password!");
+                $_SESSION['entered_username'] = $name; // Store the entered username
+                header("Location: user_login.php?error=Incorrect Password!");
                 exit();
             }
         } else {

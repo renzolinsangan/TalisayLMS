@@ -25,6 +25,7 @@ $contact = $row['contact'];
 if (isset($_POST['submit'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $hashedPassword=password_hash($password, PASSWORD_DEFAULT);
     $email = $_POST['email'];
     $firstname = $_POST['firstname'];
     $middlename = $_POST['middlename'];
@@ -34,7 +35,7 @@ if (isset($_POST['submit'])) {
     $address = $_POST['address'];
     $contact = $_POST['contact'];
 
-    $sql = "UPDATE user_account SET username='$username', password='$password', email='$email', firstname='$firstname', middlename='$middlename', lastname='$lastname', department='$department', usertype='$usertype', address='$address', contact='$contact' WHERE user_id=$id";
+    $sql = "UPDATE user_account SET username='$username', password='$hashedPassword', email='$email', firstname='$firstname', middlename='$middlename', lastname='$lastname', department='$department', usertype='$usertype', address='$address', contact='$contact' WHERE user_id=$id";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
