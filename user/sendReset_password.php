@@ -41,7 +41,7 @@ if ($stmt->affected_rows) {
 
     $mail = require __DIR__ . "/mailer.php";
 
-    $mail->setFrom("renzolinsangan11@gmail.com");
+    $mail->setFrom("talisaylms@gmail.com");
     $mail->addAddress($email);
     $mail->Subject = "Password Reset";
     $mail->Body = <<<END
