@@ -22,8 +22,10 @@ if (isset($_GET['class_id'])) {
   if ($teacher_data) {
     $class_name = $teacher_data['class_name'];
     $section = $teacher_data['section'];
+    $_SESSION['teacher_id '] = $teacher_data['teacher_id'];
+    $_SESSION['student_id'] = $teacher_data['student_id'];
 
-    $sql_enrolled_students = "SELECT student_firstname, student_lastname FROM class_enrolled WHERE class_name = ? AND section = ?";
+    $sql_enrolled_students = "SELECT student_firstname, student_lastname, student_id FROM class_enrolled WHERE class_name = ? AND section = ?";
     $stmt_enrolled_students = $conn->prepare($sql_enrolled_students);
     $stmt_enrolled_students->bind_param("ss", $class_name, $section);
     $stmt_enrolled_students->execute();
@@ -53,12 +55,13 @@ $stmt->close();
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+    crossorigin="anonymous"></script>
   <link rel="stylesheet" href="assets/css/class_people.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="assets/image/trace.svg" />
@@ -146,7 +149,6 @@ $stmt->close();
         </button>
       </div>
     </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -218,9 +220,31 @@ $stmt->close();
                     <div class="card-body">
                       <h2 style="margin-left: 20px; color: green;">Teachers</h2>
                       <hr class="divider" style="border-color: green;">
-                      <h4 class="mt-4" style="margin-left: 20px; font-weight: normal;">
-                        <?php echo strtoupper($teacher_data['first_name'] . ' ' . $teacher_data['last_name']); ?>
-                      </h4>
+                      <?php
+                      $sql_get_teacher_id = "SELECT user_id FROM user_account WHERE user_id = ?";
+                      $stmt_get_teacher_id = $conn->prepare($sql_get_teacher_id);
+                      $stmt_get_teacher_id->bind_param("i", $_SESSION['teacher_id']);
+                      $stmt_get_teacher_id->execute();
+                      $teacherId_result = $stmt_get_teacher_id->get_result();
+                      $teacherId_data = $teacherId_result->fetch_assoc();
+
+                      if($teacherId_data)
+                      {
+                        $teacher_id = $teacherId_data['user_id'];
+                        ?>
+                          <h4 class="mt-4 d-flex justify-content-between" style="margin-left: 20px; font-weight: normal;">
+                          <span>
+                            <?php echo strtoupper($teacher_data['first_name'] . ' ' . $teacher_data['last_name']); ?>
+                          </span>
+                          <a href="teacherView_profile.php?user_id=<?php echo $teacher_id ?>" class="ml-auto mr-4">
+                            <div data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="View Profile">
+                              <i class="bi bi-person-circle" style="color: green; font-size: 20px;"></i>
+                            </div>
+                          </a>
+                        </h4>
+                      <?php
+                      }
+                      ?>
                     </div>
                   </div>
                 </div>
@@ -235,13 +259,23 @@ $stmt->close();
                       <hr class="divider" style="border-color: green;">
                       <?php
                       while ($student = $enrolled_students_result->fetch_assoc()) {
+                        $studentId = $student['student_id'];
+                        $isCurrentUser = ($_SESSION['user_id'] == $studentId);
+                      
                         ?>
-                        <h4 class="mt-4" style="margin-left: 20px; font-weight: normal;">
-                          <?php echo strtoupper($student['student_firstname'] . ' ' . $student['student_lastname']); ?>
-                          <hr class="divider" style="border-color: green; margin-left: -20px;">
+                        <h4 class="mt-4 d-flex justify-content-between" style="margin-left: 20px; font-weight: normal;">
+                          <span>
+                            <?php echo strtoupper($student['student_firstname'] . ' ' . $student['student_lastname']); ?>
+                          </span>
+                          <a href="<?php echo ($isCurrentUser) ? 'profile.php' : 'studentView_profile.php?user_id=' . $studentId; ?>" class="ml-auto mr-4">
+                            <div data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="View Profile">
+                              <i class="bi bi-person-circle" style="color: green; font-size: 20px;"></i>
+                            </div>
+                          </a>
                         </h4>
-                      <?php
-                      }
+                        <hr class="divider" style="border-color: green;">
+                        <?php
+                      }                      
                       ?>
                     </div>
                   </div>
@@ -284,11 +318,19 @@ $stmt->close();
       }
     });
   </script>
+  <script>
+    // Initialize tooltips
+    var tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(function (tooltip) {
+      new bootstrap.Tooltip(tooltip);
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
     crossorigin="anonymous"></script>
   <!-- container-scroller -->
   <!-- plugins:js -->

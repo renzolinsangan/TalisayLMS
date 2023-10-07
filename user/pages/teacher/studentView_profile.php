@@ -1,46 +1,47 @@
 <?php
 session_start();
+include("db_conn.php");
 
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../../user_login.php");
   exit();
 }
 
-include("db_conn.php");
 $teacher_id = $_SESSION['user_id'];
-
-if (isset($_GET['class_id'])) {
-  $class_id = $_GET['class_id'];
-
-  // Retrieve teacher information
-  $sql_teacher = "SELECT * FROM section WHERE class_id = ?";
-  $stmt_teacher = $conn->prepare($sql_teacher);
-  $stmt_teacher->bind_param("i", $class_id);
-  $stmt_teacher->execute();
-  $teacher_result = $stmt_teacher->get_result();
-  $teacher_data = $teacher_result->fetch_assoc();
-
-  if ($teacher_data) {
-    $class_name = $teacher_data['class_name'];
-    $section = $teacher_data['section'];
-
-    $sql_enrolled_students = "SELECT student_firstname, student_lastname, student_id FROM class_enrolled WHERE class_name = ? AND section = ?";
-    $stmt_enrolled_students = $conn->prepare($sql_enrolled_students);
-    $stmt_enrolled_students->bind_param("ss", $class_name, $section);
-    $stmt_enrolled_students->execute();
-    $enrolled_students_result = $stmt_enrolled_students->get_result();
-  }
-}
-
 $user_id = $_SESSION['user_id'];
 
-$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-$stmt = $conn->prepare($sql);
+$sql_profile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+$stmt = $conn->prepare($sql_profile);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $stmt->bind_result($profile);
 $stmt->fetch();
 $stmt->close();
+
+if (isset($_GET['user_id'])) {
+  $getUser_id = $_GET['user_id'];
+}
+
+$otherUser_id = $getUser_id;
+
+$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $otherUser_id);
+$stmt->execute();
+$stmt->bind_result($otherProfile);
+$stmt->fetch();
+$stmt->close();
+
+$sql_student_info = "SELECT address, firstname, middlename, lastname, grade_level, department, section, usertype FROM user_account WHERE user_id=?";
+$stmt = $conn->prepare($sql_student_info);
+
+if ($stmt) {
+  $stmt->bind_param("i", $otherUser_id);
+  $stmt->execute();
+  $stmt->bind_result($address, $firstname, $middlename, $lastname, $grade_level, $department, $section, $usertype);
+  $stmt->fetch();
+  $stmt->close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,14 +56,14 @@ $stmt->close();
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
-    crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="assets/css/people.css">
+  <!-- endinject -->
+  <!-- Plugin css for this page -->
+  <!-- End plugin css for this page -->
+  <!-- inject:css -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/profile.css">
+  <!-- endinject -->
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
@@ -73,6 +74,7 @@ $stmt->close();
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
             alt="logo" />Talisay LMS</a>
+        <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/trace.svg" alt="logo" /></a>
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <ul class="navbar-nav navbar-nav-right">
@@ -201,72 +203,110 @@ $stmt->close();
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
-        <div class="header-sticky" style="overflow-x: auto; white-space: nowrap;">
-          <div class="header-links">
-            <?php
-            if (isset($_GET['class_id'])) {
-              $class_id = $_GET['class_id'];
-              ?>
-              <a class="btn-success" href="course.php"><i class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-              <a href="class_course.php?class_id=<?php echo $class_id ?>" class="people"
-                style="margin-left: 2vh;">Stream</a>
-              <a href="class_classwork.php?class_id=<?php echo $class_id ?>" class="people">Classwork</a>
-              <a href="class_people.php?class_id=<?php echo $class_id ?>" class="nav-link active">People</a>
-              <?php
-            }
-            ?>
-          </div>
-        </div>
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-12 grid-margin stretch-card" style="margin-top: 10vh;">
+            <div class="col-md-12 grid-margin stretch-card">
               <div class="card">
-                <div class="row">
-                  <div class="col">
-                    <div class="card-body">
-                      <h2 style="margin-left: 20px; color: green;">Teachers</h2>
-                      <hr class="divider" style="border-color: green;">
-                      <h4 class="mt-4 d-flex justify-content-between" style="margin-left: 20px; font-weight: normal;">
-                        <span>
-                          <?php echo strtoupper($teacher_data['first_name'] . ' ' . $teacher_data['last_name']); ?>
-                        </span>
-                        <a href="profile.php" class="ml-auto mr-4">
-                          <div data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="View Profile">
-                            <i class="bi bi-person-circle" style="color: green; font-size: 20px;"></i>
+                <div class="card-body">
+                  <div class="row justify-content-between">
+                    <div class="col-md-3">
+                      <div class="circle-image"
+                        style="margin-left: 20px; background-image: url('<?php echo empty($otherProfile) ? '../student/images/profile.png' : '../student/assets/image/' . $otherProfile; ?>');">
+                      </div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center mt-3">
+                      <div class="col-md-12">
+                        <h2>
+                          <?php echo $firstname . " " . (!empty($middlename) ? strtoupper(substr($middlename, 0, 1)) . "." : "") . " " . $lastname ?>
+                        </h2>
+                        <h3 class="mt-2" style="color: green;">
+                          <?php echo strtoupper($department) ?>
+                        </h3>
+                        <p class="text-body-secondary">(
+                          <?php echo $usertype ?>)
+                        </p>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="d-flex flex-column justify-content-between h-100">
+                        <div></div>
+                        <div class="text-right">
+                          <button class="btn edit" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
+                            style="color: green;">
+                            + Add Student
+                          </button>
+                        </div>
+                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                                  Add Student</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                  aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <h3>Add
+                                  <?php echo $firstname . ' ' . $lastname ?> as your student.
+                                </h3>
+                                <p class="text-body-secondary">If you wish to cancel, press the x button.</p>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-success">Add</button>
+                              </div>
+                            </div>
                           </div>
-                        </a>
-                      </h4>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="row">
-                  <div class="col">
-                    <div class="card-body">
-                      <h2 style="margin-left: 20px; color: green;">Students</h2>
-                      <hr class="divider" style="border-color: green;">
-                      <?php
-                      while ($student = $enrolled_students_result->fetch_assoc()) {
-                        ?>
-                        <h4 class="mt-4 d-flex justify-content-between" style="margin-left: 20px; font-weight: normal;">
-                          <span>
-                            <?php echo strtoupper($student['student_firstname'] . ' ' . $student['student_lastname']); ?>
-                          </span>
-                          <a href="studentView_profile.php?user_id=<?php echo $student['student_id'] ?>" class="ml-auto mr-4 mb-2">
-                            <div data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="View Profile">
-                              <i class="bi bi-person-circle" style="color: green; font-size: 20px;"></i>
-                            </div>
-                          </a>
-                        </h4>
-                        <hr class="divider" style="border-color: green;">
-                        <?php
-                      }
-                      ?>
+            <div class="row">
+              <div class="col-md-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row justify-content-left align-items-center">
+                      <div class="col-md-3">
+                        <h3>
+                          <?php echo ucfirst($usertype) ?> Information
+                        </h3>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <hr class="mt-3" style="border-top: 2px solid black;">
+                      </div>
+                    </div>
+                    <div class="row justify-content-left align-items-center">
+                      <div class="col-md-5">
+                        <h3 class="mb-3">Basic Information</h3>
+                        <ul>
+                          <li>
+                            <p>Department:
+                              <?php echo strtoupper($department) ?>
+                            </p>
+                          </li>
+                          <li>
+                            <p>Section:
+                              <?php echo $section ?>
+                            </p>
+                          </li>
+                          <li>
+                            <p>Year Level:
+                              <?php echo $grade_level ?>
+                            </p>
+                          </li>
+                          <li>
+                            <p>House Address:
+                              <?php echo $address ?>
+                            </p>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -275,66 +315,19 @@ $stmt->close();
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- content-wrapper ends -->
-  </div>
-  <!-- main-panel ends -->
-  </div>
-  <!-- page-body-wrapper ends -->
-  </div>
-
-  <script>
-    var form = document.getElementById('myForm');
-    var validationAlert = document.getElementById('validationAlert');
-
-    form.addEventListener('submit', function (event) {
-      var classnameInput = form.querySelector('input[name="class_name"]');
-      var sectionInput = form.querySelector('input[name="section"]');
-      var subjectInput = form.querySelector('input[name="subject"]');
-      var strandDropdown = form.querySelector('select[name="strand"]');
-
-      if (classnameInput.value === '' || sectionInput.value === '' ||
-        subjectInput.value === '' || strandDropdown.value === '') {
-        event.preventDefault();
-        validationAlert.style.display = 'block';
-
-        // Scroll to the top
-        setTimeout(function () {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          // Focus on the alert element
-          validationAlert.focus();
-        }, 100);
-      }
-    });
-  </script>
-  <script>
-    // Initialize tooltips
-    var tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltips.forEach(function (tooltip) {
-      new bootstrap.Tooltip(tooltip);
-    });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+        crossorigin="anonymous"></script>
+      <script src="../../vendors/js/vendor.bundle.base.js"></script>
+      <script src="../../js/off-canvas.js"></script>
+      <script src="../../js/hoverable-collapse.js"></script>
+      <script src="../../js/template.js"></script>
+      <script src="../../js/settings.js"></script>
+      <script src="../../js/todolist.js"></script>
 </body>
 
 </html>
