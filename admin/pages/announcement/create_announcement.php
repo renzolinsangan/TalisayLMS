@@ -8,21 +8,46 @@ if (!isset($_SESSION['id'])) {
 }
 if (isset($_POST['submit'])) {
     $title = $_POST['title'];
-    $type = $_POST['type'];
     $track = $_POST['track'];
     $startDate = $_POST['start_date'];
     $endDate = $_POST['end_date'];
     $detail = $_POST['detail'];
-    $attachment = $_POST['attachment'];
+    $name = $_POST['name'];
+    $date = date('Y-m-d');
 
-    $sql = "INSERT INTO news (title, type, track, start_date, end_date, detail, attachment) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $stmtinsert = $db->prepare($sql);
-    $result = $stmtinsert->execute([$title, $type, $track, $startDate, $endDate, $detail, $attachment]);
+    // Check if a file was uploaded
+    if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === 0) {
+        $file = $_FILES['attachment'];
 
-    if ($result) {
-        header("Location: announcement.php?msg=Announcement created successfully!");
+        // Validate that it's an image
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+        $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (in_array($fileExtension, $allowedExtensions)) {
+            // Generate a unique filename and save the image
+            $uniqueFilename = uniqid('picture_') . '.' . $fileExtension;
+            $uploadDirectory = 'assets/image/announcement_upload/';
+            $uploadPath = $uploadDirectory . $uniqueFilename;
+
+            if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+                // File was successfully uploaded, proceed with database insertion
+                $sql = "INSERT INTO news (title, name, date, track, start_date, end_date, detail, attachment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $stmtinsert = $db->prepare($sql);
+                $result = $stmtinsert->execute([$title, $name, $date, $track, $startDate, $endDate, $detail, $uniqueFilename]);
+
+                if ($result) {
+                    header("Location: announcement.php?msg=Announcement created successfully!");
+                } else {
+                    echo "Failed: " . mysqli_error($conn);
+                }
+            } else {
+                echo "Failed to move the uploaded file.";
+            }
+        } else {
+            echo "Invalid file type. Please upload an image (jpg, jpeg, png, gif).";
+        }
     } else {
-        echo "Failed: " . mysqli_error($conn);
+        echo "No file was uploaded.";
     }
 }
 ?>
@@ -55,7 +80,7 @@ if (isset($_POST['submit'])) {
 
             <section class="content">
                 <div class="container d-flex justify-content-center">
-                    <form action="" method="post" style="width: 50vw; min-width: 300px;">
+                    <form action="" method="post" enctype="multipart/form-data" style="width: 50vw; min-width: 300px;">
                         <div class="row" style="flex: 1; padding-bottom: 8vh;">
                             <div class="col-mb-4">
                                 <div class="alert alert-danger alert-dismissible fade show" id="validationAlert"
@@ -66,22 +91,15 @@ if (isset($_POST['submit'])) {
 
                             <div></div>
                             <div class="col mb-4">
-                                <label class="form-label">Topic Title</label>
+                                <label class="form-label">Announcement Title</label>
                                 <input type="text" class="form-control" name="title">
                             </div>
 
                             <div class="div"></div>
 
                             <div class="col mb-4">
-                                <label class="form-label">Type</label>
-                                <div class="select-with-icon">
-                                    <select name="type" id="type" class="form-control custom-select lightened-select">
-                                        <option disabled selected value=""></option>
-                                        <option value="announcement">Announcement</option>
-                                        <option value="news">News</option>
-                                    </select>
-                                    <i class="bi bi-chevron-down select-icon"></i>
-                                </div>
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" name="name">
                             </div>
 
                             <div class="col mb-4">
@@ -139,9 +157,9 @@ if (isset($_POST['submit'])) {
 
                             <div></div>
                             <div class="col mb-5 d-flex align-items-center">
-                                <label class="form-label" style="margin-right: 10px;">Attachment: </label>
-                                <input class="form-control custom-input" type="file" name="attachment"
-                                    id="formFileMultiple" multiple style="width: 36%;">
+                                <label class="form-label" style="margin-right: 10px;">Attachment (Image Only): </label>
+                                <input class="form-control custom-input" type="file" name="attachment" id="imageUpload"
+                                    accept="image/*" multiple style="width: 36%;">
                             </div>
 
                             <div class="col-12 d-flex justify-content-end mt-4">
@@ -170,7 +188,7 @@ if (isset($_POST['submit'])) {
         form.addEventListener('submit', function (event) {
             // Get the input fields and text area
             var titleInput = document.querySelector('input[name="title"]');
-            var typeDropdown = document.querySelector('select[name="type"]');
+            var nameInput = document.querySelector('input[name="name"]');
             var divisionDropdown = document.querySelector('select[name="track"]');
             var startDateDropdown = document.querySelector('select[name="start_date"]');
             var endDateDropdown = document.querySelector('select[name="end_date"]');
@@ -185,11 +203,11 @@ if (isset($_POST['submit'])) {
                 titleInput.classList.remove('is-invalid'); // Remove the class if it's valid
             }
 
-            if (typeDropdown.value === '') {
+            if (nameInput.value.trim() === '') {
                 isEmpty = true;
-                typeDropdown.classList.add('is-invalid'); // Add a class to highlight the invalid input
+                nameInput.classList.add('is-invalid');
             } else {
-                typeDropdown.classList.remove('is-invalid'); // Remove the class if it's valid
+                nameInput.classList.remove('is-invalid');
             }
 
             if (divisionDropdown.value === '') {
@@ -201,16 +219,16 @@ if (isset($_POST['submit'])) {
 
             if (startDateDropdown.value === '') {
                 isEmpty = true;
-                startDateDropdown.classList.add('is-invalid'); // Add a class to highlight the invalid input
+                startDateDropdown.classList.add('is-invalid');
             } else {
-                startDateDropdown.classList.remove('is-invalid'); // Remove the class if it's valid
+                startDateDropdown.classList.remove('is-invalid');
             }
 
             if (endDateDropdown.value === '') {
                 isEmpty = true;
-                endDateDropdown.classList.add('is-invalid'); // Add a class to highlight the invalid input
+                endDateDropdown.classList.add('is-invalid');
             } else {
-                endDateDropdown.classList.remove('is-invalid'); // Remove the class if it's valid
+                endDateDropdown.classList.remove('is-invalid');
             }
 
             if (detailTextArea.value.trim() === '') {
@@ -221,8 +239,9 @@ if (isset($_POST['submit'])) {
             }
 
             // Check if any required fields are empty
-            if (titleInput.value === '' || typeDropdown.value === '' || divisionDropdown.value === '' ||
-                startDateDropdown.value === '' || endDateDropdown.value === '' || detailTextArea.value === '') {
+            if (titleInput.value === '' || typeDropdown.value === '' ||
+                startDateDropdown.value === '' || endDateDropdown === '' ||
+                divisionDropdown.value === '' || detailTextArea.value === '') {
                 // Prevent form submission
                 event.preventDefault();
 
@@ -236,6 +255,21 @@ if (isset($_POST['submit'])) {
                     // Focus on the alert element
                     validationAlert.focus();
                 }, 100); // Adjust the timeout value as needed
+            }
+        });
+    </script>
+    <script>
+        // Add an event listener to the file input
+        document.getElementById("imageUpload").addEventListener("change", function () {
+            var files = this.files;
+            var validExtensions = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+
+            for (var i = 0; i < files.length; i++) {
+                if (validExtensions.indexOf(files[i].type) === -1) {
+                    alert("Invalid file type. Please upload an image (jpg, jpeg, png, gif).");
+                    this.value = ""; // Clear the input
+                    return false;
+                }
             }
         });
     </script>

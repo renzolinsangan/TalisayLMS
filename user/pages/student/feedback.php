@@ -274,7 +274,9 @@ $stmt->closeCursor();
                         </span>
                       </div>
                     </div>
-                    <button class="btn btn-danger" style="margin-right: 2vh;">Cancel</button>
+                    <a href="index.php">
+                      <span class="btn btn-danger" style="margin-right: 2vh;">Cancel</span>
+                    </a>
                     <button type="submit" name="submit" class="btn btn-success mr-2">Submit</button>
                   </form>
                 </div>

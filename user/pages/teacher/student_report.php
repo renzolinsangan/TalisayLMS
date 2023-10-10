@@ -216,7 +216,7 @@ $stmt->close();
         </div>
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-12 grid-margin stretch-card" style="margin-left: -20px;">
+            <div class="col-12 grid-margin stretch-card">
               <div class="card">
                 <div class="row">
                   <div class="col-md-6">

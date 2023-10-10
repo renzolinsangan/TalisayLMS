@@ -16,6 +16,14 @@ $stmt->execute();
 $stmt->bind_result($profile);
 $stmt->fetch();
 $stmt->close();
+
+$sql_department = "SELECT department FROM user_account WHERE user_id = ?";
+$stmt_department = $conn->prepare($sql_department);
+$stmt_department->bind_param("i", $user_id);
+$stmt_department->execute();
+$stmt_department->bind_result($department);
+$stmt_department->fetch();
+$stmt_department->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -491,56 +499,32 @@ $stmt->close();
               <div class="card">
                 <div class="card-body">
                   <?php
-                  $sql = "SELECT * FROM news WHERE type='announcement'";
-                  $result = mysqli_query($conn, $sql);
-                  $totalAnnouncement = mysqli_num_rows($result);
-                  ?>
-                  <p class="card-title mb-0">Announcements <span class="text-body-secondary">(
-                      <?php echo $totalAnnouncement ?>)
-                    </span></p>
-                  <?php
-                  while ($row = mysqli_fetch_assoc($result)) {
-                    ?>
-                    <a href="pages/feedback/feedback.php">
-                      <h3 style="margin-top: 2vh;">
-                        <?php echo $row['title'] ?>
-                      </h3>
-                      <p class="text-body-secondary">
-                        <?php echo $row['detail'] ?>
-                      </p>
-                      <p>
-                        <?php echo $row['start_date'] ?>
-                      </p>
-                    </a>
-                    <?php
+                  $currentDate = date("Y-m-d");
+                  $userStrand = $department;
+
+                  if ($userStrand == "all") {
+                    $sql = "SELECT * FROM news WHERE end_date >= '$currentDate'";
+                  } else {
+                    $sql = "SELECT * FROM news WHERE (track = 'all' OR track = '$userStrand') AND end_date >= '$currentDate'";
                   }
-                  ?>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4 stretch-card grid-margin">
-              <div class="card">
-                <div class="card-body">
-                  <?php
-                  $sql = "SELECT * FROM news WHERE type='news'";
                   $result = mysqli_query($conn, $sql);
                   $totalNews = mysqli_num_rows($result);
                   ?>
                   <p class="card-title mb-0">News <span class="text-body-secondary">(
-                      <?php echo $totalNews ?>)
+                      <?php echo $totalNews ?> )
                     </span></p>
                   <?php
                   while ($row = mysqli_fetch_assoc($result)) {
                     ?>
-                    <a href="pages/feedback/feedback.php">
+                    <a href="view_announcement.php?news_id=<?php $row['news_id'] ?>">
                       <h3 style="margin-top: 2vh;">
                         <?php echo $row['title'] ?>
                       </h3>
                       <p class="text-body-secondary">
-                        <?php echo $row['detail'] ?>
+                        <?php echo $row['date'] ?>
                       </p>
-                      <p>
-                        <?php echo $row['start_date'] ?>
+                      <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                        <?php echo $row['detail'] ?>
                       </p>
                     </a>
                     <?php

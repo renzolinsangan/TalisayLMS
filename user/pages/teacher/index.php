@@ -18,6 +18,14 @@ $stmt->bind_result($profile);
 $stmt->fetch();
 $stmt->close();
 
+$sql_department = "SELECT department FROM user_account WHERE user_id = ?";
+$stmt_department = $conn->prepare($sql_department);
+$stmt_department->bind_param("i", $user_id);
+$stmt_department->execute();
+$stmt_department->bind_result($department);
+$stmt_department->fetch();
+$stmt_department->close();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -500,56 +508,35 @@ $stmt->close();
               <div class="card">
                 <div class="card-body">
                   <?php
-                  $sql = "SELECT * FROM news WHERE type='announcement'";
+                  $currentDate = date("Y-m-d");
+                  $userStrand = $department;
+
+                  if ($userStrand == "all") {
+                    $sql = "SELECT * FROM news WHERE end_date >= '$currentDate'";
+                  } else {
+                    $sql = "SELECT * FROM news WHERE (track = 'all' OR track = '$userStrand') AND end_date >= '$currentDate'";
+                  }
+
                   $result = mysqli_query($conn, $sql);
                   $totalAnnouncement = mysqli_num_rows($result);
                   ?>
-                  <p class="card-title mb-0">Announcements <span class="text-body-secondary">(
-                      <?php echo $totalAnnouncement ?>)
-                    </span></p>
-                  <?php
-                  while ($row = mysqli_fetch_assoc($result)) {
-                    ?>
-                    <a href="pages/feedback/feedback.php">
-                      <h3 style="margin-top: 2vh;">
-                        <?php echo $row['title'] ?>
-                      </h3>
-                      <p class="text-body-secondary">
-                        <?php echo $row['detail'] ?>
-                      </p>
-                      <p>
-                        <?php echo $row['start_date'] ?>
-                      </p>
-                    </a>
-                    <?php
-                  }
-                  ?>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4 stretch-card grid-margin">
-              <div class="card">
-                <div class="card-body">
-                  <?php
-                  $sql = "SELECT * FROM news WHERE type='news'";
-                  $result = mysqli_query($conn, $sql);
-                  $totalNews = mysqli_num_rows($result);
-                  ?>
+
                   <p class="card-title mb-0">News <span class="text-body-secondary">(
-                      <?php echo $totalNews ?>)
+                      <?php echo $totalAnnouncement ?> )
                     </span></p>
+
                   <?php
                   while ($row = mysqli_fetch_assoc($result)) {
                     ?>
-                    <a href="pages/feedback/feedback.php">
+                    <a href="view_announcement.php?news_id=<?php echo $row['news_id'] ?>">
                       <h3 style="margin-top: 2vh;">
                         <?php echo $row['title'] ?>
                       </h3>
                       <p class="text-body-secondary">
-                        <?php echo $row['detail'] ?>
+                        <?php echo $row['date'] ?>
                       </p>
-                      <p>
-                        <?php echo $row['start_date'] ?>
+                      <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                        <?php echo $row['detail'] ?>
                       </p>
                     </a>
                     <?php
@@ -558,47 +545,27 @@ $stmt->close();
                 </div>
               </div>
             </div>
-          </div>
-          <!-- content-wrapper ends -->
-          <!-- partial:partials/_footer.html -->
-          <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021. Premium <a
-                  href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash.
-                All rights reserved.</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i
-                  class="ti-heart text-danger ml-1"></i></span>
-            </div>
-          </footer>
-          <!-- partial -->
-        </div>
-        <!-- main-panel ends -->
-      </div>
-      <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
+            <!-- plugins:js -->
+            <script src="vendors/js/vendor.bundle.base.js"></script>
+            <!-- endinject -->
+            <!-- Plugin js for this page -->
+            <script src="vendors/chart.js/Chart.min.js"></script>
+            <script src="vendors/datatables.net/jquery.dataTables.js"></script>
+            <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
+            <script src="js/dataTables.select.min.js"></script>
 
-    <!-- plugins:js -->
-    <script src="vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <script src="vendors/chart.js/Chart.min.js"></script>
-    <script src="vendors/datatables.net/jquery.dataTables.js"></script>
-    <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
-    <script src="js/dataTables.select.min.js"></script>
-
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="js/off-canvas.js"></script>
-    <script src="js/hoverable-collapse.js"></script>
-    <script src="js/template.js"></script>
-    <script src="js/settings.js"></script>
-    <script src="js/todolist.js"></script>
-    <!-- endinject -->
-    <!-- Custom js for this page-->
-    <script src="js/dashboard.js"></script>
-    <script src="js/Chart.roundedBarCharts.js"></script>
-    <!-- End custom js for this page-->
+            <!-- End plugin js for this page -->
+            <!-- inject:js -->
+            <script src="js/off-canvas.js"></script>
+            <script src="js/hoverable-collapse.js"></script>
+            <script src="js/template.js"></script>
+            <script src="js/settings.js"></script>
+            <script src="js/todolist.js"></script>
+            <!-- endinject -->
+            <!-- Custom js for this page-->
+            <script src="js/dashboard.js"></script>
+            <script src="js/Chart.roundedBarCharts.js"></script>
+            <!-- End custom js for this page-->
 </body>
 
 </html>

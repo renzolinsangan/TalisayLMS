@@ -8,12 +8,16 @@ if (!isset($_SESSION['id'])) {
 }
 
 $id = $_GET['updateid'];
-$sql = "SELECT * FROM news WHERE news_id=$id";
-$result = mysqli_query($conn, $sql);
+$sql = "SELECT * FROM news WHERE news_id=?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 $row = mysqli_fetch_assoc($result);
 
 $title = $row['title'];
-$type = $row['type'];
+$name = $row['name'];
+$date = $row['date'];
 $track = $row['track'];
 $startDate = $row['start_date'];
 $endDate = $row['end_date'];
@@ -22,20 +26,54 @@ $attachment = $row['attachment'];
 
 if (isset($_POST['submit'])) {
     $title = $_POST['title'];
-    $type = $_POST['type'];
+    $name = $_POST['name'];
+    $date = date("Y-m-d");
     $track = $_POST['track'];
-    $startDate = $_POST['start_date'];
-    $endDate = $_POST['end_date'];
+    $startDate = isset($_POST['start_date']) ? $_POST['start_date'] : null;
+    $endDate = isset($_POST['end_date']) ? $_POST['end_date'] : null;
     $detail = $_POST['detail'];
-    $attachment = $_POST['attachment'];
 
-    $sql = "UPDATE news SET title='$title', type='$type', track='$track', start_date='$startDate', end_date='$endDate', detail='$detail', attachment='$attachment' WHERE news_id=$id";
-    $result = mysqli_query($conn, $sql);
+    // Check if a new image file is uploaded
+    if (!empty($_FILES['attachment']['name'])) {
+        // New image file is uploaded
+        $attachment = basename($_FILES['attachment']['name']);
 
-    if ($result) {
-        header("Location: announcement.php?msg=Announcement Updated Successfully!");
+        // Upload the new image file and update the database
+        $uploadDirectory = 'assets/image/announcement_upload/';
+        $uploadPath = $uploadDirectory . $attachment;
+
+        // Check if the file is an image
+        $fileExtension = strtolower(pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg'];
+
+        if (in_array($fileExtension, $allowedExtensions)) {
+            if (move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadPath)) {
+                // File uploaded successfully, update the attachment field in the database
+                $sql = "UPDATE news SET title=?, name=?, date=?, track=?, start_date=?, end_date=?, detail=?, attachment=? WHERE news_id=?";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "ssssssssi", $title, $name, $date, $track, $startDate, $endDate, $detail, $attachment, $id);
+                if (mysqli_stmt_execute($stmt)) {
+                    header("Location: announcement.php?msg=Announcement Updated Successfully!");
+                } else {
+                    echo "Failed: " . mysqli_error($conn);
+                }
+            } else {
+                echo "Failed to upload the file.";
+            }
+        } else {
+            echo "Invalid file format. Please upload a valid image file.";
+        }
     } else {
-        echo "Failed: " . mysqli_error($conn);
+        // No new image file is uploaded, retain the existing image filename
+        $sql = "UPDATE news SET title=?, name=?, date=?, track=?, start_date=?, end_date=?, detail=? WHERE news_id=?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "sssssssi", $title, $name, $date, $track, $startDate, $endDate, $detail, $id);
+
+        if (mysqli_stmt_execute($stmt)) {
+            header("Location: announcement.php?msg=Announcement Updated Successfully!");
+        } else {
+            echo "Failed: " . mysqli_error($conn);
+        }
     }
 }
 ?>
@@ -68,7 +106,7 @@ if (isset($_POST['submit'])) {
 
             <section class="content">
                 <div class="container d-flex justify-content-center">
-                    <form action="" method="post" style="width: 50vw; min-width: 300px;">
+                    <form action="" method="post" enctype="multipart/form-data" style="width: 50vw; min-width: 300px;">
                         <div class="row" style="flex: 1; padding-bottom: 8vh;">
                             <div class="col-mb-4">
                                 <div class="alert alert-danger alert-dismissible fade show" id="validationAlert"
@@ -79,24 +117,15 @@ if (isset($_POST['submit'])) {
 
                             <div></div>
                             <div class="col mb-4">
-                                <label class="form-label">Topic Title</label>
-                                <input type="text" class="form-control" name="title" value=<?php echo $title ?>>
+                                <label class="form-label">Announcement Title</label>
+                                <input type="text" class="form-control" name="title" value="<?php echo $title ?>">
                             </div>
 
                             <div class="div"></div>
 
                             <div class="col mb-4">
-                                <label class="form-label">Type</label>
-                                <div class="select-with-icon">
-                                    <select name="type" id="type" class="form-control custom-select lightened-select">
-                                        <option disabled selected value=""></option>
-                                        <option value="announcement" <?php if ($type === 'announcement')
-                                            echo 'selected'; ?>>Announcement</option>
-                                        <option value="news" <?php if ($type === 'news')
-                                            echo 'selected'; ?>>News</option>
-                                    </select>
-                                    <i class="bi bi-chevron-down select-icon"></i>
-                                </div>
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" name="name" value="<?php echo $name ?>">
                             </div>
 
                             <div class="col mb-4">
@@ -129,14 +158,15 @@ if (isset($_POST['submit'])) {
                                 <div class="select-with-icon">
                                     <select name="start_date" id="start_date"
                                         class="form-control custom-select lightened-select">
-                                        <option disabled selected value=""></option>
+                                        <option disabled value=""></option>
                                         <?php
                                         $startDateTimestamp = strtotime($startDate); // Convert the database date to a timestamp
                                         
-                                        // Generate options for the next 30 days starting from the selected start date
+                                        // Generate options for the next 30 days starting from the current date
+                                        $currentDate = date('Y-m-d'); // Get the current date
                                         for ($i = 0; $i < 30; $i++) {
-                                            $date = date('Y-m-d', strtotime("+$i days", $startDateTimestamp));
-                                            $selected = ($date === $startDate) ? 'selected' : '';
+                                            $date = date('Y-m-d', strtotime("+$i days", strtotime($currentDate)));
+                                            $selected = ($date === $startDate) ? 'selected' : ''; // Add the selected attribute if it matches the database value
                                             echo "<option value=\"$date\" $selected>$date</option>";
                                         }
                                         ?>
@@ -176,27 +206,40 @@ if (isset($_POST['submit'])) {
                             <div class="col mb-5 d-flex align-items-center">
                                 <label class="form-label" style="margin-right: 10px;">Attachment: </label>
                                 <?php
+                                // Retrieve the attachment file name from the database
                                 $attachment = $row['attachment'];
+
                                 if (!empty($attachment)) {
-                                    $fileExtension = pathinfo($attachment, PATHINFO_EXTENSION);
-                                    if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'svg'])) {
-                                        echo '<img src="assets/image/' . $attachment . '" width="100" height="100" style="border-radius: 10px; margin-right: 10px;">';
+                                    // Check if the attachment file exists in the directory
+                                    $attachmentPath = 'assets/image/announcement_upload/' . $attachment;
+                                    if (file_exists($attachmentPath)) {
+                                        // Check if the file is an image based on its extension
+                                        $fileExtension = strtolower(pathinfo($attachment, PATHINFO_EXTENSION));
+                                        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg'];
+
+                                        if (in_array($fileExtension, $allowedExtensions)) {
+                                            // Display the image
+                                            echo '<img src="' . $attachmentPath . '" width="100" height="100" style="border-radius: 10px; margin-right: 10px;">';
+                                        } else {
+                                            // Display a link or icon for non-image attachments
+                                            echo '<i class="bi bi-file-earmark"></i> ' . $attachment;
+                                        }
                                     } else {
-                                        echo '<i class="bi bi-file-earmark"></i> ' . $attachment;
+                                        echo 'Attachment not found.';
                                     }
                                 } else {
                                     echo 'No attachment.';
                                 }
                                 ?>
                                 <input class="form-control custom-input" type="file" name="attachment"
-                                    id="formFileMultiple" multiple style="width: 36%;">
+                                    id="formFileMultiple" accept="image/*" style="width: 36%;">
                             </div>
 
                             <div class="col-12 d-flex justify-content-end mt-4">
                                 <a href="announcement.php" class="btn btn-outline-danger"
                                     style="padding: 7px; font-size: 15px; margin-right: 2vh;">Cancel</a>
                                 <button type="submit" class="btn btn-outline-success" name="submit"
-                                    style="padding: 7px; font-size: 15px;">Create</button>
+                                    style="padding: 7px; font-size: 15px;">Update</button>
                             </div>
 
                         </div>
@@ -218,7 +261,7 @@ if (isset($_POST['submit'])) {
         form.addEventListener('submit', function (event) {
             // Get the input fields and text area
             var titleInput = document.querySelector('input[name="title"]');
-            var typeDropdown = document.querySelector('select[name="type"]');
+            var nameInput = document.querySelector('input[name="name"]');
             var divisionDropdown = document.querySelector('select[name="track"]');
             var startDateDropdown = document.querySelector('select[name="start_date"]');
             var endDateDropdown = document.querySelector('select[name="end_date"]');
@@ -233,11 +276,11 @@ if (isset($_POST['submit'])) {
                 titleInput.classList.remove('is-invalid'); // Remove the class if it's valid
             }
 
-            if (typeDropdown.value === '') {
+            if (nameInput.value.trim() === '') {
                 isEmpty = true;
-                typeDropdown.classList.add('is-invalid'); // Add a class to highlight the invalid input
+                nameInput.classList.add('is-invalid');
             } else {
-                typeDropdown.classList.remove('is-invalid'); // Remove the class if it's valid
+                nameInput.classList.remove('is-invalid');
             }
 
             if (divisionDropdown.value === '') {
@@ -249,16 +292,16 @@ if (isset($_POST['submit'])) {
 
             if (startDateDropdown.value === '') {
                 isEmpty = true;
-                startDateDropdown.classList.add('is-invalid'); // Add a class to highlight the invalid input
+                startDateDropdown.classList.add('is-invalid');
             } else {
-                startDateDropdown.classList.remove('is-invalid'); // Remove the class if it's valid
+                startDateDropdown.classList.remove('is-invalid');
             }
 
             if (endDateDropdown.value === '') {
                 isEmpty = true;
-                endDateDropdown.classList.add('is-invalid'); // Add a class to highlight the invalid input
+                endDateDropdown.classList.add('is-invalid');
             } else {
-                endDateDropdown.classList.remove('is-invalid'); // Remove the class if it's valid
+                endDateDropdown.classList.remove('is-invalid');
             }
 
             if (detailTextArea.value.trim() === '') {
@@ -269,8 +312,9 @@ if (isset($_POST['submit'])) {
             }
 
             // Check if any required fields are empty
-            if (titleInput.value === '' || typeDropdown.value === '' || divisionDropdown.value === '' ||
-                startDateDropdown.value === '' || endDateDropdown.value === '' || detailTextArea.value === '') {
+            if (titleInput.value === '' || typeDropdown.value === '' ||
+                startDateDropdown.value === '' ||endDateDropdown.value === '' ||
+                divisionDropdown.value === '' || detailTextArea.value === '') {
                 // Prevent form submission
                 event.preventDefault();
 

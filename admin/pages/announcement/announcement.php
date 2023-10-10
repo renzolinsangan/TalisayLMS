@@ -193,7 +193,8 @@ if (!isset($_SESSION['id'])) {
                           <thead class="table" style="background-color: #4BB543; color: white;">
                             <tr>
                               <th scope="col">Title</th>
-                              <th scope="col">Type</th>
+                              <th scope="col">Name</th>
+                              <th scope="col">Date</th>
                               <th scope="col">Division/Track</th>
                               <th scope="col">Start Date</th>
                               <th scope="col">End Date</th>
@@ -212,11 +213,14 @@ if (!isset($_SESSION['id'])) {
                             while ($row = mysqli_fetch_assoc($result)) {
                               ?>
                               <tr>
-                                <td>
+                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
                                   <?php echo $row['title'] ?>
                                 </td>
                                 <td>
-                                  <?php echo $row['type'] ?>
+                                  <?php echo $row['name'] ?>
+                                </td>
+                                <td>
+                                  <?php echo $row['date'] ?>
                                 </td>
                                 <td>
                                   <?php echo $row['track'] ?>
@@ -227,7 +231,7 @@ if (!isset($_SESSION['id'])) {
                                 <td>
                                   <?php echo $row['end_date'] ?>
                                 </td>
-                                <td>
+                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
                                   <?php echo $row['detail'] ?>
                                 </td>
                                 <td>
@@ -239,7 +243,7 @@ if (!isset($_SESSION['id'])) {
 
                                   if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif', 'svg'])) {
                                     // Display image
-                                    echo '<img src="assets/image/' . $attachment . '" width="100" height="100" style="border-radius: 10px;">';
+                                    echo '<img src="assets/image/announcement_upload/' . $attachment . '" width="100" height="100" style="border-radius: 10px;">';
                                   } elseif (in_array($fileExtension, ['pdf', 'docx', 'ppt'])) {
                                     // Display file icon or link
                                     echo '<a href="assets/image/' . $attachment . '" target="_blank"><i class="bi bi-file-earmark"></i></a>';
@@ -273,18 +277,18 @@ if (!isset($_SESSION['id'])) {
       </div>
     </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>
