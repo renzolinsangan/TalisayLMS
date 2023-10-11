@@ -239,7 +239,7 @@ if (isset($_POST['submit'])) {
             }
 
             // Check if any required fields are empty
-            if (titleInput.value === '' || typeDropdown.value === '' ||
+            if (titleInput.value === '' || divisionDropdown.value === '' ||
                 startDateDropdown.value === '' || endDateDropdown === '' ||
                 divisionDropdown.value === '' || detailTextArea.value === '') {
                 // Prevent form submission
