@@ -27,7 +27,7 @@ if ($teacher_id) {
     $first_name = $class_info['first_name'];
     $last_name = $class_info['last_name'];
 
-    $sql_get_assignment_info = "SELECT title, instruction, point, due_date, time, link, file, youtube FROM classwork_assignment WHERE teacher_id=? AND assignment_id=?";
+    $sql_get_assignment_info = "SELECT title, instruction, point, due_date, time, link, file, youtube, assignment_status FROM classwork_assignment WHERE teacher_id=? AND assignment_id=?";
     $stmt_get_assignment_info = $db->prepare($sql_get_assignment_info);
     $stmt_get_assignment_info->execute([$teacher_id, $assignment_id]);
     $assignment_data = $stmt_get_assignment_info->fetch(PDO::FETCH_ASSOC);
@@ -42,6 +42,7 @@ if ($teacher_id) {
       $link = $assignment_data['link'];
       $file = $assignment_data['file'];
       $youtube = $assignment_data['youtube'];
+      $assignment_status = $assignment_data['assignment_status'];
 
       $fileDirectory = "../teacher/assets/uploads/";
       $filePath = $fileDirectory . $file;
@@ -161,79 +162,6 @@ if (isset($_POST['file_submit'])) {
           <?php echo $instruction ?>
         </div>
       </div>
-      <div class="row justify-content-left align-items-center">
-        <?php if (!empty($filePath) && !empty($file)) {
-          ?>
-          <div class="col-md-3 mt-5" style="margin-right: 15vh;">
-            <div class="card">
-              <a href="<?php echo $filePath; ?>" style="text-decoration: none; margin-left: 30px;">
-                <div class="row mt-3" style="margin-bottom: -15px;">
-                  <div class="col-md-9">
-                    <p
-                      style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                      <?php echo $file ?>
-                    </p>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-md-9 text-body-secondary">
-                    <?php echo strtoupper(pathinfo($file, PATHINFO_EXTENSION)); ?>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-          <?php
-        }
-        ?>
-        <?php if (!empty($link) && $link != 'null') {
-          ?>
-          <div class="col-md-3 mt-5" style="margin-right: 15vh;">
-            <div class="card">
-              <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none; margin-left: 30px;">
-                <div class="row mt-3" style="margin-bottom: -15px;">
-                  <div class="col-md-9">
-                    <p
-                      style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                      <?php echo $link ?>
-                    </p>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-md-9 text-body-secondary">
-                    LINK
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-          <?php
-        }
-        ?>
-        <?php if (!empty($youtube) && $youtube != 'null') { ?>
-          <div class="col-md-3 mt-5">
-            <div class="card">
-              <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none; margin-left: 30px;">
-                <div class="row mt-3" style="margin-bottom: -15px;">
-                  <div class="col-md-9">
-                    <p
-                      style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                      <?php echo $youtube ?>
-                    </p>
-                  </div>
-                </div>
-                <div class="row mb-3">
-                  <div class="col-md-9 text-body-secondary">
-                    YOUTUBE LINK
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-          <?php
-        }
-        ?>
-      </div>
       <form action="" method="post">
         <div class="row justify-content-left align-items-center mb-5" id="submit-card">
           <div class="col-md-8"></div>
@@ -244,7 +172,7 @@ if (isset($_POST['file_submit'])) {
                   <h5>Your Work</h5>
                 </div>
                 <div class="col text-end mt-4" style="margin-right: 25px;">
-                  <p class="text-body-secondary">Assigned</p>
+                  <p class="text-body-secondary"><?php echo ucfirst($assignment_status) ?></p>
                 </div>
               </div>
               <?php
@@ -365,6 +293,79 @@ if (isset($_POST['file_submit'])) {
           </div>
         </div>
       </form>
+      <div class="row justify-content-left align-items-center">
+        <?php if (!empty($filePath) && !empty($file)) {
+          ?>
+          <div class="col-md-3" style="margin-right: 15vh;">
+            <div class="card">
+              <a href="<?php echo $filePath; ?>" style="text-decoration: none; margin-left: 30px;">
+                <div class="row mt-3" style="margin-bottom: -15px;">
+                  <div class="col-md-9">
+                    <p
+                      style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                      <?php echo $file ?>
+                    </p>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-9 text-body-secondary">
+                    <?php echo strtoupper(pathinfo($file, PATHINFO_EXTENSION)); ?>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <?php
+        }
+        ?>
+        <?php if (!empty($link) && $link != 'null') {
+          ?>
+          <div class="col-md-3" style="margin-right: 15vh;">
+            <div class="card">
+              <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none; margin-left: 30px;">
+                <div class="row mt-3" style="margin-bottom: -15px;">
+                  <div class="col-md-9">
+                    <p
+                      style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                      <?php echo $link ?>
+                    </p>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-9 text-body-secondary">
+                    LINK
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <?php
+        }
+        ?>
+        <?php if (!empty($youtube) && $youtube != 'null') { ?>
+          <div class="col-md-3">
+            <div class="card">
+              <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none; margin-left: 30px;">
+                <div class="row mt-3" style="margin-bottom: -15px;">
+                  <div class="col-md-9">
+                    <p
+                      style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                      <?php echo $youtube ?>
+                    </p>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-9 text-body-secondary">
+                    YOUTUBE LINK
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+          <?php
+        }
+        ?>
+      </div>
     </div>
   </div>
   <form action="" method="post" class="form-link" id="myLinkForm">

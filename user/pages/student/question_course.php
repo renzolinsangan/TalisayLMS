@@ -27,7 +27,7 @@ if ($teacher_id) {
     $first_name = $class_info['first_name'];
     $last_name = $class_info['last_name'];
 
-    $sql_get_question_info = "SELECT title, question, instruction, point, due_date, time, link, file, youtube FROM classwork_question WHERE teacher_id=? AND question_id=?";
+    $sql_get_question_info = "SELECT title, question, instruction, point, due_date, time, link, file, youtube, question_status FROM classwork_question WHERE teacher_id=? AND question_id=?";
     $stmt_get_question_info = $db->prepare($sql_get_question_info);
     $stmt_get_question_info->execute([$teacher_id, $question_id]);
     $question_data = $stmt_get_question_info->fetch(PDO::FETCH_ASSOC);
@@ -43,6 +43,7 @@ if ($teacher_id) {
       $link = $question_data['link'];
       $file = $question_data['file'];
       $youtube = $question_data['youtube'];
+      $question_status = $question_data['question_status'];
     }
   }
 }
@@ -74,9 +75,7 @@ if ($teacher_id) {
         </p>
         <h3 class="greater" style="margin-left: 10px; margin-top: 5px; margin-right: 10px; pointer-events: none;">&gt;
         </h3>
-        <p class="classname text-body-secondary"
-          style="margin-top: 10px; font-size: 22px; pointer-events: none;">
-          <!-- Adjust max-width as needed -->
+        <p class="classname text-body-secondary" style="margin-top: 10px; font-size: 22px; pointer-events: none;">
           <?php echo $class_name ?>
         </p>
       </div>
@@ -212,36 +211,71 @@ if ($teacher_id) {
           exit();
         }
       }
+
       $sql = "SELECT question_answer FROM student_question_course_answer WHERE class_id=? AND question_id=?";
       $stmt = $db->prepare($sql);
       $stmt->execute([$class_id, $question_id]);
       $question_answer_data = $stmt->fetch(PDO::FETCH_ASSOC);
+      $question_status = $question_answer_data ? "answered" : "not answered";
+      $textAreaDisabled = $question_answer_data ? 'disabled' : '';
       ?>
-      <form action="" method="post">
+      <form class="question" action="" method="post">
         <div class="row justify-content-left align-items-center mt-5 mb-5">
           <div class="col-md-9">
             <div class="card answer-box mb-5">
               <div class="card-body">
-                <div class="form-floating" style="margin: 10px;">
-                  <textarea name="question_answer" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Your Answer" <?php if (isset($question_answer_data) && !empty($question_answer_data['question_answer'])) {
-                      echo 'disabled';
-                    } ?>><?php if (isset($question_answer_data) && !empty($question_answer_data['question_answer'])) {
-                       echo $question_answer_data['question_answer'];
-                     } ?></textarea>
-                  <div id="submittedAnswerContainer" style="display: none;">
-                    <textarea name="submitted_answer" class="form-control auto-resize"
-                      style="border: none; outline: none; box-shadow: none;"></textarea>
-                  </div>
-                  <label for="floatingInput">Your Answer</label>
+                <div class="card-header d-flex justify-content-between" style="border: none; background-color: white;">
+                  <span>Your Answer</span>
+                  <span class="text-body-secondary ml-auto">
+                    <?php echo ucfirst($question_status) ?>
+                  </span>
+                </div>
+                <div style="margin: 10px;">
+                  <textarea name="question_answer" class="form-control auto-resize" id="floatingInput" <?php echo $textAreaDisabled ?>><?php echo $question_answer_data['question_answer'] ?? ''; ?></textarea>
                 </div>
                 <div class="text-end mt-4" style="margin-right: 12px;">
-                  <?php if (isset($question_answer_data) && !empty($question_answer_data['question_answer'])) { ?>
-                    <button class="btn btn-outline-secondary" type="button" onclick="editAnswer()">Edit Answer</button>
-                  <?php } else { ?>
-                    <button name="question_submit" class="btn btn-outline-secondary" type="submit"
-                      onclick="submitAnswer(event)">Submit</button>
-                  <?php } ?>
+                  <button name="question_edit" class="btn btn-outline-secondary" type="button"
+                    style="<?php echo $question_answer_data ? '' : 'display: none;' ?>">Edit Answer</button>
+                  <button name="question_submit" class="btn btn-outline-secondary" type="submit"
+                    style="<?php echo $question_answer_data ? 'display: none;' : '' ?>">Submit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <?php
+      if (isset($_POST['submit_editQuestion'])) {
+        $edited_answer = $_POST['question_answer'];
+
+        $sql = "UPDATE student_question_course_answer SET question_answer = ? WHERE class_id = ? AND question_id = ?";
+        $stmtupdate = $db->prepare($sql);
+        $result = $stmtupdate->execute([$edited_answer, $class_id, $question_id]);
+
+        if($result) {
+          $update_sql = "UPDATE classwork_question SET question_status = 'turned in' WHERE question_id = ? AND teacher_id = ?";
+          $stmtupdate = $db->prepare($update_sql);
+          $update_result = $stmtupdate->execute([$question_id, $teacher_id]);
+        }
+      }
+      ?>
+      <form class="edited_question" action="" method="post" style="display: none;">
+        <div class="row justify-content-left align-items-center mt-5 mb-5">
+          <div class="col-md-9">
+            <div class="card answer-box mb-5">
+              <div class="card-body">
+                <div class="card-header d-flex justify-content-between" style="border: none; background-color: white;">
+                  <span>Your Answer</span>
+                  <span class="text-body-secondary ml-auto">
+                    <?php echo ucfirst($question_status) ?>
+                  </span>
+                </div>
+                <div style="margin: 10px;">
+                  <textarea name="question_answer" class="form-control auto-resize"
+                    id="floatingInput"><?php echo $question_answer_data['question_answer'] ?? ''; ?></textarea>
+                </div>
+                <div class="text-end mt-4" style="margin-right: 12px;">
+                  <button name="submit_editQuestion" class="btn btn-outline-secondary" type="submit">Submit</button>
                 </div>
               </div>
             </div>
@@ -266,8 +300,7 @@ if ($teacher_id) {
         this.style.height = (this.scrollHeight <= this.clientHeight) ? initialHeight : this.scrollHeight + "px";
       });
     });
-  </script>
-  <script>
+
     const textarea = document.querySelector(".auto-resize");
     const submittedAnswerContainer = document.getElementById("submittedAnswerContainer");
     const submittedAnswerTextarea = submittedAnswerContainer.querySelector("textarea");
@@ -278,27 +311,12 @@ if ($teacher_id) {
     });
 
     textarea.dispatchEvent(new Event("input"));
-
-    function submitAnswer(event) {
-      event.preventDefault();
-      var userAnswer = document.querySelector('textarea[name="question_answer"]');
-      submittedAnswerTextarea.value = userAnswer.value;
-      userAnswer.disabled = true;
-      submittedAnswerContainer.style.display = "block";
-    }
-
-    function editAnswer() {
-      var userAnswer = document.querySelector('textarea[name="question_answer"]');
-      var currentValue = userAnswer.value;
-      var submittedAnswerTextarea = document.getElementById('floatingInput')
-      submittedAnswerTextarea.value = currentValue;
-      userAnswer.disabled = false;
-
-      var submittedAnswerContainer = document.getElementById('submittedAnswerContainer');
-      if (submittedAnswerContainer) {
-        submittedAnswerContainer.style.display = "none";
-      }
-    }
+  </script>
+  <script>
+    document.querySelector('button[name="question_edit"]').addEventListener('click', function () {
+      document.querySelector('.question').style.display = 'none';
+      document.querySelector('.edited_question').style.display = 'block';
+    });
   </script>
   <script type="text/javascript" src="js/virtual-select.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

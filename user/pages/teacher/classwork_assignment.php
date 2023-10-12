@@ -24,6 +24,7 @@ if (isset($_POST['assign_button'])) {
   $time = $_POST['time'];
   $class_topic = $_POST['class_topic'];
   $youtube = isset($_SESSION['temp_youtube']) ? $_SESSION['temp_youtube'] : '';
+  $assignment_status = "assigned";
 
   // Check if there's a temporary file ID in the session
   if (isset($_SESSION['temp_file_id'])) {
@@ -31,9 +32,9 @@ if (isset($_POST['assign_button'])) {
     $link = $_SESSION['temp_link'];
     $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
 
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, link, file, youtube) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, link, file, youtube, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube]);
+    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $assignment_status]);
 
     if ($result) {
       // Update the used column for the associated link and file
@@ -52,9 +53,9 @@ if (isset($_POST['assign_button'])) {
       echo "Failed: " . $conn->error;
     }
   } else {
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id]);
+    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $assignment_status]);
 
     if ($result) {
       header("Location: class_classwork.php?class_id=$class_id");
@@ -425,9 +426,7 @@ if (isset($_POST['youtube_submit'])) {
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Due-date</label>
               <div class="col-md-14 mb-4">
-                <select name="due_date" id="due-date" class="form-select" style="height: 45px;">
-                  <option value="" selected>No Due-date</option>
-                </select>
+                <input type="date" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d'); ?>">
               </div>
             </div>
             <div class="row">
@@ -530,7 +529,7 @@ if (isset($_POST['youtube_submit'])) {
       var titleInput = document.querySelector('[name="title"]');
       var instructionInput = document.querySelector('[name="instruction"]');
       var pointInput = document.querySelector('[name="point"]');
-      var studentDropdown = document.querySelector('[name="student"]');
+      var duedateInput = document.querySelector('[name="due_date"]');
 
       var isEmpty = false;
 
@@ -563,9 +562,15 @@ if (isset($_POST['youtube_submit'])) {
         pointInput.classList.add('is-invalid');
       }
 
+      if (duedateInput.value.trim() === '') {
+        isEmpty = true;
+        duedateInput.classList.add('is-invalid');
+      } else {
+        duedateInput.classList.remove('is-invalid');
+      }
+
       if (isEmpty) {
         event.preventDefault();
-        // Optionally, you can show a validation message/alert here
       }
     });
   </script>
@@ -582,27 +587,6 @@ if (isset($_POST['youtube_submit'])) {
   <script>
     function goToClasswork(classId) {
       window.location.href = `class_classwork.php?class_id=${classId}`;
-    }
-
-    var dueDateSelect = document.getElementById("due-date");
-    var currentDate = new Date();
-    var numberOfDaysToAdd = 30; // You can adjust this to set the range of due dates
-
-    for (var i = 0; i < numberOfDaysToAdd; i++) {
-      var dateOption = new Date(currentDate);
-      dateOption.setDate(currentDate.getDate() + i);
-
-      // Format the date as "Month Day, Year"
-      var formattedDate = dateOption.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-
-      var option = document.createElement("option");
-      option.value = formattedDate;
-      option.textContent = formattedDate;
-      dueDateSelect.appendChild(option);
     }
 
     const textarea = document.querySelector(".auto-resize");

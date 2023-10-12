@@ -434,9 +434,7 @@ if (isset($_POST['youtube_submit'])) {
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Due-date</label>
               <div class="col-md-14 mb-4">
-                <select name="due_date" id="due-date" class="form-select" style="height: 45px;">
-                  <option value="" selected>No Due-date</option>
-                </select>
+              <input type="date" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d'); ?>">
               </div>
             </div>
             <div class="row">
@@ -541,6 +539,7 @@ if (isset($_POST['youtube_submit'])) {
         var questionInput = document.querySelector('[name="question"]');
         var instructionInput = document.querySelector('[name="instruction"]');
         var pointInput = document.querySelector('[name="point"]');
+        var duedateInput = document.querySelector('[name="due_date"]');
 
         var isEmpty = false;
 
@@ -571,6 +570,13 @@ if (isset($_POST['youtube_submit'])) {
           pointInput.classList.add('is-invalid');
         }
 
+        if (duedateInput.value.trim() === '') {
+        isEmpty = true;
+        duedateInput.classList.add('is-invalid');
+      } else {
+        duedateInput.classList.remove('is-invalid');
+      }
+
         if (isEmpty) {
           event.preventDefault();
         }
@@ -590,27 +596,6 @@ if (isset($_POST['youtube_submit'])) {
   <script>
     function goToClasswork(classId) {
       window.location.href = `class_classwork.php?class_id=${classId}`;
-    }
-
-    var dueDateSelect = document.getElementById("due-date");
-    var currentDate = new Date();
-    var numberOfDaysToAdd = 30; // You can adjust this to set the range of due dates
-
-    for (var i = 0; i < numberOfDaysToAdd; i++) {
-      var dateOption = new Date(currentDate);
-      dateOption.setDate(currentDate.getDate() + i);
-
-      // Format the date as "Month Day, Year"
-      var formattedDate = dateOption.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-
-      var option = document.createElement("option");
-      option.value = formattedDate;
-      option.textContent = formattedDate;
-      dueDateSelect.appendChild(option);
     }
 
     const textarea = document.querySelector(".auto-resize");

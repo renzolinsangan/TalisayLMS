@@ -258,9 +258,10 @@ $stmt->closeCursor();
                 <div class="col-md-3 mb-3">
                   <div class="card"
                     style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
-                    <h4>Upcoming</h4>
+                    <h4>To-do List</h4>
                     <p class="text-body-secondary mt-3">Check the works assigned to you.</p>
-                    <a href="#" class="create mt-2" style="margin-left: auto;">View to-do list</a>
+                    <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>" class="create mt-2"
+                      style="margin-left: auto; color: green;">View to-do list</a>
                   </div>
                 </div>
                 <div class="col">
@@ -270,124 +271,137 @@ $stmt->closeCursor();
                     </a>
                   </div>
                   <?php
+                  $material_results = [];
+                  $question_results = [];
+                  $assignment_results = [];
+
                   $sql_material = "SELECT material_id, title, date FROM classwork_material WHERE teacher_id=? AND class_name=?";
                   $stmt_titles_material = $db->prepare($sql_material);
                   $stmt_titles_material->execute([$teacher_id, $class_name]);
+                  $material_results = $stmt_titles_material->fetchAll();
 
                   $sql_question = "SELECT question_id, title, date FROM classwork_question WHERE teacher_id=? AND class_name=?";
                   $stmt_titles_question = $db->prepare($sql_question);
                   $stmt_titles_question->execute([$teacher_id, $class_name]);
+                  $question_results = $stmt_titles_question->fetchAll();
 
                   $sql_assignment = "SELECT assignment_id, title, date FROM classwork_assignment WHERE teacher_id=? AND class_name=?";
                   $stmt_titles_assignment = $db->prepare($sql_assignment);
                   $stmt_titles_assignment->execute([$teacher_id, $class_name]);
+                  $assignment_results = $stmt_titles_assignment->fetchAll();
 
-                  foreach ($stmt_titles_material as $title_row) {
-                    $material_id = $title_row['material_id'];
-                    $title = $title_row['title'];
-                    $words = explode(' ', $title);
-                    $maxWords = 6;
-                    $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
-                    $date = $title_row['date'];
-                    $formatted_date = date("F j", strtotime($date));
+                  $combined_results = array_merge($material_results, $question_results, $assignment_results);
+                  usort($combined_results, function ($a, $b) {
+                      return strtotime($a['date']) - strtotime($b['date']);
+                  });
 
-                    if (count($words) > $maxWords) {
-                      $truncatedTitle .= '...';
+                  foreach ($combined_results as $row) {
+                    if (isset($row['material_id'])) {
+                      $material_id = $row['material_id'];
+                      $title = $row['title'];
+                      $words = explode(' ', $title);
+                      $maxWords = 6;
+                      $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                      $date = $row['date'];
+                      $formatted_date = date("F j", strtotime($date));
+
+                      if (count($words) > $maxWords) {
+                        $truncatedTitle .= '...';
+                      }
+
+                      ?>
+                      <div class="d-grid gap-2 col-13 mx-auto mb-4">
+                        <a class="announce" type="button"
+                          href="material_course.php?class_id=<?php echo $class_id ?>&material_id=<?php echo $material_id ?>"
+                          style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                          <div
+                            style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                            <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                          </div>
+                          <p
+                            style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $_SESSION['first_name'] . " " . $_SESSION['last_name'] ?>
+                            posted a new material:
+                            <?php echo $truncatedTitle ?>
+                          </p>
+                          <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                            <?php echo $formatted_date ?>
+                          </div>
+                        </a>
+                      </div>
+                      <?php
+                    } 
+                    elseif (isset($row['question_id'])) {
+                      $question_id = $row['question_id'];
+                      $title = $row['title'];
+                      $words = explode(' ', $title);
+                      $maxWords = 6;
+                      $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                      $date = $row['date'];
+                      $formatted_date = date("F j", strtotime($date));
+
+                      if (count($words) > $maxWords) {
+                        $truncatedTitle .= '...';
+                      }
+
+                      ?>
+                      <div class="d-grid gap-2 col-13 mx-auto mb-4">
+                        <a class="announce" type="button"
+                          href="question_course.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>&user_id=<?php echo $user_id ?>"
+                          style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                          <div
+                            style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                            <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                          </div>
+                          <p
+                            style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $_SESSION['first_name'] . " " . $_SESSION['last_name'] ?>
+                            posted a new question:
+                            <?php echo $truncatedTitle ?>
+                          </p>
+                          <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                            <?php echo $formatted_date ?>
+                          </div>
+                        </a>
+                      </div>
+                      <?php
+                    } 
+                    elseif (isset($row['assignment_id'])) {
+                      $assignment_id = $row['assignment_id'];
+                      $title = $row['title'];
+                      $words = explode(' ', $title);
+                      $maxWords = 6;
+                      $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                      $date = $row['date'];
+                      $formatted_date = date("F j", strtotime($date));
+
+                      if (count($words) > $maxWords)
+                        ; {
+                        $truncatedTitle .= '...';
+                      }
+
+                      ?>
+                        <div class="d-grid gap-2 col-13 mx-auto mb-4">
+                          <a class="announce" type="button"
+                            href="assignment_course.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>&user_id=<?php echo $user_id ?>"
+                            style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <div
+                              style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                              <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                            </div>
+                            <p
+                              style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $_SESSION['first_name'] . " " . $_SESSION['last_name'] ?>
+                              posted a new assignment:
+                            <?php echo $truncatedTitle ?>
+                            </p>
+                            <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                            <?php echo $formatted_date ?>
+                            </div>
+                          </a>
+                        </div>
+                      <?php
                     }
-
-                    ?>
-                    <div class="d-grid gap-2 col-13 mx-auto mb-4">
-                      <a class="announce" type="button"
-                        href="material_course.php?class_id=<?php echo $class_id ?>&material_id=<?php echo $material_id ?>"
-                        style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <div
-                          style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
-                          <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
-                        </div>
-                        <p
-                          style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $_SESSION['first_name'] . " " . $_SESSION['last_name'] ?>
-                          posted a new material:
-                          <?php echo $truncatedTitle ?>
-                        </p>
-                        <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
-                          <?php echo $formatted_date ?>
-                        </div>
-                      </a>
-                    </div>
-                    <?php
-                  }
-
-                  foreach ($stmt_titles_question as $question_row) {
-                    $question_id = $question_row['question_id'];
-                    $title = $question_row['title'];
-                    $words = explode(' ', $title);
-                    $maxWords = 6;
-                    $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
-                    $date = $question_row['date'];
-                    $formatted_date = date("F j", strtotime($date));
-
-                    if (count($words) > $maxWords) {
-                      $truncatedTitle .= '...';
-                    }
-
-                    ?>
-                    <div class="d-grid gap-2 col-13 mx-auto mb-4">
-                      <a class="announce" type="button"
-                        href="question_course.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>&user_id=<?php echo $user_id ?>"
-                        style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <div
-                          style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
-                          <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
-                        </div>
-                        <p
-                          style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $_SESSION['first_name'] . " " . $_SESSION['last_name'] ?>
-                          posted a new question:
-                          <?php echo $truncatedTitle ?>
-                        </p>
-                        <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
-                          <?php echo $formatted_date ?>
-                        </div>
-                      </a>
-                    </div>
-                    <?php
-                  }
-                  foreach ($stmt_titles_assignment as $title_row) {
-                    $assignment_id = $title_row['assignment_id'];
-                    $title = $title_row['title'];
-                    $words = explode(' ', $title);
-                    $maxWords = 6;
-                    $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
-                    $date = $title_row['date'];
-                    $formatted_date = date("F j", strtotime($date));
-
-                    if (count($words) > $maxWords)
-                      ; {
-                      $truncatedTitle .= '...';
-                    }
-
-                    ?>
-                    <div class="d-grid gap-2 col-13 mx-auto mb-4">
-                      <a class="announce" type="button"
-                        href="assignment_course.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>&user_id=<?php echo $user_id ?>"
-                        style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <div
-                          style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
-                          <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
-                        </div>
-                        <p
-                          style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $_SESSION['first_name'] . " " . $_SESSION['last_name'] ?>
-                          posted a new assignment:
-                          <?php echo $truncatedTitle ?>
-                        </p>
-                        <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
-                          <?php echo $formatted_date ?>
-                        </div>
-                      </a>
-                    </div>
-                    <?php
                   }
                   ?>
                 </div>
@@ -428,19 +442,7 @@ $stmt->closeCursor();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
       integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
       crossorigin="anonymous"></script>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
     <script src="../../vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
-    <script src="../../js/off-canvas.js"></script>
-    <script src="../../js/hoverable-collapse.js"></script>
-    <script src="../../js/template.js"></script>
-    <script src="../../js/settings.js"></script>
-    <script src="../../js/todolist.js"></script>
-    <!-- endinject -->
 </body>
 
 </html>
