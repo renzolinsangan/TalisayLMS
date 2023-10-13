@@ -504,6 +504,44 @@ $stmt_department->close();
             </div>
           </div>
           <div class="row">
+          <div class="col-md-4 stretch-card grid-margin">
+              <div class="card">
+                <div class="card-body">
+                  <?php
+                  $currentDate = date("Y-m-d");
+                  $userStrand = $department;
+
+                  if ($userStrand == "all") {
+                    $sql = "SELECT * FROM news WHERE type = 'announcement' AND end_date >= '$currentDate'";
+                  } else {
+                    $sql = "SELECT * FROM news WHERE type = 'announcement' AND (track = 'all' OR track = '$userStrand') AND end_date >= '$currentDate'";
+                  }
+                  $result = mysqli_query($conn, $sql);
+                  $totalNews = mysqli_num_rows($result);
+                  ?>
+                  <p class="card-title mb-0">Announcement <span class="text-body-secondary">(
+                      <?php echo $totalNews ?> )
+                    </span></p>
+                  <?php
+                  while ($row = mysqli_fetch_assoc($result)) {
+                    ?>
+                    <a href="view_announcement.php?news_id=<?php $row['news_id'] ?>">
+                      <h3 style="margin-top: 2vh;">
+                        <?php echo $row['title'] ?>
+                      </h3>
+                      <p class="text-body-secondary">
+                        <?php echo $row['date'] ?>
+                      </p>
+                      <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                        <?php echo $row['detail'] ?>
+                      </p>
+                    </a>
+                    <?php
+                  }
+                  ?>
+                </div>
+              </div>
+            </div>
             <div class="col-md-4 stretch-card grid-margin">
               <div class="card">
                 <div class="card-body">
@@ -512,23 +550,20 @@ $stmt_department->close();
                   $userStrand = $department;
 
                   if ($userStrand == "all") {
-                    $sql = "SELECT * FROM news WHERE end_date >= '$currentDate'";
+                    $sql = "SELECT * FROM news WHERE type = 'news' AND end_date >= '$currentDate'";
                   } else {
-                    $sql = "SELECT * FROM news WHERE (track = 'all' OR track = '$userStrand') AND end_date >= '$currentDate'";
+                    $sql = "SELECT * FROM news WHERE type = 'news' AND (track = 'all' OR track = '$userStrand') AND end_date >= '$currentDate'";
                   }
-
                   $result = mysqli_query($conn, $sql);
-                  $totalAnnouncement = mysqli_num_rows($result);
+                  $totalNews = mysqli_num_rows($result);
                   ?>
-
                   <p class="card-title mb-0">News <span class="text-body-secondary">(
-                      <?php echo $totalAnnouncement ?> )
+                      <?php echo $totalNews ?> )
                     </span></p>
-
                   <?php
                   while ($row = mysqli_fetch_assoc($result)) {
                     ?>
-                    <a href="view_announcement.php?news_id=<?php echo $row['news_id'] ?>">
+                    <a href="view_news.php?news_id=<?php $row['news_id'] ?>">
                       <h3 style="margin-top: 2vh;">
                         <?php echo $row['title'] ?>
                       </h3>

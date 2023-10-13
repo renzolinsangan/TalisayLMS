@@ -52,7 +52,6 @@ if ($teacher_id) {
 
 if (isset($_POST['add_link'])) {
   $link = $_POST['link'];
-  $_SESSION['temp_link'] = $link;
 
   $sql = "INSERT INTO assignment_course_upload (link, class_id, user_id, assignment_id) VALUES (?, ?, ?, ?)";
   $stmtinsert = $db->prepare($sql);
@@ -162,7 +161,7 @@ if (isset($_POST['file_submit'])) {
           <?php echo $instruction ?>
         </div>
       </div>
-      <form action="" method="post">
+      <form class="assignment" action="" method="post">
         <div class="row justify-content-left align-items-center mb-5" id="submit-card">
           <div class="col-md-8"></div>
           <div class="col-md-4 mt-5">
@@ -172,24 +171,193 @@ if (isset($_POST['file_submit'])) {
                   <h5>Your Work</h5>
                 </div>
                 <div class="col text-end mt-4" style="margin-right: 25px;">
-                  <p class="text-body-secondary"><?php echo ucfirst($assignment_status) ?></p>
+                  <p class="text-body-secondary">
+                    <?php echo ucfirst($assignment_status) ?>
+                  </p>
                 </div>
               </div>
               <?php
-              $sql = "SELECT assignment_course_upload_id, link, file FROM assignment_course_upload WHERE class_id=? AND assignment_id=?";
+              $sql = "SELECT assignment_course_upload_id, link, file, status FROM assignment_course_upload WHERE class_id=? AND assignment_id=?";
               $stmt = $db->prepare($sql);
               $stmt->execute([$class_id, $assignment_id]);
 
               while ($row = $stmt->fetch()) {
-                $file=$row['file'];
+                $file = $row['file'];
+                $status = $row['status'];
                 if (!empty($row['link'])) {
                   $assignment_course_upload_id = $row['assignment_course_upload_id'];
                   $link = $row['link'];
                   ?>
-                  <div class="row justify-content-center align-items-center mt-3 mb-3">
+                  <div class="row justify-content-center align-items-center mb-3">
                     <div class="col-md-11">
                       <div class="card">
-                        <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none; margin-left: 15px;">
+                        <a class="mb-2" href="<?php echo $link ?>" target="_blank"
+                          style="text-decoration: none; margin-left: 15px;">
+                          <div class="row mt-3" style="margin-bottom: -15px;">
+                            <div class="col-md-11">
+                              <p
+                                style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                                <?php echo $link ?>
+                              </p>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-9 text-body-secondary">
+                              LINK
+                            </div>
+                          </div>
+                        </a>
+                        <?php if ($status !== "submitted") { ?>
+                          <a
+                            href="delete_link_assignment.php?deleteid=<?php echo $assignment_course_upload_id ?>&class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>">
+                            <div class="row mb-2">
+                              <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
+                                <i class="bi bi-trash-fill trash-icon"></i>
+                              </div>
+                            </div>
+                          </a>
+                        <?php } ?>
+                      </div>
+                    </div>
+                  </div>
+                  <?php
+                } elseif (!empty($row['file'])) {
+                  $assignment_course_upload_id = $row['assignment_course_upload_id'];
+                  $fileUrl = $row['file'];
+                  $fileExtension = pathinfo($fileUrl, PATHINFO_EXTENSION);
+                  $displayText = ($fileExtension === 'pdf') ? 'PDF File' : strtoupper($fileExtension) . ' File';
+                  ?>
+                  <div class="row justify-content-center align-items-center mb-3">
+                    <div class="col-md-11">
+                      <div class="card">
+                        <a class="mb-2" href="<?php echo $fileUrl; ?>" target="_blank"
+                          style="text-decoration: none; margin-left: 30px;">
+                          <div class="row mt-3" style="margin-bottom: -15px;">
+                            <div class="col-md-9">
+                              <p
+                                style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                                <?php echo $fileUrl ?>
+                              </p>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-9 text-body-secondary">
+                              <?php echo strtoupper($fileExtension) ?>
+                            </div>
+                          </div>
+                        </a>
+                        <?php if ($status !== "submitted") { ?>
+                          <a
+                            href="delete_file_assignment.php?deleteid=<?php echo $assignment_course_upload_id ?>&class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>">
+                            <div class="row mb-2">
+                              <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
+                                <i class="bi bi-trash-fill trash-icon"></i>
+                              </div>
+                            </div>
+                          </a>
+                        <?php } ?>
+                      </div>
+                    </div>
+                  </div>
+                  <?php
+                }
+              }
+              ?>
+              <?php
+              $sql_assignment_answer = "SELECT assignment_link, assignment_file FROM student_assignment_course_answer WHERE class_id = ? AND assignment_id = ?";
+              $stmt_assignment_answer = $db->prepare($sql_assignment_answer);
+              $stmt_assignment_answer->execute([$class_id, $assignment_id]);
+              $assignment_answer_data = $stmt_assignment_answer->fetch(PDO::FETCH_ASSOC);
+
+              if (isset($_POST['mark_done'])) {
+                $sql = "INSERT INTO student_assignment_course_answer (assignment_course_upload_id, assignment_id, assignment_link, assignment_file, user_id, class_id, teacher_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $stmt = $db->prepare($sql);
+                $result = $stmt->execute([$assignment_course_upload_id, $assignment_id, $link, $file, $user_id, $class_id, $teacher_id]);
+
+                $stmt_assignment_answer->execute([$class_id, $assignment_id]);
+                $assignment_answer_data = $stmt_assignment_answer->fetch(PDO::FETCH_ASSOC);
+
+                if ($assignment_answer_data) {
+                  $sql_update = "UPDATE assignment_course_upload SET status = 'submitted' 
+                  WHERE class_id = ? AND assignment_id = ?";
+                  $stmt_update = $db->prepare($sql_update);
+                  $update_result = $stmt_update->execute([$class_id, $assignment_id]);
+
+                  $new_status = ($assignment_status === "missing") ? "turned-in late" : "turned in";
+
+                  $sql_update_status = "UPDATE classwork_assignment SET assignment_status = ? WHERE assignment_id = ?";
+                  $stmt_update_status = $db->prepare($sql_update_status);
+                  $result_update_status = $stmt_update_status->execute([$new_status, $assignment_id]);
+                }
+              }
+              ?>
+              <div class="row justify-content-center align-items-center mt-2 mb-4">
+                <div class="d-grid gap-2 col-11 mx-auto">
+                  <div class="dropdown">
+                    <div class="d-grid gap-2 col-12 mx-auto">
+                      <button class="btn btn-outline-success mb-2" type="button" data-bs-toggle="dropdown"
+                        style="<?php echo $assignment_answer_data ? 'display: none;' : '' ?>">+ Add or
+                        Create</button>
+                      <ul class="dropdown-menu w-100">
+                        <li>
+                          <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#linkModal"
+                            style="font-size: 18px; cursor: pointer;">
+                            <i class="bi bi-link" style="margin-right: 10px; font-size: 23px"></i>
+                            Link
+                          </a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#fileModal"
+                            style="font-size: 18px; cursor: pointer;">
+                            <i class="bi bi-file-earmark-arrow-up" style="margin-right: 10px; font-size: 23px "></i>
+                            File
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <button class="btn btn-success" id="unsubmitButton" name="unsubmit" type="button"
+                    style="<?php echo $assignment_answer_data ? '' : 'display: none;' ?>">Edit Answer</button>
+                  <button class="btn btn-success" id="turnInButton" name="mark_done" type="submit"
+                    style="<?php echo $assignment_answer_data ? 'display: none;' : '' ?>">Turn-in</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <form class="edited_assignment" action="" method="post" style="display: none;">
+        <div class="row justify-content-left align-items-center mb-5" id="submit-card">
+          <div class="col-md-8"></div>
+          <div class="col-md-4 mt-5">
+            <div class="card">
+              <div class="row justify-content-between">
+                <div class="col mt-4" style="margin-left: 25px;">
+                  <h5>Your Work</h5>
+                </div>
+                <div class="col text-end mt-4" style="margin-right: 25px;">
+                  <p class="text-body-secondary">
+                    <?php echo ucfirst($assignment_status) ?>
+                  </p>
+                </div>
+              </div>
+              <?php
+              $sql = "SELECT assignment_course_upload_id, link, file, status FROM assignment_course_upload WHERE class_id=? AND assignment_id=?";
+              $stmt = $db->prepare($sql);
+              $stmt->execute([$class_id, $assignment_id]);
+
+              while ($row = $stmt->fetch()) {
+                $file = $row['file'];
+                $status = $row['status'];
+                if (!empty($row['link'])) {
+                  $assignment_course_upload_id = $row['assignment_course_upload_id'];
+                  $link = $row['link'];
+                  ?>
+                  <div class="row justify-content-center align-items-center mb-3">
+                    <div class="col-md-11">
+                      <div class="card">
+                        <a class="mb-2" href="<?php echo $link ?>" target="_blank"
+                          style="text-decoration: none; margin-left: 15px;">
                           <div class="row mt-3" style="margin-bottom: -15px;">
                             <div class="col-md-11">
                               <p
@@ -222,7 +390,7 @@ if (isset($_POST['file_submit'])) {
                   $fileExtension = pathinfo($fileUrl, PATHINFO_EXTENSION);
                   $displayText = ($fileExtension === 'pdf') ? 'PDF File' : strtoupper($fileExtension) . ' File';
                   ?>
-                  <div class="row justify-content-center align-items-center mt-3 mb-3">
+                  <div class="row justify-content-center align-items-center mb-3">
                     <div class="col-md-11">
                       <div class="card">
                         <a href="<?php echo $fileUrl; ?>" target="_blank" style="text-decoration: none; margin-left: 30px;">
@@ -254,7 +422,7 @@ if (isset($_POST['file_submit'])) {
                   <?php
                 }
               }
-              ?>
+              ?>              
               <div class="row justify-content-center align-items-center mt-2 mb-4">
                 <div class="d-grid gap-2 col-11 mx-auto">
                   <div class="dropdown">
@@ -272,20 +440,13 @@ if (isset($_POST['file_submit'])) {
                         <li>
                           <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#fileModal"
                             style="font-size: 18px; cursor: pointer;">
-                            <i class="bi bi-file-earmark-arrow-up" style="margin-right: 10px; font-size: 23px"></i>
+                            <i class="bi bi-file-earmark-arrow-up" style="margin-right: 10px; font-size: 23px "></i>
                             File
                           </a>
                         </li>
                       </ul>
                     </div>
                   </div>
-                  <?php
-                  if (isset($_POST['mark_done'])) {
-                    $sql = "INSERT INTO student_assignment_course_answer (assignment_course_upload_id, assignment_id, assignment_link, assignment_file, user_id, class_id, teacher_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                    $stmt = $db->prepare($sql);
-                    $result = $stmt->execute([$assignment_course_upload_id, $assignment_id, $link, $file, $user_id, $class_id, $teacher_id]);
-                  }
-                  ?>
                   <button class="btn btn-success" id="turnInButton" name="mark_done" type="submit">Turn-in</button>
                 </div>
               </div>
@@ -294,22 +455,22 @@ if (isset($_POST['file_submit'])) {
         </div>
       </form>
       <div class="row justify-content-left align-items-center">
-        <?php if (!empty($filePath) && !empty($file)) {
+        <?php if (!empty($assignment_data['filePath']) && !empty($assignment_data['file'])) {
           ?>
           <div class="col-md-3" style="margin-right: 15vh;">
             <div class="card">
-              <a href="<?php echo $filePath; ?>" style="text-decoration: none; margin-left: 30px;">
+              <a href="<?php echo $assignment_data['filePath']; ?>" style="text-decoration: none; margin-left: 30px;">
                 <div class="row mt-3" style="margin-bottom: -15px;">
                   <div class="col-md-9">
                     <p
                       style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                      <?php echo $file ?>
+                      <?php echo $assignment_data['file'] ?>
                     </p>
                   </div>
                 </div>
                 <div class="row mb-3">
                   <div class="col-md-9 text-body-secondary">
-                    <?php echo strtoupper(pathinfo($file, PATHINFO_EXTENSION)); ?>
+                    <?php echo strtoupper(pathinfo($assignment_data['file'], PATHINFO_EXTENSION)); ?>
                   </div>
                 </div>
               </a>
@@ -318,16 +479,17 @@ if (isset($_POST['file_submit'])) {
           <?php
         }
         ?>
-        <?php if (!empty($link) && $link != 'null') {
+        <?php if (!empty($assignment_data['link']) && $assignment_data['link'] != 'null') {
           ?>
           <div class="col-md-3" style="margin-right: 15vh;">
             <div class="card">
-              <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none; margin-left: 30px;">
+              <a href="<?php echo $assignment_data['link'] ?>" target="_blank"
+                style="text-decoration: none; margin-left: 30px;">
                 <div class="row mt-3" style="margin-bottom: -15px;">
                   <div class="col-md-9">
                     <p
                       style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                      <?php echo $link ?>
+                      <?php echo $assignment_data['link'] ?>
                     </p>
                   </div>
                 </div>
@@ -342,15 +504,16 @@ if (isset($_POST['file_submit'])) {
           <?php
         }
         ?>
-        <?php if (!empty($youtube) && $youtube != 'null') { ?>
+        <?php if (!empty($assignment_data['youtube']) && $assignment_data['youtube'] != 'null') { ?>
           <div class="col-md-3">
             <div class="card">
-              <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none; margin-left: 30px;">
+              <a href="<?php echo $assignment_data['youtube'] ?>" target="_blank"
+                style="text-decoration: none; margin-left: 30px;">
                 <div class="row mt-3" style="margin-bottom: -15px;">
                   <div class="col-md-9">
                     <p
                       style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                      <?php echo $youtube ?>
+                      <?php echo $assignment_data['youtube'] ?>
                     </p>
                   </div>
                 </div>
@@ -412,6 +575,12 @@ if (isset($_POST['file_submit'])) {
     function goToClasswork(classId) {
       window.location.href = `class_course.php?class_id=${classId}`;
     }
+  </script>
+  <script>
+    document.querySelector('button[name="unsubmit"]').addEventListener('click', function () {
+      document.querySelector('.assignment').style.display = 'none';
+      document.querySelector('.edited_assignment').style.display = 'block';
+    });
   </script>
   <script type="text/javascript" src="js/virtual-select.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

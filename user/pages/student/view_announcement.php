@@ -130,9 +130,9 @@ $stmt->closeCursor();
             </a>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" href="announcement.php">
-              <i class="menu-icon"><i class="bi bi-megaphone"></i></i>
-              <span class="menu-title">Announcement</span>
+            <a class="nav-link" href="course.php">
+              <i class="menu-icon"><i class="bi bi-journals"></i></i>
+              <span class="menu-title">Courses</span>
             </a>
           </li>
           <li class="nav-item mb-3">
@@ -169,7 +169,17 @@ $stmt->closeCursor();
         <div class="content-wrapper">
           <div class="row">
             <div class="col mb-4">
-              <h2 style="margin-left: 8px;">News Feed</h2>
+              <?php
+                include("db_conn.php");
+
+                $sql_newsType = "SELECT type FROM news WHERE type = 'announcement'";
+                $result_newsType = mysqli_query($conn, $sql_newsType);
+
+                if($row = mysqli_fetch_assoc($result_newsType)) {
+                  $type = $row['type'];
+                }
+              ?>
+              <h2 style="margin-left: 8px;"><?php echo ucfirst($type) ?> Feed</h2>
               <p class="text-body-secondary" style="margin-left: 8px;">(From Talisay Senior High School)</p>
               <span style="margin-left: 8px;">Go back to <a href="index.php"
                   style="text-decoration: none; color: green;">homepage.</a></span>
@@ -177,7 +187,7 @@ $stmt->closeCursor();
             <?php
             include("db_conn.php");
 
-            $sql = "SELECT * FROM news";
+            $sql = "SELECT * FROM news WHERE type = 'announcement'";
             $result = mysqli_query($conn, $sql);
             ?>
 

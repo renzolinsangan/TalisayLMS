@@ -216,7 +216,6 @@ if ($teacher_id) {
       $stmt = $db->prepare($sql);
       $stmt->execute([$class_id, $question_id]);
       $question_answer_data = $stmt->fetch(PDO::FETCH_ASSOC);
-      $question_status = $question_answer_data ? "answered" : "not answered";
       $textAreaDisabled = $question_answer_data ? 'disabled' : '';
       ?>
       <form class="question" action="" method="post">
@@ -253,9 +252,11 @@ if ($teacher_id) {
         $result = $stmtupdate->execute([$edited_answer, $class_id, $question_id]);
 
         if($result) {
-          $update_sql = "UPDATE classwork_question SET question_status = 'turned in' WHERE question_id = ? AND teacher_id = ?";
+          $new_status = ($question_status === "missing") ? "turned-in late" : "turned in";
+
+          $update_sql = "UPDATE classwork_question SET question_status = ? WHERE question_id = ? AND teacher_id = ?";
           $stmtupdate = $db->prepare($update_sql);
-          $update_result = $stmtupdate->execute([$question_id, $teacher_id]);
+          $update_result = $stmtupdate->execute([$new_status, $question_id, $teacher_id]);
         }
       }
       ?>

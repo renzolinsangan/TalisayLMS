@@ -8,6 +8,7 @@ if (!isset($_SESSION['id'])) {
 }
 if (isset($_POST['submit'])) {
     $title = $_POST['title'];
+    $type = $_POST['type'];
     $track = $_POST['track'];
     $startDate = $_POST['start_date'];
     $endDate = $_POST['end_date'];
@@ -31,9 +32,9 @@ if (isset($_POST['submit'])) {
 
             if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
                 // File was successfully uploaded, proceed with database insertion
-                $sql = "INSERT INTO news (title, name, date, track, start_date, end_date, detail, attachment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO news (title, type, name, date, track, start_date, end_date, detail, attachment) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmtinsert = $db->prepare($sql);
-                $result = $stmtinsert->execute([$title, $name, $date, $track, $startDate, $endDate, $detail, $uniqueFilename]);
+                $result = $stmtinsert->execute([$title, $type, $name, $date, $track, $startDate, $endDate, $detail, $uniqueFilename]);
 
                 if ($result) {
                     header("Location: announcement.php?msg=Announcement created successfully!");
@@ -93,6 +94,18 @@ if (isset($_POST['submit'])) {
                             <div class="col mb-4">
                                 <label class="form-label">Announcement Title</label>
                                 <input type="text" class="form-control" name="title">
+                            </div>
+
+                            <div class="col mb-4">
+                                <label class="form-label">Type</label>
+                                <div class="select-with-icon">
+                                    <select name="type" id="type" class="form-control custom-select lightened-select">
+                                        <option disabled selected value=""></option>
+                                        <option value="announcement">Announcement</option>
+                                        <option value="news">News</option>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-icon"></i>
+                                </div>
                             </div>
 
                             <div class="div"></div>
@@ -188,6 +201,7 @@ if (isset($_POST['submit'])) {
         form.addEventListener('submit', function (event) {
             // Get the input fields and text area
             var titleInput = document.querySelector('input[name="title"]');
+            var typeDropdown = document.querySelector('select[name="type"]');
             var nameInput = document.querySelector('input[name="name"]');
             var divisionDropdown = document.querySelector('select[name="track"]');
             var startDateDropdown = document.querySelector('select[name="start_date"]');
@@ -201,6 +215,13 @@ if (isset($_POST['submit'])) {
                 titleInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
             } else {
                 titleInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            if (typeDropdown.value.trim() === '') {
+                isEmpty = true;
+                typeDropdown.classList.add('is-invalid');
+            } else {
+                typeDropdown.classList.remove('is-invalid');
             }
 
             if (nameInput.value.trim() === '') {
@@ -239,7 +260,8 @@ if (isset($_POST['submit'])) {
             }
 
             // Check if any required fields are empty
-            if (titleInput.value === '' || divisionDropdown.value === '' ||
+            if (titleInput.value === '' || typeDropdown.value === '' ||
+                divisionDropdown.value === '' ||
                 startDateDropdown.value === '' || endDateDropdown === '' ||
                 divisionDropdown.value === '' || detailTextArea.value === '') {
                 // Prevent form submission

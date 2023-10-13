@@ -193,6 +193,7 @@ if (!isset($_SESSION['id'])) {
                           <thead class="table" style="background-color: #4BB543; color: white;">
                             <tr>
                               <th scope="col">Title</th>
+                              <th scope="col">Type</th>
                               <th scope="col">Name</th>
                               <th scope="col">Date</th>
                               <th scope="col">Division/Track</th>
@@ -215,6 +216,9 @@ if (!isset($_SESSION['id'])) {
                               <tr>
                                 <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
                                   <?php echo $row['title'] ?>
+                                </td>
+                                <td>
+                                  <?php echo $row['type'] ?>
                                 </td>
                                 <td>
                                   <?php echo $row['name'] ?>

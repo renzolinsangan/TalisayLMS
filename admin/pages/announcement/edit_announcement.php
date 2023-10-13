@@ -16,6 +16,7 @@ $result = mysqli_stmt_get_result($stmt);
 $row = mysqli_fetch_assoc($result);
 
 $title = $row['title'];
+$type = $row['type'];
 $name = $row['name'];
 $date = $row['date'];
 $track = $row['track'];
@@ -26,6 +27,7 @@ $attachment = $row['attachment'];
 
 if (isset($_POST['submit'])) {
     $title = $_POST['title'];
+    $type = $_POST['type'];
     $name = $_POST['name'];
     $date = date("Y-m-d");
     $track = $_POST['track'];
@@ -49,9 +51,9 @@ if (isset($_POST['submit'])) {
         if (in_array($fileExtension, $allowedExtensions)) {
             if (move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadPath)) {
                 // File uploaded successfully, update the attachment field in the database
-                $sql = "UPDATE news SET title=?, name=?, date=?, track=?, start_date=?, end_date=?, detail=?, attachment=? WHERE news_id=?";
+                $sql = "UPDATE news SET title=?, type=?, name=?, date=?, track=?, start_date=?, end_date=?, detail=?, attachment=? WHERE news_id=?";
                 $stmt = mysqli_prepare($conn, $sql);
-                mysqli_stmt_bind_param($stmt, "ssssssssi", $title, $name, $date, $track, $startDate, $endDate, $detail, $attachment, $id);
+                mysqli_stmt_bind_param($stmt, "sssssssssi", $title, $type, $name, $date, $track, $startDate, $endDate, $detail, $attachment, $id);
                 if (mysqli_stmt_execute($stmt)) {
                     header("Location: announcement.php?msg=Announcement Updated Successfully!");
                 } else {
@@ -65,9 +67,9 @@ if (isset($_POST['submit'])) {
         }
     } else {
         // No new image file is uploaded, retain the existing image filename
-        $sql = "UPDATE news SET title=?, name=?, date=?, track=?, start_date=?, end_date=?, detail=? WHERE news_id=?";
+        $sql = "UPDATE news SET title=?, type=?, name=?, date=?, track=?, start_date=?, end_date=?, detail=? WHERE news_id=?";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sssssssi", $title, $name, $date, $track, $startDate, $endDate, $detail, $id);
+        mysqli_stmt_bind_param($stmt, "ssssssssi", $title, $type, $name, $date, $track, $startDate, $endDate, $detail, $id);
 
         if (mysqli_stmt_execute($stmt)) {
             header("Location: announcement.php?msg=Announcement Updated Successfully!");
@@ -121,6 +123,23 @@ if (isset($_POST['submit'])) {
                                 <input type="text" class="form-control" name="title" value="<?php echo $title ?>">
                             </div>
 
+                            <div class="col mb-4">
+                                <label class="form-label">Type</label>
+                                <div class="select-with-icon">
+                                    <select name="type" id="type" class="form-control custom-select lightened-select">
+                                        <option disabled selected value=""></option>
+                                        <option value="announcement" 
+                                        <?php if ($type === 'announcement') 
+                                            echo 'selected'; ?>>Announcement
+                                        </option>
+                                        <option value="news"
+                                        <?php if ($type === 'news') 
+                                            echo 'selected'; ?>>News
+                                        </option>
+                                    </select>
+                                    <i class="bi bi-chevron-down select-icon"></i>
+                                </div>
+                            </div>
                             <div class="div"></div>
 
                             <div class="col mb-4">
@@ -261,6 +280,7 @@ if (isset($_POST['submit'])) {
         form.addEventListener('submit', function (event) {
             // Get the input fields and text area
             var titleInput = document.querySelector('input[name="title"]');
+            var typeDropdown = document.querySelector('select[name="type"]');
             var nameInput = document.querySelector('input[name="name"]');
             var divisionDropdown = document.querySelector('select[name="track"]');
             var startDateDropdown = document.querySelector('select[name="start_date"]');
@@ -274,6 +294,13 @@ if (isset($_POST['submit'])) {
                 titleInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
             } else {
                 titleInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            if (typeDropdown.value.trim() === '') {
+                isEmpty = true;
+                typeDropdown.classList.add('is-invalid');
+            } else {
+                typeDropdown.classList.add('is-invalid');
             }
 
             if (nameInput.value.trim() === '') {
@@ -312,7 +339,8 @@ if (isset($_POST['submit'])) {
             }
 
             // Check if any required fields are empty
-            if (titleInput.value === '' || divisionDropdown.value === '' ||
+            if (titleInput.value === '' || typeDropdown.value === '' ||
+                divisionDropdown.value === '' ||
                 startDateDropdown.value === '' ||endDateDropdown.value === '' ||
                 divisionDropdown.value === '' || detailTextArea.value === '') {
                 // Prevent form submission
