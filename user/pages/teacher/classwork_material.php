@@ -22,7 +22,6 @@ if (isset($_POST['post_button'])) {
   $date = date('Y-m-d');
   $youtube = isset($_SESSION['temp_youtube']) ? $_SESSION['temp_youtube'] : '';
 
-  // Check if there's a temporary file ID in the session
   if (isset($_SESSION['temp_file_id'])) {
     $file_id = $_SESSION['temp_file_id'];
     $link = $_SESSION['temp_link'];
@@ -71,8 +70,7 @@ if (isset($_POST['add_link'])) {
 
   if ($result) {
     $lastInsertId = $conn->insert_id;
-    $_SESSION['temp_file_id'] = $lastInsertId; // Store the ID in the session
-    header("Location: classwork_material.php?class_id=$class_id");
+    $_SESSION['temp_file_id'] = $lastInsertId;
   }
 }
 
@@ -98,9 +96,6 @@ if (isset($_POST['file_submit'])) {
           $lastInsertId = $conn->insert_id;
           $_SESSION['temp_file_id'] = $lastInsertId;
           $_SESSION['temp_file_name'] = $file_name; // Store the filename in the session
-
-          header("Location: classwork_material.php?class_id=$class_id");
-          exit;
         } else {
           echo "Error saving file to the database.";
         }
@@ -124,10 +119,8 @@ if (isset($_POST['youtube_submit'])) {
   if ($result) {
     $lastInsertId = $conn->insert_id;
     $_SESSION['temp_file_id'] = $lastInsertId;
-    header("Location: classwork_material.php?class_id=$class_id");
-    exit; // Exit after redirection
   } else {
-    echo "Error: " . $stmt->error; // Check for errors in query execution
+    echo "Error: " . $stmt->error;
   }
 }
 ?>
@@ -159,10 +152,10 @@ if (isset($_POST['youtube_submit'])) {
         <div>
           <div class="btn-group">
             <button type="submit" name="post_button" class="btn btn-success"
-              style="margin-right: 3px; width: 12vh; margin-bottom: 10px;">Post</button>
+              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Post</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
-              style="margin-right: 15px; width: 5vh; height: 6vh; margin-bottom: 10px;">
+              style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
 
@@ -438,7 +431,8 @@ if (isset($_POST['youtube_submit'])) {
       </div>
     </div>
   </form>
-  <form action="" method="post" class="form-link" id="myLinkForm">
+  <form action="classwork_material.php?class_id=<?php echo $class_id ?>" method="post" class="form-link"
+    id="myLinkForm">
     <div class="modal fade" id="linkModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
       aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -450,7 +444,7 @@ if (isset($_POST['youtube_submit'])) {
               <label for="linkInput">Link</label>
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" style="border: none;">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary" id="addLink" name="add_link">Add Link</button>
           </div>
@@ -458,7 +452,8 @@ if (isset($_POST['youtube_submit'])) {
       </div>
     </div>
   </form>
-  <form action="" method="post" class="form-link" enctype="multipart/form-data" id="myFileForm">
+  <form action="classwork_material.php?class_id=<?php echo $class_id ?>" method="post" class="form-link"
+    enctype="multipart/form-data" id="myFileForm">
     <div class="modal fade" id="fileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
       aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -469,7 +464,7 @@ if (isset($_POST['youtube_submit'])) {
               <input type="file" name="file">
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" style="border: none;">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary" name="file_submit">Add File</button>
           </div>
@@ -477,7 +472,8 @@ if (isset($_POST['youtube_submit'])) {
       </div>
     </div>
   </form>
-  <form action="" method="post" class="form-youtube" id="myYoutubeForm">
+  <form action="classwork_material.php?class_id=<?php echo $class_id ?>" method="post" class="form-youtube"
+    id="myYoutubeForm">
     <div class="modal fade" id="youtubeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
       aria-labelledby="staticBackdropLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -489,9 +485,9 @@ if (isset($_POST['youtube_submit'])) {
               <label for="youtubeLinkInput">Link</label>
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" style="border: none;">
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="addYoutubeLink" name="youtube_submit">Add Youtube
+            <button type="button" class="btn btn-primary" id="addYoutubeLink" name="youtube_submit">Add Youtube
               Link</button>
           </div>
         </div>
@@ -499,6 +495,7 @@ if (isset($_POST['youtube_submit'])) {
     </div>
   </form>
 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     var form = document.querySelector('form');
 
@@ -525,7 +522,6 @@ if (isset($_POST['youtube_submit'])) {
 
       if (isEmpty) {
         event.preventDefault();
-        // Optionally, you can show a validation message/alert here
       }
     });
   </script>

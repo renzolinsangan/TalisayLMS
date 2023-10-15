@@ -244,7 +244,7 @@ $stmt->closeCursor();
                         <label for="floatingName">Class Topic</label>
                       </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer" style="border: none;">
                       <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
                       <button type="submit" name="submit_topic" class="btn btn-success">Add</button>
                     </div>
@@ -493,15 +493,34 @@ $stmt->closeCursor();
                           style="font-size: 20px; color: green; margin-right: 10px;">
                           <i class="bi bi-three-dots-vertical"></i>
                         </a>
-
                         <ul class="dropdown-menu">
                           <li>
-                            <a class="dropdown-item" href="#">Rename</a>
-                          </li>
-                          <li>
-                            <a class="dropdown-item" href="#">Delete</a>
+                            <a class="dropdown-item" data-toggle="modal" data-target="#editMyModal"
+                              style="cursor: pointer;">Delete</a>
                           </li>
                         </ul>
+                        <div class="modal fade" id="editMyModal">
+                          <form action="" method="post" class="forms-sample" id="myEditForm">
+                            <div class="modal-dialog modal-dialog-centered" style="top: -6vh;">
+                              <div class="modal-content">
+                                <div class="modal-body">
+                                  <h4 class="mb-4">Rename Class Topic</h4>
+                                  <div id="editedValidationAlert" class="alert alert-danger" style="display: none;">Class Topic cannot be
+                                    empty.</div>
+                                  <div class="form-floating mb-2">
+                                    <input type="text" name="rename_topic" id="rename_topic" class="form-control" id="floatingInput"
+                                      placeholder="Class Name">
+                                    <label for="floatingName">Class Topic</label>
+                                  </div>
+                                </div>
+                                <div class="modal-footer" style="border: none;">
+                                  <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                                  <button type="submit" name="submit_topic" class="btn btn-success">Add</button>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
                       </div>
                     </div>
                     <p class="bottom-border mb-4"></p>
@@ -647,7 +666,7 @@ $stmt->closeCursor();
                                 <ul class="dropdown-menu">
                                   <li>
                                     <a class="dropdown-item"
-                                      href="edit_quesiton.php?updateid=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                      href="edit_question.php?updateid=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
                                   </li>
                                   <li>
                                     <a class="dropdown-item"
@@ -698,6 +717,23 @@ $stmt->closeCursor();
     classTopicInput.addEventListener('input', function () {
       validationAlert.style.display = 'none'; // Hide the error message
       classTopicInput.classList.remove('is-invalid'); // Remove the is-invalid class
+    });
+
+    var form = document.getElementById('myEditForm');
+    var editedClassTopic = document.getElementById('rename_topic');
+    var editedValidationAlert = document.getElementById('editedValidationAlert');
+
+    form.addEventListener('submit', function (event) {
+      if (editedClassTopic.value.trim() === '') {
+        event.preventDefault();
+        editedValidationAlert.style.display = 'block';
+        editedClassTopic.classList.add('is-invalid');
+      }
+    });
+
+    editedClassTopic.addEventListener('input', function () {
+      editedValidationAlert.style.display = 'none';
+      editedClassTopic.classList.remove('is-invalid');
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

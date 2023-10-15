@@ -13,94 +13,131 @@ if (isset($_GET['class_id'])) {
 include("db_conn.php");
 $teacher_id = $_SESSION['user_id'];
 
-if (isset($_POST['assign_button'])) {
-  $title = $_POST['title'];
-  $instruction = $_POST['instruction'];
-  $class_name = $_POST['class_name'];
-  $student = $_POST['student'];
-  $point = $_POST['point'];
-  $date = date('Y-m-d');
-  $due_date = $_POST['due_date'];
-  $time = $_POST['time'];
-  $class_topic = $_POST['class_topic'];
-  $youtube = isset($_SESSION['temp_youtube']) ? $_SESSION['temp_youtube'] : '';
-  $assignment_status = "assigned";
+$_SESSION['id'] = $_GET['updateid'];
+$id = $_SESSION['id'];
 
-  // Check if there's a temporary file ID in the session
-  if (isset($_SESSION['temp_file_id'])) {
-    $file_id = $_SESSION['temp_file_id'];
-    $link = $_SESSION['temp_link'];
-    $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
+$sql="SELECT * FROM classwork_question WHERE question_id = ? AND class_id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "ii", $id, $class_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$row = mysqli_fetch_assoc($result);
 
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, link, file, youtube, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $assignment_status]);
+$title = $row['title'];
+$question = $row['question'];
+$instruction = $row['instruction'];
+$point = $row['point'];
+$due_date = $row['due_date'];
+$time = $row['time'];
+$class_topic = $row['class_topic'];
 
-    if ($result) {
-      // Update the used column for the associated link and file
-      $sql = "UPDATE classwork_assignment_upload SET used = 1 WHERE link = ? OR assignment_upload_id = ? OR youtube = ?";
+// Question
+if (isset($_POST['ask_button'])) { 
+    $class_id = $_GET['class_id'];
+    $teacher_id = $_SESSION['user_id'];
+    $question_id = $_SESSION['id'];
+    $title = $_POST['title'];
+    $question = $_POST['question'];
+    $instruction = $_POST['instruction'];
+    $class_name = $_POST['class_name'];
+    $student = $_POST['student'];
+    $point = $_POST['point'];
+    $date = date('Y-m-d');
+    $due_date = $_POST['due_date'];
+    $time = $_POST['time'];
+    $class_topic = $_POST['class_topic'];
+    $youtube = isset($_SESSION['temp_youtube']) ? $_SESSION['temp_youtube'] : '';
+  
+    // Check if there's a temporary file ID in the session
+    if (isset($_SESSION['temp_file_id'])) {
+      $file_id = $_SESSION['temp_file_id'];
+      $link = $_SESSION['temp_link'];
+      $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
+  
+      $sql = "UPDATE classwork_question SET title = ?, question = ?, instruction = ?, class_name = ?, student = ?, point = ?, date = ?, due_date = ?, time = ?, class_topic = ?, class_id = ?, teacher_id = ?, link = ?, file = ?, youtube = ? WHERE teacher_id = ? AND class_id = ? AND question_id = ?";
       $stmtupdate = $conn->prepare($sql);
-      $stmtupdate->execute([$link, $file_id, $youtube]);
-
-      // Remove the temporary link, file ID, and filename from the session
-      unset($_SESSION['temp_link']);
-      unset($_SESSION['temp_file_id']);
-      unset($_SESSION['temp_file_name']);
-      unset($_SESSION['temp_youtube']);
-
-      header("Location: class_classwork.php?class_id=$class_id");
+  
+      if ($stmtupdate === false) {
+        echo "Error in preparing the update statement: " . mysqli_error($conn);
+      } else {
+        mysqli_stmt_bind_param($stmtupdate, "sssssissssiisssiii", $title, $question, $instruction, $class_name, $student, $point, 
+        $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $teacher_id, $class_id, $question_id);
+  
+        if (mysqli_stmt_execute($stmtupdate)) {
+          // Update the used column for the associated link and file
+          $sql = "UPDATE classwork_question_upload SET used = 1 WHERE link = ? OR question_upload_id = ? OR youtube = ?";
+          $stmtupdate2 = $conn->prepare($sql);
+  
+          if ($stmtupdate2 === false) {
+            echo "Error in preparing the update statement for classwork_question_upload: " . mysqli_error($conn);
+          } else {
+            $stmtupdate2->execute([$link, $file_id, $youtube]);
+  
+            // Remove the temporary link, file ID, and filename from the session
+            unset($_SESSION['temp_link']);
+            unset($_SESSION['temp_file_id']);
+            unset($_SESSION['temp_file_name']);
+            unset($_SESSION['temp_youtube']);
+  
+            header("Location: class_classwork.php?class_id=$class_id");
+          }
+        } else {
+          echo "Failed to execute the update statement: " . $stmtupdate->error;
+        }
+      }
     } else {
-      echo "Failed: " . $conn->error;
-    }
-  } else {
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $assignment_status]);
-
-    if ($result) {
-      header("Location: class_classwork.php?class_id=$class_id");
-    } else {
-      echo "Failed: " . $conn->error;
+      $sql = "UPDATE classwork_question SET title = ?, question = ?, instruction = ?, class_name = ?, student = ?, point = ?, date = ?, due_date = ?, time = ?, class_topic = ?, teacher_id = ? WHERE teacher_id = ? AND class_id = ? AND question_id = ?";
+      $stmtupdate = $conn->prepare($sql);
+  
+      if ($stmtupdate === false) {
+        echo "Error in preparing the update statement: " . mysqli_error($conn);
+      } else {
+        mysqli_stmt_bind_param($stmtupdate, "sssssissssiiii", $title, $question, $instruction, $class_name, $student, 
+        $point, $date, $due_date, $time, $class_topic, $teacher_id, $teacher_id, $class_id, $question_id);
+  
+        if (mysqli_stmt_execute($stmtupdate)) {
+          header("Location: class_classwork.php?class_id=$class_id");
+        } else {
+          echo "Failed to execute the update statement: " . $stmtupdate->error;
+        }
+      }
     }
   }
-}
+  
 
 if (isset($_POST['add_link'])) {
   $link = $_POST['link'];
   $_SESSION['temp_link'] = $link;
 
-  $sql = "INSERT INTO classwork_assignment_upload (link, used) VALUES (?, 0)";
+  $sql = "INSERT INTO classwork_question_upload (link, used) VALUES (?, 0)";
   $stmtinsert = $conn->prepare($sql);
   $result = $stmtinsert->execute([$link]);
 
   if ($result) {
     $lastInsertId = $conn->insert_id;
-    $_SESSION['temp_file_id'] = $lastInsertId; // Store the ID in the session
+    $_SESSION['temp_file_id'] = $lastInsertId;
   }
 }
 
 if (isset($_POST['file_submit'])) {
-  // Check if a file was uploaded
   if (isset($_FILES['file'])) {
     $file = $_FILES['file'];
 
-    // Check for file errors
     if ($file['error'] === UPLOAD_ERR_OK) {
       $tmp_name = $file['tmp_name'];
-      $file_name = basename($file['name']); // Get just the filename
+      $file_name = basename($file['name']);
 
-      $upload_directory = 'assets/uploads/' . $file_name; // Include the directory again
+      $upload_directory = 'assets/uploads/' . $file_name;
 
-      // Move the uploaded file to the specified directory
       if (move_uploaded_file($tmp_name, $upload_directory)) {
-        $sql = "INSERT INTO classwork_assignment_upload (file, used) VALUES (?, 0)";
+        $sql = "INSERT INTO classwork_question_upload (file, used) VALUES (?, 0)";
         $stmt = $conn->prepare($sql);
-        $result = $stmt->execute([$file_name]); // Insert just the filename, not the full path
+        $result = $stmt->execute([$file_name]);
 
         if ($result) {
           $lastInsertId = $conn->insert_id;
           $_SESSION['temp_file_id'] = $lastInsertId;
-          $_SESSION['temp_file_name'] = $file_name; // Store the filename in the session
+          $_SESSION['temp_file_name'] = $file_name;
         } else {
           echo "Error saving file to the database.";
         }
@@ -117,7 +154,7 @@ if (isset($_POST['youtube_submit'])) {
   $youtube = $_POST['youtube'];
   $_SESSION['temp_youtube'] = $youtube;
 
-  $sql = "INSERT INTO classwork_assignment_upload (youtube, used) VALUES (?, 0)"; // Fix the table name here
+  $sql = "INSERT INTO classwork_question_upload (youtube, used) VALUES (?, 0)"; // Fix the table name here
   $stmt = $conn->prepare($sql);
   $result = $stmt->execute([$youtube]);
 
@@ -137,12 +174,11 @@ if (isset($_POST['youtube_submit'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Talisay Senior High School LMS</title>
   <link rel="stylesheet" type="text/css" href="assets/css/virtual-select.min.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/cw_assignment.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/cw_question.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <script type="text/javascript" src="multi-select"></script>
 </head>
 
 <body>
@@ -153,12 +189,12 @@ if (isset($_POST['youtube_submit'])) {
         <div class="d-flex align-items-center">
           <button type="button" class="go-back" onclick="goToClasswork('<?php echo $class_id; ?>')"><i
               class="bi bi-x-lg custom-icon"></i></button>
-          <p class="text-body-secondary" style="margin-top: 10px; font-size: 22px;">Assignment</p>
+          <p class="text-body-secondary" style="margin-top: 10px; font-size: 22px;">Edit Question</p>
         </div>
         <div>
           <div class="btn-group">
-            <button type="submit" name="assign_button" class="btn btn-success"
-              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Assign</button>
+            <button type="submit" id="ask_button" name="ask_button" class="btn btn-success"
+              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Update</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
               style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
@@ -181,15 +217,27 @@ if (isset($_POST['youtube_submit'])) {
       <div class="container">
         <section class="row">
           <div class="col-md-7 mb-4">
-            <div class="row" style="padding-bottom: 8vh;">
+            <div class="row" style="padding-bottom: 4vh">
               <div class="col-md-1" style="margin-left: 3px; margin-right: 5px;">
-                <i class="bi bi-menu-down" style="font-size: 7vh;"></i>
+                <i class="bi bi-card-heading" style="font-size: 7vh;"></i>
               </div>
-              <div class="col-md-6 mb-4" style="margin-left: 3px;">
+              <div class="col-md-7 mb-4" style="margin-left: 3px;">
                 <div class="form-floating">
                   <textarea name="title" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Title"></textarea>
-                  <label for="floatingInput">Title</label>
+                    placeholder="Question Title"><?php echo $title ?></textarea>
+                  <label for="floatingInput">Question Title</label>
+                </div>
+              </div>
+            </div>
+            <div class="row" style="padding-bottom: 8vh;">
+              <div class="col-md-1" style="margin-left: 3px; margin-right: 5px;">
+                <i class="bi bi-patch-question" style="font-size: 7vh;"></i>
+              </div>
+              <div class="col-md-8 mb-4" style="margin-left: 3px;">
+                <div class="form-floating">
+                  <textarea name="question" class="form-control auto-resize" id="floatingInput"
+                    placeholder="Question"><?php echo $question ?></textarea>
+                  <label for="floatingInput">Question</label>
                 </div>
               </div>
             </div>
@@ -200,7 +248,7 @@ if (isset($_POST['youtube_submit'])) {
               <div class="col-md-10">
                 <div class="form-floating">
                   <textarea name="instruction" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Instructions" style="height: 200px;"></textarea>
+                    placeholder="Instructions" style="height: 200px;"><?php echo $instruction ?></textarea>
                   <label for="floatingInput">Instructions</label>
                 </div>
               </div>
@@ -240,13 +288,13 @@ if (isset($_POST['youtube_submit'])) {
             <?php
             include("db_conn.php");
 
-            $sql = "SELECT assignment_upload_id, youtube, file, link FROM classwork_assignment_upload WHERE used=0";
+            $sql = "SELECT question_upload_id, youtube, file, link FROM classwork_question_upload WHERE used=0";
             $result = mysqli_query($conn, $sql);
 
             while ($row = mysqli_fetch_assoc($result)) {
               if (!empty($row['youtube'])) // Check if it's a YouTube link
               {
-                $assignment_upload_id = $row['assignment_upload_id'];
+                $question_upload_id = $row['question_upload_id'];
                 $youtube = $row['youtube'];
                 $video_id = '';
                 parse_str(parse_url($youtube, PHP_URL_QUERY), $video_id);
@@ -274,7 +322,7 @@ if (isset($_POST['youtube_submit'])) {
                           </div>
                         </a>
                         <a
-                          href="delete_youtube_assignment.php?deleteid=<?php echo $assignment_upload_id ?>&class_id=<?php echo $class_id ?>">
+                          href="delete_youtube_question.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
                           <div class="row mb-3">
                             <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                               <i class="bi bi-trash-fill"></i>
@@ -287,7 +335,7 @@ if (isset($_POST['youtube_submit'])) {
                   <?php
                 }
               } elseif (!empty($row['file'])) {
-                $assignment_upload_id = $row['assignment_upload_id'];
+                $question_upload_id = $row['question_upload_id'];
                 $fileUrl = $row['file'];
                 $fileExtension = pathinfo($fileUrl, PATHINFO_EXTENSION);
                 $displayText = ($fileExtension === 'pdf') ? 'PDF File' : strtoupper($fileExtension) . ' File';
@@ -312,7 +360,7 @@ if (isset($_POST['youtube_submit'])) {
                         </div>
                       </a>
                       <a
-                        href="delete_file_assignment.php?deleteid=<?php echo $assignment_upload_id ?>&class_id=<?php echo $class_id ?>">
+                        href="delete_file_question.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
                         <div class="row mb-3">
                           <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                             <i class="bi bi-trash-fill"></i>
@@ -324,7 +372,7 @@ if (isset($_POST['youtube_submit'])) {
                 </div>
                 <?php
               } elseif (!empty($row['link'])) {
-                $assignment_upload_id = $row['assignment_upload_id'];
+                $question_upload_id = $row['question_upload_id'];
                 $linkUrl = $row['link'];
                 ?>
                 <div class="row">
@@ -347,7 +395,7 @@ if (isset($_POST['youtube_submit'])) {
                         </div>
                       </a>
                       <a
-                        href="delete_link_assignment.php?deleteid=<?php echo $assignment_upload_id ?>&class_id=<?php echo $class_id ?>">
+                        href="delete_link_question.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
                         <div class="row mb-3">
                           <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                             <i class="bi bi-trash-fill"></i>
@@ -414,19 +462,19 @@ if (isset($_POST['youtube_submit'])) {
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Points</label>
               <div class="col-md-6 mb-4">
-                <input type="text" class="form-control" name="point" style="padding: 10px;">
+                <input type="text" name="point" class="form-control" style="padding: 10px;" value="<?php echo $point ?>">
               </div>
             </div>
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Due-date</label>
               <div class="col-md-14 mb-4">
-                <input type="date" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d'); ?>">
+              <input type="date" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d'); ?>" value="<?php echo $due_date ?>">
               </div>
             </div>
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Time (AM/PM)</label>
               <div class="col-md-6 mb-4">
-                <input type="text" name="time" class="form-control" style="padding: 10px;" value="11:59 PM">
+                <input type="text" name="time" class="form-control" style="padding: 10px;" value="<?php echo $time ?>">
               </div>
             </div>
             <div class="row">
@@ -435,17 +483,35 @@ if (isset($_POST['youtube_submit'])) {
                 <select id="classTopicSelect" name="class_topic" placeholder="Select Topics" data-search="true"
                   data-silent-initial-value-set="true" style="height: 45px;">
                   <option value="" selected>No Topic</option>
-                  <?php
-                  include("db_conn.php");
-                  $teacher_id = $_SESSION['user_id'];
+                  <?php 
+                    include("db_conn.php");
+                    $teacher_id = $_SESSION['user_id'];
 
-                  $sql = "SELECT class_topic FROM topic WHERE teacher_id=$teacher_id AND class_id=$class_id";
-                  $result = mysqli_query($conn, $sql);
+                    $sql_topic = "SELECT class_topic FROM topic WHERE teacher_id = $teacher_id AND class_id = $class_id";
+                    $stmt_result = mysqli_query($conn, $sql_topic);
+                    $matchingOptionFound = false;
 
-                  while ($row = mysqli_fetch_assoc($result)) {
-                    $class_topic = $row['class_topic'];
-                    echo '<option value="' . $class_topic . '">' . $class_topic . '</option>';
-                  }
+                    while ($row = mysqli_fetch_assoc($stmt_result)) {
+                        $class_topic = $row['class_topic'];
+                        $id = $_SESSION['id'];
+                        $class_id = $_GET['class_id'];
+
+                        $sql_questionTopic = "SELECT class_topic FROM classwork_question WHERE question_id = $id AND class_id = $class_id";
+                        $stmt_result_questionTopic = mysqli_query($conn, $sql_questionTopic);
+
+                        while($row_questionTopic = mysqli_fetch_assoc($stmt_result_questionTopic)) {
+                            $class_topicQuestion = $row_questionTopic['class_topic'];
+                            $selected = ($class_topicQuestion == $class_topic) ? 'selected' : '';
+
+                            if ($selected) {
+                                $matchingOptionFound = true;
+                            }
+                                echo '<option value="' . $class_topic . '" ' . $selected . '>' . $class_topic . '</option>';
+                            }
+                        }
+                    if (!$matchingOptionFound) {
+                        echo '<option value="" selected>No Topic</option>';
+                    }
                   ?>
                 </select>
               </div>
@@ -517,55 +583,56 @@ if (isset($_POST['youtube_submit'])) {
   </form>
 
   <script>
-    var form = document.querySelector('form');
+    document.addEventListener("DOMContentLoaded", function () {
+      var askButton = document.getElementById("ask_button"); // Get the "Ask" button
+      var form = document.querySelector('form');
 
-    form.addEventListener('submit', function (event) {
-      var titleInput = document.querySelector('[name="title"]');
-      var instructionInput = document.querySelector('[name="instruction"]');
-      var pointInput = document.querySelector('[name="point"]');
-      var duedateInput = document.querySelector('[name="due_date"]');
+      askButton.addEventListener('click', function (event) {
+        var questionInput = document.querySelector('[name="question"]');
+        var instructionInput = document.querySelector('[name="instruction"]');
+        var pointInput = document.querySelector('[name="point"]');
+        var duedateInput = document.querySelector('[name="due_date"]');
 
-      var isEmpty = false;
+        var isEmpty = false;
 
-      if (titleInput.value.trim() === '') {
-        isEmpty = true;
-        titleInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
-      } else {
-        titleInput.classList.remove('is-invalid'); // Remove the class if it's valid
-      }
+        if (questionInput.value.trim() === '') {
+          isEmpty = true;
+          questionInput.classList.add('is-invalid');
+        } else {
+          questionInput.classList.remove('is-invalid');
+        }
 
-      if (instructionInput.value.trim() === '') {
-        isEmpty = true;
-        instructionInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
-      } else {
-        instructionInput.classList.remove('is-invalid'); // Remove the class if it's valid
-      }
+        if (instructionInput.value.trim() === '') {
+          isEmpty = true;
+          instructionInput.classList.add('is-invalid');
+        } else {
+          instructionInput.classList.remove('is-invalid');
+        }
 
-      var pointValue = pointInput.value.trim();
-      var pointNumericValue = parseFloat(pointValue); // Convert to a numeric value
+        var pointValue = pointInput.value.trim();
+        if (pointValue === '' || isNaN(pointValue) || pointValue < 0 || pointValue > 100) {
+          isEmpty = true;
+          pointInput.classList.add('is-invalid');
+        } else {
+          pointInput.classList.remove('is-invalid');
+        }
 
-      if (pointValue === '' || isNaN(pointNumericValue) || pointNumericValue < 1 || pointNumericValue > 100) {
-        isEmpty = true;
-        pointInput.classList.add('is-invalid');
-      } else {
-        pointInput.classList.remove('is-invalid');
-      }
+        if (pointValue.length > 3) {
+          isEmpty = true;
+          pointInput.classList.add('is-invalid');
+        }
 
-      if (pointValue.length > 3) {
-        isEmpty = true;
-        pointInput.classList.add('is-invalid');
-      }
-
-      if (duedateInput.value.trim() === '') {
+        if (duedateInput.value.trim() === '') {
         isEmpty = true;
         duedateInput.classList.add('is-invalid');
       } else {
         duedateInput.classList.remove('is-invalid');
       }
 
-      if (isEmpty) {
-        event.preventDefault();
-      }
+        if (isEmpty) {
+          event.preventDefault();
+        }
+      });
     });
   </script>
   <script type="text/javascript" src="js/virtual-select.min.js"></script>
@@ -600,17 +667,6 @@ if (isset($_POST['youtube_submit'])) {
         this.style.height = initialHeight;
         this.style.height = (this.scrollHeight <= this.clientHeight) ? initialHeight : this.scrollHeight + "px";
       });
-    });
-
-    const gradingSelect = document.getElementById("grading");
-    const pointsInput = document.getElementById("floatingInput");
-
-    gradingSelect.addEventListener("change", function () {
-      if (this.value === "ungraded") {
-        pointsInput.setAttribute("disabled", true);
-      } else {
-        pointsInput.removeAttribute("disabled");
-      }
     });
   </script>
   <script>

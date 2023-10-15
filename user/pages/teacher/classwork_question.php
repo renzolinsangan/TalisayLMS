@@ -76,7 +76,6 @@ if (isset($_POST['add_link'])) {
   if ($result) {
     $lastInsertId = $conn->insert_id;
     $_SESSION['temp_file_id'] = $lastInsertId;
-    header("Location: classwork_question.php?class_id=$class_id");
   }
 }
 
@@ -99,9 +98,6 @@ if (isset($_POST['file_submit'])) {
           $lastInsertId = $conn->insert_id;
           $_SESSION['temp_file_id'] = $lastInsertId;
           $_SESSION['temp_file_name'] = $file_name;
-
-          header("Location: classwork_question.php?class_id=$class_id");
-          exit;
         } else {
           echo "Error saving file to the database.";
         }
@@ -125,8 +121,6 @@ if (isset($_POST['youtube_submit'])) {
   if ($result) {
     $lastInsertId = $conn->insert_id;
     $_SESSION['temp_file_id'] = $lastInsertId;
-    header("Location: classwork_question.php?class_id=$class_id");
-    exit; // Exit after redirection
   } else {
     echo "Error: " . $stmt->error; // Check for errors in query execution
   }
@@ -160,10 +154,10 @@ if (isset($_POST['youtube_submit'])) {
         <div>
           <div class="btn-group">
             <button type="submit" id="ask_button" name="ask_button" class="btn btn-success"
-              style="margin-right: 3px; width: 12vh; margin-bottom: 10px;">Ask</button>
+              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Ask</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
-              style="margin-right: 15px; width: 5vh; height: 6vh; margin-bottom: 10px;">
+              style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
 

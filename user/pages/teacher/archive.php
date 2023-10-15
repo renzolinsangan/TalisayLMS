@@ -55,19 +55,19 @@ $profile = $stmt->fetch(PDO::FETCH_COLUMN);
 $stmt->closeCursor();
 
 include("config.php");
-if (isset($_POST['archive'])) {
+if (isset($_POST['unarchive'])) {
   $class_id = $_POST['class_id'];
 
-  $sql_update_section = "UPDATE section SET archive_status = 'archive' WHERE class_id = ?";
+  $sql_update_section = "UPDATE section SET archive_status = '' WHERE class_id = ?";
   $stmt_update_section = $db->prepare($sql_update_section);
   $stmt_update_section->execute([$class_id]);
 
   if ($stmt_update_section->rowCount() > 0) {
-    $sql_update_classEnrolled = "UPDATE class_enrolled SET archive_status = 'archive' WHERE tc_id = ?";
+    $sql_update_classEnrolled = "UPDATE class_enrolled SET archive_status = '' WHERE tc_id = ?";
     $stmt_update_classEnrolled = $db->prepare($sql_update_classEnrolled);
     $stmt_update_classEnrolled->execute([$class_id]);
 
-    header("Location: archive.php");
+    header("Location: course.php?");
     exit();
   } else {
     header("Location: error.php");
@@ -109,11 +109,6 @@ if (isset($_POST['archive'])) {
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <ul class="navbar-nav navbar-nav-right">
-          <li class="nav-item nav-profile dropdown mt-2" style="margin-right: -2px; cursor: pointer;">
-            <a class="nav-link dropdown-toggle" data-toggle="modal" data-target="#myModal">
-              <i class="bi bi-plus-square mx-0" style="font-size: 28px; color: green;"></i>
-            </a>
-          </li>
           <li class="nav-item dropdown">
             <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
               data-toggle="dropdown">
@@ -249,72 +244,13 @@ if (isset($_POST['archive'])) {
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
-            <div class="modal fade" id="myModal">
-              <form action="" method="post" class="forms-sample" id="myForm">
-                <div class="modal-dialog modal-dialog-centered" style="top: -6vh;">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Create Class List</h5>
-                      <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="col-mb-4">
-                        <div id="validationAlert" class="alert alert-danger alert-dismissible fade show" role="alert"
-                          style="display: none;">
-                          Please fill in all required fields.
-                        </div>
-                      </div>
-                      <div class="form-floating mb-4">
-                        <select name="strand" class="form-control custom-select lightened-select"
-                          style="padding-top: 2vh;">
-                          <option disabled selected value="">Select Department</option>
-                          <option value="STEM">STEM</option>
-                          <option value="HUMSS">HUMSS</option>
-                          <option value="ABM">ABM</option>
-                          <option value="TVL">TVL</option>
-                        </select>
-                      </div>
-                      <div class="form-floating mb-4">
-                        <input type="text" name="section" class="form-control" id="floatingInput" placeholder="Section">
-                        <label for="floatingSection">Section</label>
-                      </div>
-                      <div class="form-floating mb-4">
-                        <input type="text" name="class_name" class="form-control" id="floatingInput"
-                          placeholder="Class Name">
-                        <label for="floatingName">Class Name</label>
-                      </div>
-                      <div class="form-floating mb-4">
-                        <input type="text" name="subject" class="form-control" id="floatingInput" placeholder="Subject">
-                        <label for="floatingSubject">Subject</label>
-                      </div>
-                    </div>
-                    <div class="modal-footer">
-                      <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                      <button type="submit" name="submit" class="btn btn-success">Submit</button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div class="col">
-              <h2>
-                Created Courses
-              </h2>
-              <p class="text-body-secondary">
-                (Teacher)
-              </p>
-            </div>
-            <div class="col-md-4" style="margin-left: 113vh; margin-bottom: -30px;">
-              <div class="row">
-                <div class="col">
-                  <div class="card-body">
-                    <p class="text-body-secondary" style="font-size: 14px; margin-top: -90px;">
-                      Create your class list here!
-                      <i class="bi bi-box-arrow-up-right" style="font-size: 20px; position: relative; top: -20px;"></i>
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <div class="col-md-4 mb-2">
+                <h2>
+                    Archive Courses
+                </h2>
+                <p class="text-body-secondary">
+                    (Teacher)
+                </p>
             </div>
           </div>
           <div class="row">
@@ -322,7 +258,7 @@ if (isset($_POST['archive'])) {
             include("db_conn.php");
             $teacher_id = $_SESSION['user_id'];
 
-            $sql = "SELECT * FROM section WHERE teacher_id = ? AND strand = ? AND archive_status = ''";
+            $sql = "SELECT * FROM section WHERE teacher_id = ? AND strand = ? AND archive_status = 'archive'";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("is", $teacher_id, $department);
             $stmt->execute();
@@ -383,7 +319,7 @@ if (isset($_POST['archive'])) {
                     <div class="card-footer d-flex justify-content-end">
                       <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
                         data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
-                        <h5>Archive <i class="bi bi-archive" style="font-size: 20px;"></i></i></h5>
+                        <h5>Unarchive <i class="bi bi-archive" style="font-size: 20px;"></i></i></h5>
                       </button>
                       <div class="modal fade" id="staticBackdrop<?php echo $row['class_id']; ?>" data-bs-backdrop="static"
                         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -391,12 +327,12 @@ if (isset($_POST['archive'])) {
                           <div class="modal-content">
                             <div class="modal-body">
                               <div class="text-start">
-                                <h3>Archive
+                                <h3>Unarchive
                                   <?php echo $row['class_name'] ?>?
                                 </h3>
-                                <p class="text-body-secondary mt-3">Class will be moved to the archived courses.</p>
-                                <p class="text-body-secondary mt-3">Do you want to archive this class?</p>
-                                <p class="text-body-secondary mt-3">Press click archive button if yes.</p>
+                                <p class="text-body-secondary mt-3">Class will be moved to the courses.</p>
+                                <p class="text-body-secondary mt-3">Do you want to unarchive this class?</p>
+                                <p class="text-body-secondary mt-3">Press click unarchive button if yes.</p>
                               </div>
                               <input type="hidden" name="class_id" value="<?php echo $row['class_id']; ?>">
 
@@ -404,8 +340,8 @@ if (isset($_POST['archive'])) {
                                 <button type="button" class="btn" data-bs-dismiss="modal"
                                   style="margin-right: 2vh; padding: 0;">Cancel</button>
                                 <button type="submit" class="btn"
-                                  name="archive"
-                                  style="color: green; margin-top: 2vh; padding: 0;">Archive</button>
+                                  name="unarchive"
+                                  style="color: green; margin-top: 2vh; padding: 0;">Unarchive</button>
                               </div>
                             </div>
                           </div>

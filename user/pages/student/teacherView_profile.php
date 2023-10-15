@@ -236,7 +236,7 @@ if ($stmt) {
                                                     aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
-                                                            <div class="modal-header">
+                                                            <div class="modal-header" style="border: none;">
                                                                 <h1 class="modal-title fs-5" id="staticBackdropLabel">
                                                                     Add Teacher</h1>
                                                                 <button type="button" class="btn-close"
@@ -246,7 +246,7 @@ if ($stmt) {
                                                                 <h3>Add <?php echo $firstname . ' ' . $lastname ?> as your teacher.</h3>
                                                                 <p class="text-body-secondary">If you wish to cancel, press the x button.</p>
                                                             </div>
-                                                            <div class="modal-footer">
+                                                            <div class="modal-footer" style="border: none;">
                                                                 <button type="button"
                                                                     class="btn btn-success">Add</button>
                                                             </div>

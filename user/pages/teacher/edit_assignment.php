@@ -13,57 +13,91 @@ if (isset($_GET['class_id'])) {
 include("db_conn.php");
 $teacher_id = $_SESSION['user_id'];
 
+$_SESSION['id'] = $_GET['updateid'];
+$id = $_SESSION['id'];
+
+$sql="SELECT * FROM classwork_assignment WHERE assignment_id = ? AND class_id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "ii", $id, $class_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$row = mysqli_fetch_assoc($result);
+
+$title = $row['title'];
+$instruction = $row['instruction'];
+$point = $row['point'];
+$due_date = $row['due_date'];
+$time = $row['time'];
+
 if (isset($_POST['assign_button'])) {
-  $title = $_POST['title'];
-  $instruction = $_POST['instruction'];
-  $class_name = $_POST['class_name'];
-  $student = $_POST['student'];
-  $point = $_POST['point'];
-  $date = date('Y-m-d');
-  $due_date = $_POST['due_date'];
-  $time = $_POST['time'];
-  $class_topic = $_POST['class_topic'];
-  $youtube = isset($_SESSION['temp_youtube']) ? $_SESSION['temp_youtube'] : '';
-  $assignment_status = "assigned";
+    $class_id = $_GET['class_id'];
+    $teacher_id = $_SESSION['user_id'];
+    $title = $_POST['title'];
+    $instruction = $_POST['instruction'];
+    $class_name = $_POST['class_name'];
+    $student = $_POST['student'];
+    $point = $_POST['point'];
+    $date = date('Y-m-d');
+    $due_date = $_POST['due_date'];
+    $time = $_POST['time'];
+    $class_topic = $_POST['class_topic'];
+    $youtube = isset($_SESSION['temp_youtube']) ? $_SESSION['temp_youtube'] : '';
+    $assignment_status = "assigned";
 
-  // Check if there's a temporary file ID in the session
-  if (isset($_SESSION['temp_file_id'])) {
-    $file_id = $_SESSION['temp_file_id'];
-    $link = $_SESSION['temp_link'];
-    $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
+    // Check if there's a temporary file ID in the session
+    if (isset($_SESSION['temp_file_id'])) {
+        $file_id = $_SESSION['temp_file_id'];
+        $link = $_SESSION['temp_link'];
+        $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
 
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, link, file, youtube, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $assignment_status]);
+        $sql = "UPDATE classwork_assignment SET title = ?, instruction = ?, class_name = ?, student = ?, point = ?, date = ?, due_date = ?, time = ?, class_topic = ?, class_id = ?, teacher_id = ?, link = ?, file = ?, youtube = ?, assignment_status = ? WHERE teacher_id = ? AND class_id = ? AND assignment_id = ?";
+        $stmtinsert = mysqli_prepare($conn, $sql);
 
-    if ($result) {
-      // Update the used column for the associated link and file
-      $sql = "UPDATE classwork_assignment_upload SET used = 1 WHERE link = ? OR assignment_upload_id = ? OR youtube = ?";
-      $stmtupdate = $conn->prepare($sql);
-      $stmtupdate->execute([$link, $file_id, $youtube]);
+        if ($stmtinsert === false) {
+            echo "Error in preparing the update statement: " . mysqli_error($conn);
+        } else {
+            mysqli_stmt_bind_param($stmtinsert, "ssssissssiissssiii", $title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $assignment_status, $teacher_id, $class_id, $id);
 
-      // Remove the temporary link, file ID, and filename from the session
-      unset($_SESSION['temp_link']);
-      unset($_SESSION['temp_file_id']);
-      unset($_SESSION['temp_file_name']);
-      unset($_SESSION['temp_youtube']);
+            if (mysqli_stmt_execute($stmtinsert)) {
+                // Update the used column for the associated link and file
+                $sql = "UPDATE classwork_assignment_upload SET used = 1 WHERE link = ? OR assignment_upload_id = ? OR youtube = ?";
+                $stmtupdate = $conn->prepare($sql);
 
-      header("Location: class_classwork.php?class_id=$class_id");
+                if ($stmtupdate === false) {
+                    echo "Error in preparing the update statement for classwork_assignment_upload: " . mysqli_error($conn);
+                } else {
+                    $stmtupdate->execute([$link, $file_id, $youtube]);
+
+                    // Remove the temporary link, file ID, and filename from the session
+                    unset($_SESSION['temp_link']);
+                    unset($_SESSION['temp_file_id']);
+                    unset($_SESSION['temp_file_name']);
+                    unset($_SESSION['temp_youtube']);
+
+                    header("Location: class_classwork.php?class_id=$class_id");
+                }
+            } else {
+                echo "Failed to execute the update statement: " . $stmtinsert->error;
+            }
+        }
     } else {
-      echo "Failed: " . $conn->error;
-    }
-  } else {
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $assignment_status]);
+        $sql = "UPDATE classwork_assignment SET title = ?, instruction = ?, class_name = ?, student = ?, point = ?, date = ?, due_date = ?, class_topic = ?, teacher_id = ?, time = ?, assignment_status = ? WHERE teacher_id = ? AND class_id = ? AND assignment_id = ?";
+        $stmtinsert = mysqli_prepare($conn, $sql);
 
-    if ($result) {
-      header("Location: class_classwork.php?class_id=$class_id");
-    } else {
-      echo "Failed: " . $conn->error;
+        if ($stmtinsert === false) {
+            echo "Error in preparing the update statement: " . mysqli_error($conn);
+        } else {
+            mysqli_stmt_bind_param($stmtinsert, "ssssisssissiii", $title, $instruction, $class_name, $student, $point, $date, $due_date, $class_topic, $teacher_id, $time, $assignment_status, $teacher_id, $class_id, $id);
+
+            if (mysqli_stmt_execute($stmtinsert)) {
+                header("Location: class_classwork.php?class_id=$class_id");
+            } else {
+                echo "Failed to execute the update statement: " . $stmtinsert->error;
+            }
+        }
     }
-  }
 }
+
 
 if (isset($_POST['add_link'])) {
   $link = $_POST['link'];
@@ -153,12 +187,12 @@ if (isset($_POST['youtube_submit'])) {
         <div class="d-flex align-items-center">
           <button type="button" class="go-back" onclick="goToClasswork('<?php echo $class_id; ?>')"><i
               class="bi bi-x-lg custom-icon"></i></button>
-          <p class="text-body-secondary" style="margin-top: 10px; font-size: 22px;">Assignment</p>
+          <p class="text-body-secondary" style="margin-top: 10px; font-size: 22px;">Edit Assignment</p>
         </div>
         <div>
           <div class="btn-group">
             <button type="submit" name="assign_button" class="btn btn-success"
-              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Assign</button>
+              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Update</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
               style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
@@ -188,7 +222,7 @@ if (isset($_POST['youtube_submit'])) {
               <div class="col-md-6 mb-4" style="margin-left: 3px;">
                 <div class="form-floating">
                   <textarea name="title" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Title"></textarea>
+                    placeholder="Title"><?php echo $title ?></textarea>
                   <label for="floatingInput">Title</label>
                 </div>
               </div>
@@ -200,7 +234,7 @@ if (isset($_POST['youtube_submit'])) {
               <div class="col-md-10">
                 <div class="form-floating">
                   <textarea name="instruction" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Instructions" style="height: 200px;"></textarea>
+                    placeholder="Instructions" style="height: 200px;"><?php echo $instruction ?></textarea>
                   <label for="floatingInput">Instructions</label>
                 </div>
               </div>
@@ -414,19 +448,19 @@ if (isset($_POST['youtube_submit'])) {
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Points</label>
               <div class="col-md-6 mb-4">
-                <input type="text" class="form-control" name="point" style="padding: 10px;">
+                <input type="text" class="form-control" name="point" style="padding: 10px;" value="<?php echo $point ?>">
               </div>
             </div>
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Due-date</label>
               <div class="col-md-14 mb-4">
-                <input type="date" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d'); ?>">
+                <input type="date" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d'); ?>" value="<?php echo $due_date ?>">
               </div>
             </div>
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Time (AM/PM)</label>
               <div class="col-md-6 mb-4">
-                <input type="text" name="time" class="form-control" style="padding: 10px;" value="11:59 PM">
+                <input type="text" name="time" class="form-control" style="padding: 10px;" value="<?php echo $time ?>">
               </div>
             </div>
             <div class="row">
@@ -434,18 +468,35 @@ if (isset($_POST['youtube_submit'])) {
               <div class="col-md-12 mb-4">
                 <select id="classTopicSelect" name="class_topic" placeholder="Select Topics" data-search="true"
                   data-silent-initial-value-set="true" style="height: 45px;">
-                  <option value="" selected>No Topic</option>
-                  <?php
-                  include("db_conn.php");
-                  $teacher_id = $_SESSION['user_id'];
+                  <?php 
+                    include("db_conn.php");
+                    $teacher_id = $_SESSION['user_id'];
 
-                  $sql = "SELECT class_topic FROM topic WHERE teacher_id=$teacher_id AND class_id=$class_id";
-                  $result = mysqli_query($conn, $sql);
+                    $sql_topic = "SELECT class_topic FROM topic WHERE teacher_id = $teacher_id AND class_id = $class_id";
+                    $stmt_result = mysqli_query($conn, $sql_topic);
+                    $matchingOptionFound = false;
 
-                  while ($row = mysqli_fetch_assoc($result)) {
-                    $class_topic = $row['class_topic'];
-                    echo '<option value="' . $class_topic . '">' . $class_topic . '</option>';
-                  }
+                    while ($row = mysqli_fetch_assoc($stmt_result)) {
+                        $class_topic = $row['class_topic'];
+                        $id = $_SESSION['id'];
+                        $class_id = $_GET['class_id'];
+
+                        $sql_assignmentTopic = "SELECT class_topic FROM classwork_assignment WHERE assignment_id = $id AND class_id = $class_id";
+                        $stmt_result_assignmentTopic = mysqli_query($conn, $sql_assignmentTopic);
+
+                        while($row_assignmentTopic = mysqli_fetch_assoc($stmt_result_assignmentTopic)) {
+                            $class_topicAssignment = $row_assignmentTopic['class_topic'];
+                            $selected = ($class_topicAssignment == $class_topic) ? 'selected' : '';
+
+                            if ($selected) {
+                                $matchingOptionFound = true;
+                            }
+                                echo '<option value="' . $class_topic . '" ' . $selected . '>' . $class_topic . '</option>';
+                            }
+                        }
+                    if (!$matchingOptionFound) {
+                        echo '<option value="" selected>No Topic</option>';
+                    }
                   ?>
                 </select>
               </div>

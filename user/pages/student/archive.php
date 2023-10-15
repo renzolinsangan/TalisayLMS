@@ -244,9 +244,13 @@ $stmt->closeCursor();
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
-            <div class="col mb-2">
-              <h2>Enrolled Courses</h2>
-              <p class="text-body-secondary">(Student)</p>
+            <div class="col-md-4 mb-2">
+              <h2>
+                Archive Courses
+              </h2>
+              <p class="text-body-secondary">
+                (Student)
+              </p>
             </div>
           </div>
           <div class="row">
@@ -270,7 +274,7 @@ $stmt->closeCursor();
             $sql_enrolled = "SELECT ce.class_id, se.class_name, se.section, se.first_name, se.last_name, se.teacher_id
                 FROM class_enrolled ce
                 INNER JOIN section se ON ce.class_code = se.class_code
-                WHERE ce.student_id = ? AND ce.archive_status = '' AND se.archive_status = ''";
+                WHERE ce.student_id = ? AND ce.archive_status = 'archive' AND se.archive_status = 'archive'";
             $stmt_enrolled = $conn->prepare($sql_enrolled);
             $stmt_enrolled->bind_param("i", $student_id);
             $stmt_enrolled->execute();

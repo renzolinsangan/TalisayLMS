@@ -74,7 +74,7 @@ if (isset($_GET['class_id'])) {
         </div>
         <div class="row mt-5">
           <div class="col-md-10 mx-auto grid-margin stretch-card mb-5">
-            <div class="card" id="adjustable-card">
+            <div class="card" id="adjustable-card-1">
               <div class="card-header"
                 style="display: flex; justify-content: space-between; align-items: center; height: 10vh;">
                 <input class="form-control" type="text" name="question" id="adjustable-input" value="Untitled Question">
@@ -404,11 +404,14 @@ if (isset($_GET['class_id'])) {
                 </div>
               </div>
             </div>
+            <div class="card-container mt-3">
+            </div>
             <div class="col-md-4 mt-4 mb-2 mx-auto grid-margin stretch-card">
               <div class="card">
                 <div class="card-body d-flex justify-content-between align-items-center">
                   <div data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add Question">
-                    <button style="border: none; background-color: transparent;">
+                    <button type="button" id="addQuestionButton" onclick="addQuestionCard()"
+                      style="border: none; background-color: transparent;">
                       <i class="bi bi-plus-circle" style="font-size: 22px; color: grey;"></i>
                     </button>
                   </div>
@@ -440,7 +443,6 @@ if (isset($_GET['class_id'])) {
       $('[data-bs-toggle="tooltip"]').tooltip();
     });
 
-    // Initialize dropdowns
     $(function () {
       $('.dropstart [data-bs-toggle="dropdown"]').dropdown();
     });
@@ -587,6 +589,65 @@ if (isset($_GET['class_id'])) {
       this.style.height = initialHeight;
       this.style.height = (this.scrollHeight <= this.clientHeight) ? initialHeight : this.scrollHeight + "px";
     }); 
+  </script>
+  <script>
+    let cardCount = 1;
+
+    document.getElementById("addQuestionButton").addEventListener("click", function () {
+      cardCount++;
+      const originalCard = document.getElementById("adjustable-card-1");
+      const newCard = originalCard.cloneNode(true);
+
+      // Update the new card's ID to make it unique
+      newCard.id = `adjustable-card-${cardCount}`;
+
+      // Update any other elements in the cloned card if necessary
+      const inputElement = newCard.querySelector(".form-control");
+      inputElement.value = "Untitled Question";
+
+      // Clear the selected question type for the new card
+      const selectedOption = newCard.querySelector("#selected-option");
+      selectedOption.textContent = "Type of Question";
+
+      // Hide all card-body and card-footer elements
+      const cardBodies = newCard.querySelectorAll(".card-body");
+      const cardFooters = newCard.querySelectorAll(".card-footer");
+
+      cardBodies.forEach((body) => {
+        body.style.display = "none";
+      });
+
+      cardFooters.forEach((footer) => {
+        footer.style.display = "none";
+      });
+
+      // Apply margin-bottom to the new card
+      newCard.style.marginBottom = "20px";
+
+      // Attach event listeners for the dropdown menu items to show the appropriate body and footer
+      const dropdownItems = newCard.querySelectorAll(".dropdown-item");
+      dropdownItems.forEach((item) => {
+        item.addEventListener("click", function (event) {
+          const selectedOption = newCard.querySelector("#selected-option");
+          selectedOption.textContent = item.textContent;
+          const questionType = item.getAttribute("name");
+
+          // Show the specific card-body and card-footer for the selected question type
+          const body = newCard.querySelector(`#${questionType}-body`);
+          const footer = newCard.querySelector(`#${questionType}-footer`);
+
+          if (body && footer) {
+            body.style.display = "block";
+            footer.style.display = "block";
+          }
+        });
+      });
+      
+
+      // Find the card container and append the new card to it
+      const cardContainer = document.querySelector(".card-container");
+      cardContainer.appendChild(newCard);
+    });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
