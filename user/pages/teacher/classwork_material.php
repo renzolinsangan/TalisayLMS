@@ -268,7 +268,7 @@ if (isset($_POST['youtube_submit'])) {
                           </div>
                         </a>
                         <a
-                          href="delete_youtube_material.php?deleteid=<?php echo $material_upload_id ?>&class_id=<?php echo $class_id ?>">
+                          href="delete_mainYoutubeMaterial.php?deleteid=<?php echo $material_upload_id ?>&class_id=<?php echo $class_id ?>">
                           <div class="row mb-3">
                             <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                               <i class="bi bi-trash-fill"></i>
@@ -306,7 +306,7 @@ if (isset($_POST['youtube_submit'])) {
                         </div>
                       </a>
                       <a
-                        href="delete_file_material.php?deleteid=<?php echo $material_upload_id ?>&class_id=<?php echo $class_id ?>">
+                        href="delete_mainFileMaterial.php?deleteid=<?php echo $material_upload_id ?>&class_id=<?php echo $class_id ?>">
                         <div class="row mb-3">
                           <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                             <i class="bi bi-trash-fill"></i>
@@ -341,7 +341,7 @@ if (isset($_POST['youtube_submit'])) {
                         </div>
                       </a>
                       <a
-                        href="delete_link_material.php?deleteid=<?php echo $material_upload_id ?>&class_id=<?php echo $class_id ?>">
+                        href="delete_mainLinkMaterial.php?deleteid=<?php echo $material_upload_id ?>&class_id=<?php echo $class_id ?>">
                         <div class="row mb-3">
                           <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                             <i class="bi bi-trash-fill"></i>

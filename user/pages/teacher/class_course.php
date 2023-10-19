@@ -98,6 +98,7 @@ if ($themeData) {
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
             alt="logo" />Talisay LMS</a>
+        <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/trace.svg" alt="logo" /></a>
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <ul class="navbar-nav navbar-nav-right">
@@ -303,7 +304,7 @@ if ($themeData) {
                     style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
                     <h4>Assign</h4>
                     <p class="text-body-secondary mt-3">Provide to-do list for your students.</p>
-                    <a href="#" class="create mt-2" style="margin-left: auto; color: green;">Create to-do list</a>
+                    <a href="#" class="create mt-2" style="margin-left: auto; color: green;">Manage to-review</a>
                   </div>
                 </div>
                 <div class="col">

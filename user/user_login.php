@@ -63,7 +63,7 @@ session_start();
                     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <div class="modal-header">
+                            <div class="modal-header" style="border: none;">
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
@@ -75,7 +75,7 @@ session_start();
                                 </div>
                                 <p class="text-body-secondary">Please put your registred email in your account to send the verification of changing password.</p>
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer" style="border: none;">
                                 <button type="submit" name="email_upload" class="btn btn-success">Send</button>
                             </div>
                         </div>

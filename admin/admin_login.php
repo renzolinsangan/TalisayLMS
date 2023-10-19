@@ -79,7 +79,7 @@ if(isset($_POST['register']))
                     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <div class="modal-header">
+                            <div class="modal-header" style="border: none;">
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                             </div>
@@ -98,7 +98,7 @@ if(isset($_POST['register']))
                                     <input type="email" name="email" class="form-control">
                                 </div>
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer" style="border: none;">
                                 <button type="submit" name="register" class="btn btn-success">Send</button>
                             </div>
                         </div>

@@ -70,7 +70,7 @@ $stmt->closeCursor();
   <!-- inject:css -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <link rel="stylesheet" href="assets/css/class_classwork.css">
+  <link rel="stylesheet" href="assets/css/classwork_class.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -82,6 +82,7 @@ $stmt->closeCursor();
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
             alt="logo" />Talisay LMS</a>
+        <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/trace.svg" alt="logo" /></a>
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <ul class="navbar-nav navbar-nav-right">
@@ -505,11 +506,12 @@ $stmt->closeCursor();
                               <div class="modal-content">
                                 <div class="modal-body">
                                   <h4 class="mb-4">Rename Class Topic</h4>
-                                  <div id="editedValidationAlert" class="alert alert-danger" style="display: none;">Class Topic cannot be
+                                  <div id="editedValidationAlert" class="alert alert-danger" style="display: none;">Class
+                                    Topic cannot be
                                     empty.</div>
                                   <div class="form-floating mb-2">
-                                    <input type="text" name="rename_topic" id="rename_topic" class="form-control" id="floatingInput"
-                                      placeholder="Class Name">
+                                    <input type="text" name="rename_topic" id="rename_topic" class="form-control"
+                                      id="floatingInput" placeholder="Class Name">
                                     <label for="floatingName">Class Topic</label>
                                   </div>
                                 </div>
@@ -526,24 +528,33 @@ $stmt->closeCursor();
                     <p class="bottom-border mb-4"></p>
                     <div class="topic-body">
                       <?php
-                      $sql_material = "SELECT material_id, title FROM classwork_material WHERE class_topic=? AND class_id=?";
+                      $counter = 1;
+
+                      $sql_material = "SELECT material_id, title, description, date, link, file, youtube 
+                        FROM classwork_material WHERE class_topic=? AND class_id=?";
                       $stmt_titles_material = $db->prepare($sql_material);
                       $stmt_titles_material->execute([$_SESSION['class_topic'], $class_id]);
 
-                      $sql_assignment = "SELECT assignment_id, title FROM classwork_assignment WHERE class_topic=? AND class_id=?";
+                      $sql_assignment = "SELECT assignment_id, title, instruction, date, due_date, link, file, youtube 
+                        FROM classwork_assignment WHERE class_topic=? AND class_id=?";
                       $stmt_titles_assignment = $db->prepare($sql_assignment);
                       $stmt_titles_assignment->execute([$_SESSION['class_topic'], $class_id]);
 
-                      $sql_question = "SELECT question_id, title FROM classwork_question WHERE class_topic=? AND class_id=?";
+                      $sql_question = "SELECT question_id, title, instruction, date, due_date, link, file, youtube 
+                        FROM classwork_question WHERE class_topic=? AND class_id=?";
                       $stmt_titles_question = $db->prepare($sql_question);
                       $stmt_titles_question->execute([$_SESSION['class_topic'], $class_id]);
 
                       foreach ($stmt_titles_material as $title_row) {
                         $material_id = $title_row['material_id'];
                         $title = $title_row['title'];
+                        $description = $title_row['description'];
+                        $date = $title_row['date'];
+                        $formattedDate = date("F j", strtotime($date));
                         $words = explode(' ', $title);
                         $maxWords = 4;
                         $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                        $collapseID = "collapseMaterial" . $counter;
 
                         if (count($words) > $maxWords) {
                           $truncatedTitle .= '...';
@@ -553,44 +564,74 @@ $stmt->closeCursor();
                           <div class="col-12 grid-margin strech-card">
                             <div class="body-card"
                               style="display: flex; justify-content: space-between; align-items: center; height: 10vh;">
-                              <div style="display: flex; align-items: center;">
-                                <div
-                                  style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: 20px;">
-                                  <i class="bi bi-journal-text"
-                                    style="color: white; line-height: 41px; font-size: 26px;"></i>
+                              <button class="d-flex justify-content-between align-items-center" data-toggle="collapse"
+                                data-target="#<?php echo $collapseID ?>"
+                                style="width: 100%; height: 100%; border: none; background-color: transparent;">
+                                <div style="display: flex; align-items: center;">
+                                  <div
+                                    style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: 20px;">
+                                    <i class="bi bi-journal-text"
+                                      style="color: white; line-height: 41px; font-size: 26px;"></i>
+                                  </div>
+                                  <p style="margin-top: 12px; margin-left: 30px; font-size: 17px; color: black;">
+                                    <?php echo $truncatedTitle ?>
+                                  </p>
                                 </div>
-                                <p style="margin-top: 15px; margin-left: 30px; font-size: 17px; color: black;">
-                                  <?php echo $truncatedTitle ?>
-                                </p>
-                              </div>
-                              <div class="dropdown">
-                                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                  style="font-size: 20px; color: green; margin-right: 10px;">
-                                  <i class="bi bi-three-dots-vertical"></i>
-                                </a>
+                                <div class="ml-auto">
+                                  <p class="text-body-secondary" style="margin-top: 12px;">Posted <?php echo $formattedDate ?></p>
+                                </div>
+                                <div class="dropdown">
+                                  <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="font-size: 20px; color: green; margin-right: 10px;">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                  </a>
 
-                                <ul class="dropdown-menu">
-                                  <li>
-                                    <a class="dropdown-item"
-                                      href="edit_material.php?updateid=<?php echo $material_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
-                                  </li>
-                                  <li>
-                                    <a class="dropdown-item"
-                                      href="delete_material.php?deleteid=<?php echo $material_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
-                                  </li>
-                                </ul>
+                                  <ul class="dropdown-menu">
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="edit_material.php?updateid=<?php echo $material_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                    </li>
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="delete_material.php?deleteid=<?php echo $material_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </button>
+                            </div>
+                            <div id="<?php echo $collapseID ?>" class="collapse" aria-labelledby="accordionHeading">
+                              <div class="card-body" style="border: 1px solid #ccc;">
+                                <div class="row">
+                                  <div class="col-md-8">
+                                    <p class="text-body-secondary">Posted <?php echo $formattedDate ?></p>
+                                    <p><?php echo $description ?></p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="card-footer" style="border: 1px solid #ccc; 
+                              background-color: transparent; border-radius: 0%; padding: 10px;">
+                                <a href="#" style="color: green; margin-left: 8px; text-decoration: none;">
+                                  View Material
+                                </a>
                               </div>
                             </div>
                           </div>
                         </div>
                         <?php
+                        $counter++;
                       }
                       foreach ($stmt_titles_assignment as $titlerow) {
                         $assignment_id = $titlerow['assignment_id'];
                         $title = $titlerow['title'];
+                        $instruction = $titlerow['instruction'];
+                        $date = $titlerow['date'];
+                        $formattedDate = date('F j', strtotime($date));
+                        $due_date = $titlerow['due_date'];
+                        $formattedDueDate = date("F j", strtotime($due_date));
                         $words = explode(' ', $title);
                         $maxWords = 4;
                         $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                        $collapseID = "collapseAssignment" . $counter;
 
                         if (count($words) > $maxWords) {
                           $truncatedTitle .= '...';
@@ -600,44 +641,74 @@ $stmt->closeCursor();
                           <div class="col-12 grid-margin strech-card">
                             <div class="body-card"
                               style="display: flex; justify-content: space-between; align-items: center; height: 10vh;">
-                              <div style="display: flex; align-items: center;">
-                                <div
-                                  style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: 20px;">
-                                  <i class="bi bi-journal-text"
-                                    style="color: white; line-height: 41px; font-size: 26px;"></i>
+                              <button class="d-flex justify-content-between align-items-center" data-toggle="collapse"
+                                data-target="#<?php echo $collapseID ?>"
+                                style="width: 100%; height: 100%; border: none; background-color: transparent;">
+                                <div style="display: flex; align-items: center;">
+                                  <div
+                                    style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: 20px;">
+                                    <i class="bi bi-journal-text"
+                                      style="color: white; line-height: 41px; font-size: 26px;"></i>
+                                  </div>
+                                  <p style="margin-top: 10px; margin-left: 30px; font-size: 17px; color: black;">
+                                    <?php echo $truncatedTitle ?>
+                                  </p>
                                 </div>
-                                <p style="margin-top: 15px; margin-left: 30px; font-size: 17px; color: black;">
-                                  <?php echo $truncatedTitle ?>
-                                </p>
-                              </div>
-                              <div class="dropdown">
-                                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                  style="font-size: 20px; color: green; margin-right: 10px;">
-                                  <i class="bi bi-three-dots-vertical"></i>
-                                </a>
+                                <div class="ml-auto">
+                                  <p class="text-body-secondary" style="margin-top: 10px;">Due <?php echo $formattedDueDate ?></p>
+                                </div>
+                                <div class="dropdown">
+                                  <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="font-size: 20px; color: green; margin-right: 10px;">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                  </a>
 
-                                <ul class="dropdown-menu">
-                                  <li>
-                                    <a class="dropdown-item"
-                                      href="edit_assignment.php?updateid=<?php echo $assignment_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
-                                  </li>
-                                  <li>
-                                    <a class="dropdown-item"
-                                      href="delete_assignment.php?deleteid=<?php echo $assignment_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
-                                  </li>
-                                </ul>
+                                  <ul class="dropdown-menu">
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="edit_assignment.php?updateid=<?php echo $assignment_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                    </li>
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="delete_assignment.php?deleteid=<?php echo $assignment_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </button>
+                            </div>
+                            <div id="<?php echo $collapseID ?>" class="collapse" aria-labelledby="accordionHeading">
+                              <div class="card-body" style="border: 1px solid #ccc;">
+                                <div class="row">
+                                  <div class="col-md-8">
+                                    <p class="text-body-secondary">Posted <?php echo $formattedDate ?></p>
+                                    <p><?php echo $instruction ?></p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="card-footer" style="border: 1px solid #ccc; 
+                              background-color: transparent; border-radius: 0%;">
+                                <a href="#" style="color: green; margin-left: 8px; text-decoration: none;">
+                                  View Assignment
+                                </a>
                               </div>
                             </div>
                           </div>
                         </div>
                         <?php
+                        $counter++;
                       }
                       foreach ($stmt_titles_question as $rowquestion) {
                         $question_id = $rowquestion['question_id'];
                         $title = $rowquestion['title'];
+                        $instruction = $rowquestion['instruction'];
+                        $date = $rowquestion['date'];
+                        $formattedDate = date('F j', strtotime($date));
+                        $due_date = $rowquestion['due_date'];
+                        $formattedDueDate = date("F j", strtotime($due_date));
                         $words = explode(' ', $title);
                         $maxWords = 4;
                         $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                        $collapseID = "collapseQuestion" . $counter;
 
                         if (count($words) > $maxWords) {
                           $truncatedTitle .= '...';
@@ -647,37 +718,61 @@ $stmt->closeCursor();
                           <div class="col-12 grid-margin strech-card">
                             <div class="body-card"
                               style="display: flex; justify-content: space-between; align-items: center; height: 10vh;">
-                              <div style="display: flex; align-items: center;">
-                                <div
-                                  style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: 20px;">
-                                  <i class="bi bi-question-square"
-                                    style="color: white; line-height: 41px; font-size: 26px;"></i>
+                              <button class="d-flex justify-content-between align-items-center" data-toggle="collapse"
+                                data-target="#<?php echo $collapseID ?>"
+                                style="width: 100%; height: 100%; border: none; background-color: transparent;">
+                                <div style="display: flex; align-items: center;" id="accordionHeading">
+                                  <div
+                                    style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: 20px;">
+                                    <i class="bi bi-question-square"
+                                      style="color: white; line-height: 41px; font-size: 26px;"></i>
+                                  </div>
+                                  <p style="margin-top: 15px; margin-left: 30px; font-size: 17px; color: black;">
+                                    <?php echo $truncatedTitle ?>
+                                  </p>
                                 </div>
-                                <p style="margin-top: 15px; margin-left: 30px; font-size: 17px; color: black;">
-                                  <?php echo $truncatedTitle ?>
-                                </p>
-                              </div>
-                              <div class="dropdown">
-                                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                  style="font-size: 20px; color: green; margin-right: 10px;">
-                                  <i class="bi bi-three-dots-vertical"></i>
-                                </a>
+                                <div class="ml-auto">
+                                  <p class="text-body-secondary" style="margin-top: 12px;">Due <?php echo $formattedDueDate ?></p>
+                                </div>
+                                <div class="dropdown">
+                                  <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="font-size: 20px; color: green; margin-right: 10px;">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                  </a>
 
-                                <ul class="dropdown-menu">
-                                  <li>
-                                    <a class="dropdown-item"
-                                      href="edit_question.php?updateid=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
-                                  </li>
-                                  <li>
-                                    <a class="dropdown-item"
-                                      href="delete_question.php?delete=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
-                                  </li>
-                                </ul>
+                                  <ul class="dropdown-menu">
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="edit_question.php?updateid=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                    </li>
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="delete_question.php?delete=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </button>
+                            </div>
+                            <div id="<?php echo $collapseID ?>" class="collapse" aria-labelledby="accordionHeading">
+                              <div class="card-body" style="border: 1px solid #ccc;">
+                                <div class="row">
+                                  <div class="col-md-8">
+                                    <p class="text-body-secondary">Posted <?php echo $formattedDate ?></p>
+                                    <p><?php echo $instruction ?></p>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="card-footer" style="border: 1px solid #ccc; 
+                              background-color: transparent; border-radius: 0%;">
+                                <a href="#" style="color: green; margin-left: 8px; text-decoration: none;">
+                                  View Question
+                                </a>
                               </div>
                             </div>
                           </div>
                         </div>
                         <?php
+                        $counter++;
                       }
                       ?>
                     </div>
@@ -692,69 +787,75 @@ $stmt->closeCursor();
       </div>
     </div>
 
-    <!-- content-wrapper ends -->
-  </div>
-  <!-- main-panel ends -->
-  </div>
-  <!-- page-body-wrapper ends -->
-  </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $(".body-card button").click(function () {
+          // Toggle the background color between #ccc and transparent
+          if ($(this).css("background-color") === "rgba(0, 0, 0, 0)") {
+            $(this).css("background-color", "#ccc");
+          } else {
+            $(this).css("background-color", "transparent");
+          }
+        });
+      });
+    </script>
+    <script>
+      var form = document.getElementById('myForm');
+      var classTopicInput = document.getElementById('class_topic');
+      var validationAlert = document.getElementById('validationAlert');
 
-  <script>
-    var form = document.getElementById('myForm');
-    var classTopicInput = document.getElementById('class_topic');
-    var validationAlert = document.getElementById('validationAlert');
+      form.addEventListener('submit', function (event) {
+        // Check if class_topic field is empty
+        if (classTopicInput.value.trim() === '') {
+          event.preventDefault(); // Prevent form submission
+          validationAlert.style.display = 'block'; // Show error message
+          classTopicInput.classList.add('is-invalid'); // Add the is-invalid class to highlight the field
+        }
+      });
 
-    form.addEventListener('submit', function (event) {
-      // Check if class_topic field is empty
-      if (classTopicInput.value.trim() === '') {
-        event.preventDefault(); // Prevent form submission
-        validationAlert.style.display = 'block'; // Show error message
-        classTopicInput.classList.add('is-invalid'); // Add the is-invalid class to highlight the field
-      }
-    });
+      // Add an event listener to hide the validation message when the user starts typing
+      classTopicInput.addEventListener('input', function () {
+        validationAlert.style.display = 'none'; // Hide the error message
+        classTopicInput.classList.remove('is-invalid'); // Remove the is-invalid class
+      });
 
-    // Add an event listener to hide the validation message when the user starts typing
-    classTopicInput.addEventListener('input', function () {
-      validationAlert.style.display = 'none'; // Hide the error message
-      classTopicInput.classList.remove('is-invalid'); // Remove the is-invalid class
-    });
+      var form = document.getElementById('myEditForm');
+      var editedClassTopic = document.getElementById('rename_topic');
+      var editedValidationAlert = document.getElementById('editedValidationAlert');
 
-    var form = document.getElementById('myEditForm');
-    var editedClassTopic = document.getElementById('rename_topic');
-    var editedValidationAlert = document.getElementById('editedValidationAlert');
+      form.addEventListener('submit', function (event) {
+        if (editedClassTopic.value.trim() === '') {
+          event.preventDefault();
+          editedValidationAlert.style.display = 'block';
+          editedClassTopic.classList.add('is-invalid');
+        }
+      });
 
-    form.addEventListener('submit', function (event) {
-      if (editedClassTopic.value.trim() === '') {
-        event.preventDefault();
-        editedValidationAlert.style.display = 'block';
-        editedClassTopic.classList.add('is-invalid');
-      }
-    });
-
-    editedClassTopic.addEventListener('input', function () {
-      editedValidationAlert.style.display = 'none';
-      editedClassTopic.classList.remove('is-invalid');
-    });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+      editedClassTopic.addEventListener('input', function () {
+        editedValidationAlert.style.display = 'none';
+        editedClassTopic.classList.remove('is-invalid');
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
+    <!-- endinject -->
 </body>
 
 </html>

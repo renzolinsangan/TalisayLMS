@@ -189,7 +189,7 @@ if ($teacher_id) {
           </div>
         </div>
         <div class="content-wrapper align-items-center justify-content-center" style="margin-top: 10vh;">
-          <div class="row align-items-center justify-content-center">
+          <div class="row align-items-center justify-content-center mb-2">
             <div class="col-md-3">
               <div class="card">
                 <div class="card-body">

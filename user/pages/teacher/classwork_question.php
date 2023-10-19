@@ -282,7 +282,7 @@ if (isset($_POST['youtube_submit'])) {
                           </div>
                         </a>
                         <a
-                          href="delete_youtube_question.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
+                          href="delete_mainYoutubeQuestion.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
                           <div class="row mb-3">
                             <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                               <i class="bi bi-trash-fill"></i>
@@ -320,7 +320,7 @@ if (isset($_POST['youtube_submit'])) {
                         </div>
                       </a>
                       <a
-                        href="delete_file_question.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
+                        href="delete_mainFileQuestion.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
                         <div class="row mb-3">
                           <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                             <i class="bi bi-trash-fill"></i>
@@ -355,7 +355,7 @@ if (isset($_POST['youtube_submit'])) {
                         </div>
                       </a>
                       <a
-                        href="delete_link_question.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
+                        href="delete_mainLinkQuestion.php?deleteid=<?php echo $question_upload_id ?>&class_id=<?php echo $class_id ?>">
                         <div class="row mb-3">
                           <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
                             <i class="bi bi-trash-fill"></i>

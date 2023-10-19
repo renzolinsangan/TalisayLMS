@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 13, 2023 at 05:50 PM
+-- Generation Time: Oct 19, 2023 at 05:44 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -75,9 +75,8 @@ CREATE TABLE `classwork_assignment` (
 --
 
 INSERT INTO `classwork_assignment` (`assignment_id`, `title`, `instruction`, `class_name`, `student`, `point`, `date`, `due_date`, `time`, `class_topic`, `class_id`, `teacher_id`, `link`, `file`, `youtube`, `assignment_status`) VALUES
-(27, 'Building a Cell', 'Build a digital model of a Cell.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 20, '2023-10-03', '2023-10-09', '11:59 PM', 'Cell Biology', 39, 33, '', '', NULL, 'turned-in late'),
-(28, 'Cell Division', 'Define Cell Biology', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 10, '2023-10-11', '2023-10-02', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'turned-in late'),
-(30, 'Cytoskeleton', 'Define Cytoskeleton and give examples.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 20, '2023-10-12', '2023-10-13', '11:59 PM', 'Cell Biology', 39, 33, '', '', '', 'assigned');
+(32, 'Cell Model', 'Create a cell model in a one whole sheet of short bond paper, put it in Microsoft Docx, and submit it before due date.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 20, '2023-10-16', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'assigned'),
+(33, 'Cell Energetics', 'Create a story based on the information that is related about Cell Energetics. Be creative and submit it before the due date.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 20, '2023-10-15', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'assigned');
 
 -- --------------------------------------------------------
 
@@ -119,7 +118,7 @@ CREATE TABLE `classwork_material` (
 --
 
 INSERT INTO `classwork_material` (`material_id`, `title`, `description`, `class_name`, `student`, `class_topic`, `class_id`, `teacher_id`, `date`, `link`, `file`, `youtube`) VALUES
-(114, 'Video About Cell Biology.', 'Please watch this video about Cell Biology so that for tomorrow, we will have a short recitation about the video.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 'Cell Biology', 39, 33, '2023-10-04', NULL, NULL, 'https://www.youtube.com/watch?v=URUJD5NEXC8');
+(114, 'Video About Cell Biology.', 'Please watch this video about Cell Biology so that for tomorrow, we will have a short recitation about the video. Thank you, have a nice day!', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 'Cell Biology', 39, 33, '2023-10-15', NULL, NULL, 'https://www.youtube.com/watch?v=URUJD5NEXC8');
 
 -- --------------------------------------------------------
 
@@ -140,7 +139,8 @@ CREATE TABLE `classwork_material_upload` (
 --
 
 INSERT INTO `classwork_material_upload` (`material_upload_id`, `link`, `file`, `youtube`, `used`) VALUES
-(89, '', '', 'https://www.youtube.com/watch?v=URUJD5NEXC8', 1);
+(156, 'https://www.pinterest.ph/pin/631348441494356252/', '', '', 1),
+(183, 'https://www.pinterest.ph/pin/631348441494356252/', '', '', 1);
 
 -- --------------------------------------------------------
 
@@ -173,7 +173,7 @@ CREATE TABLE `classwork_question` (
 --
 
 INSERT INTO `classwork_question` (`question_id`, `title`, `question`, `instruction`, `class_name`, `student`, `point`, `date`, `due_date`, `time`, `class_topic`, `class_id`, `teacher_id`, `link`, `file`, `youtube`, `question_status`) VALUES
-(21, 'Cell Biology', 'What is Cell Biology? ', 'Explain it one paragraph with a minimum of 5 sentence. Do not use any AI Tools in generating answers, if you are caught, your grade will be equivalent to 0.', 'STEM-Einstein - General Biology', 'John Renzo Linsangan', 30, '2023-10-01', '2023-10-14', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'turned in');
+(21, 'Cell Biology', 'What is Cell Biology? ', 'Explain it one paragraph with a minimum of 5 sentence. Do not use any AI Tools in generating answers, if you are caught, your grade will be equivalent to 0. Do it before the due date, have a nice day.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 40, '2023-10-15', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'turned in');
 
 -- --------------------------------------------------------
 
@@ -188,6 +188,29 @@ CREATE TABLE `classwork_question_upload` (
   `youtube` varchar(2000) NOT NULL,
   `used` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `classwork_quiz`
+--
+
+CREATE TABLE `classwork_quiz` (
+  `quiz_id` int(11) NOT NULL,
+  `quiz_title` varchar(64) NOT NULL,
+  `form_description` varchar(64) NOT NULL,
+  `question_title` varchar(64) NOT NULL,
+  `question_type` varchar(64) NOT NULL,
+  `question_details` varchar(1000) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `classwork_quiz`
+--
+
+INSERT INTO `classwork_quiz` (`quiz_id`, `quiz_title`, `form_description`, `question_title`, `question_type`, `question_details`) VALUES
+(13, 'Quiz Title', 'Form Description', 'Untitled Question', 'multiple', '[]'),
+(14, 'Quiz Title', 'Form Description', 'Untitled Question', 'multiple', '[]');
 
 -- --------------------------------------------------------
 
@@ -209,19 +232,20 @@ CREATE TABLE `class_enrolled` (
   `last_name` varchar(50) NOT NULL,
   `student_id` int(11) NOT NULL,
   `student_firstname` varchar(50) NOT NULL,
-  `student_lastname` varchar(50) NOT NULL
+  `student_lastname` varchar(50) NOT NULL,
+  `archive_status` varchar(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `class_enrolled`
 --
 
-INSERT INTO `class_enrolled` (`class_id`, `tc_id`, `class_name`, `section`, `subject`, `grade_level`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`, `student_id`, `student_firstname`, `student_lastname`) VALUES
-(42, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J', 'Liwag'),
-(43, 40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'Grade 11', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan'),
-(44, 41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'Grade 11', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan'),
-(45, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan'),
-(46, 43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'Grade 11', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia');
+INSERT INTO `class_enrolled` (`class_id`, `tc_id`, `class_name`, `section`, `subject`, `grade_level`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`, `student_id`, `student_firstname`, `student_lastname`, `archive_status`) VALUES
+(42, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J', 'Liwag', ''),
+(43, 40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'Grade 11', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', ''),
+(44, 41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'Grade 11', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', 'archive'),
+(45, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', ''),
+(46, 43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'Grade 11', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia', '');
 
 -- --------------------------------------------------------
 
@@ -249,7 +273,8 @@ INSERT INTO `class_theme` (`theme_id`, `theme`, `class_id`, `teacher_id`, `class
 (22, 'theme7.jpg', 39, 33, 'STEM-Einstein - General Biology', 'old'),
 (23, 'theme4.jpg', 39, 33, 'STEM-Einstein - General Biology', 'recent'),
 (24, 'theme7.jpg', 43, 32, 'TVL-ShangriLa - Mechanics', 'recent'),
-(25, 'theme9.jpg', 40, 33, 'STEM-Einstein - Basic Calculus', 'recent');
+(25, 'theme9.jpg', 40, 33, 'STEM-Einstein - Basic Calculus', 'recent'),
+(26, 'theme8.jpg', 45, 33, 'STEM-D - Oral Communication', 'recent');
 
 -- --------------------------------------------------------
 
@@ -315,19 +340,21 @@ CREATE TABLE `section` (
   `teacher_id` int(11) NOT NULL,
   `class_code` varchar(11) NOT NULL,
   `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL
+  `last_name` varchar(50) NOT NULL,
+  `archive_status` varchar(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `section`
 --
 
-INSERT INTO `section` (`class_id`, `class_name`, `section`, `subject`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`) VALUES
-(39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star'),
-(40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star'),
-(41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star'),
-(43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants'),
-(44, 'STEM-Newton - General Biology', 'Newton', 'General Biology', 'STEM', 32, 'rV6YJDt', 'Spongebob', 'Squarepants');
+INSERT INTO `section` (`class_id`, `class_name`, `section`, `subject`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`, `archive_status`) VALUES
+(39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', ''),
+(40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', ''),
+(41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 'archive'),
+(43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', ''),
+(44, 'STEM-Newton - General Biology', 'Newton', 'General Biology', 'STEM', 32, 'rV6YJDt', 'Spongebob', 'Squarepants', ''),
+(45, 'STEM-Einstein - Oral Communication', 'Einstein', 'Oral Communication', 'STEM', 33, 'RchAh06', 'Patrick', 'Star', '');
 
 -- --------------------------------------------------------
 
@@ -414,7 +441,8 @@ INSERT INTO `topic` (`topic_id`, `class_topic`, `class_id`, `teacher_id`, `secti
 (76, 'Derivative', 38, 32, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
 (77, 'Functions', 38, 32, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
 (78, 'Integral', 38, 32, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
-(79, 'Cell Biology', 39, 33, 'Einstein', 'General Biology', 'STEM', 'STEM-Einstein - General Biology');
+(79, 'Cell Biology', 39, 33, 'Einstein', 'General Biology', 'STEM', 'STEM-Einstein - General Biology'),
+(80, 'Cytoskeleton', 39, 33, 'Einstein', 'General Biology', 'STEM', 'STEM-Einstein - General Biology');
 
 -- --------------------------------------------------------
 
@@ -550,6 +578,12 @@ ALTER TABLE `classwork_question_upload`
   ADD PRIMARY KEY (`question_upload_id`);
 
 --
+-- Indexes for table `classwork_quiz`
+--
+ALTER TABLE `classwork_quiz`
+  ADD PRIMARY KEY (`quiz_id`);
+
+--
 -- Indexes for table `class_enrolled`
 --
 ALTER TABLE `class_enrolled`
@@ -630,7 +664,7 @@ ALTER TABLE `assignment_course_upload`
 -- AUTO_INCREMENT for table `classwork_assignment`
 --
 ALTER TABLE `classwork_assignment`
-  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `classwork_assignment_upload`
@@ -642,13 +676,13 @@ ALTER TABLE `classwork_assignment_upload`
 -- AUTO_INCREMENT for table `classwork_material`
 --
 ALTER TABLE `classwork_material`
-  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
 
 --
 -- AUTO_INCREMENT for table `classwork_material_upload`
 --
 ALTER TABLE `classwork_material_upload`
-  MODIFY `material_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `material_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=188;
 
 --
 -- AUTO_INCREMENT for table `classwork_question`
@@ -660,7 +694,13 @@ ALTER TABLE `classwork_question`
 -- AUTO_INCREMENT for table `classwork_question_upload`
 --
 ALTER TABLE `classwork_question_upload`
-  MODIFY `question_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `question_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `classwork_quiz`
+--
+ALTER TABLE `classwork_quiz`
+  MODIFY `quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `class_enrolled`
@@ -672,7 +712,7 @@ ALTER TABLE `class_enrolled`
 -- AUTO_INCREMENT for table `class_theme`
 --
 ALTER TABLE `class_theme`
-  MODIFY `theme_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `theme_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `feedback`
@@ -690,7 +730,7 @@ ALTER TABLE `news`
 -- AUTO_INCREMENT for table `section`
 --
 ALTER TABLE `section`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `student_assignment_course_answer`
@@ -708,7 +748,7 @@ ALTER TABLE `student_question_course_answer`
 -- AUTO_INCREMENT for table `topic`
 --
 ALTER TABLE `topic`
-  MODIFY `topic_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `topic_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT for table `users`

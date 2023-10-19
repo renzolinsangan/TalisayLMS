@@ -1,5 +1,6 @@
 <?php
 session_start();
+include("config.php");
 
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../../user_login.php");
@@ -8,6 +9,48 @@ if (!isset($_SESSION['user_id'])) {
 
 if (isset($_GET['class_id'])) {
   $class_id = $_GET['class_id'];
+}
+
+if (isset($_POST['create'])) {
+  $title = $_POST['title'];
+  $description = $_POST['description'];
+  $question_title = $_POST['question_title'];
+  $question_type = $_POST['question_type'];
+
+  if($question_type === 'short-answer') {
+    $class_id = $_GET['class_id'];
+    $short_answer = $_POST['short_answer'];
+
+    $sql_createQuiz_sa = "INSERT INTO classwork_quiz (quiz_title, form_description, question_title, question_type, question_details) VALUES (?, ?, ?, ?, ?)";
+    $stmt_insert_createQuiz_sa = $db->prepare($sql_createQuiz_sa);
+    $stmt_insert_createQuiz_sa->execute([$title, $description, $question_title, $question_type, $short_answer]);
+
+    header("Location: classwork_quiz.php?class_id=$class_id");
+  }
+  elseif($question_type === 'paragraph') {
+    $class_id = $_GET['class_id'];
+    $paragraph = $_POST['paragraph'];
+
+    $sql_createQuiz_pa = "INSERT INTO classwork_quiz (quiz_title, form_description, question_title, question_type, question_details) VALUES (?, ?, ?, ?, ?)";
+    $stmt_insert_createQuiz_pa = $db->prepare($sql_createQuiz_pa);
+    $stmt_insert_createQuiz_pa->execute([$title, $description, $question_title, $question_type, $paragraph]);  
+
+    header("Location: classwork_quiz.php?class_id=$class_id");
+  }
+  elseif($question_type === 'multiple') {
+  }
+  elseif($question_type === 'checkbox') {
+  }
+  elseif($question_type === 'truefalse') {
+    $truefalseValue = $_POST['truefalse'];
+    $class_id = $_GET['class_id'];
+
+    $sql_createQuiz_tf = "INSERT INTO classwork_quiz (quiz_title, form_description, question_title, question_type, question_details) VALUES (?, ?, ?, ?, ?)";
+    $stmt_insert_createQuiz_tf = $db->prepare($sql_createQuiz_tf);
+    $stmt_insert_createQuiz_tf->execute([$title, $description, $question_title, $question_type, $truefalseValue]);
+
+    header("Location: classwork_quiz.php?class_id=$class_id");
+  }
 }
 ?>
 <!doctype html>
@@ -29,7 +72,7 @@ if (isset($_GET['class_id'])) {
 
 <body>
 
-  <form action="" method="post">
+  <form action="classwork_quiz.php" method="post">
     <nav class="navbar navbar-light mb-5">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
@@ -40,10 +83,10 @@ if (isset($_GET['class_id'])) {
         <div>
           <div class="btn-group">
             <button type="submit" name="create" class="btn btn-success"
-              style="margin-right: 3px; width: 12vh; margin-bottom: 10px;">Create</button>
+              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Create</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
-              style="margin-right: 15px; width: 5vh; height: 6vh; margin-bottom: 10px;">
+              style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
               <span class="visually-hidden">Toggle Dropdown</span>
             </button>
 
@@ -65,9 +108,9 @@ if (isset($_GET['class_id'])) {
           <div class="col-md-10 mx-auto grid-margin stretch-card">
             <div class="card" style="border-top: 15px solid green; height: 35vh;">
               <div class="card-body mt-3 mb-4" id="quiz-header">
-                <input class="form-control title" type="text" name="title" value="Quiz Title" placeholder="Quiz Title">
+                <input class="form-control title" type="text" name="title" value="Quiz Title">
                 <input class="form-control text-body-secondary description mt-3" type="text" name="description"
-                  value="Form Description" placeholder="Form Description">
+                  value="Form Description">
               </div>
             </div>
           </div>
@@ -77,27 +120,47 @@ if (isset($_GET['class_id'])) {
             <div class="card" id="adjustable-card-1">
               <div class="card-header"
                 style="display: flex; justify-content: space-between; align-items: center; height: 10vh;">
-                <input class="form-control" type="text" name="question" id="adjustable-input" value="Untitled Question">
+                <input class="form-control" type="text" name="question_title" id="adjustable-input" value="Untitled Question">
                 <div class="dropdown-center" style="margin-left: 30px;">
-                  <button class="btn btn-transparent btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                  <button class="btn btn-transparent btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <span id="selected-option">Type of Question</span>
                   </button>
                   <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" id="short-answer" name="short-answer"><i
-                          class="bi bi-filter-left" style="margin-right: 5px;"></i>Short Answer</a></li>
-                    <li><a class="dropdown-item" href="#" id="paragraph" name="paragraph"><i
-                          class="bi bi-text-paragraph" style="margin-right: 5px;"></i>Paragraph</a></li>
+                    <li>
+                      <a class="dropdown-item" href="#" id="short-answer" name="short-answer" value="short-answer">
+                        <i class="bi bi-filter-left" style="margin-right: 5px;"></i>
+                        Short Answer
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" id="paragraph" name="paragraph" value="paragraph">
+                        <i class="bi bi-text-paragraph" style="margin-right: 5px;"></i>
+                        Paragraph
+                      </a>
+                    </li>
                     <li>
                       <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item" href="#" id="multiple" name="multiple"><i class="bi bi-circle"
-                          style="margin-right: 5px;"></i>Multiple Choice</a></li>
-                    <li><a class="dropdown-item" href="#" id="checkbox" name="checkbox"><i
-                          class="bi bi-check-square-fill" style="margin-right: 5px;"></i>Checkboxes</a></li>
-                    <li><a class="dropdown-item" href="#" id="truefalse" name="truefalse"><i
-                          class="bi bi-check-circle-fill" style="margin-right: 5px;"></i>True / False</a></li>
+                    <li>
+                      <a class="dropdown-item" href="#" id="multiple" name="multiple" value="multiple">
+                        <i class="bi bi-circle" style="margin-right: 5px;"></i>
+                        Multiple Choice
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" id="checkbox" name="checkbox" value="checkbox">
+                        <i class="bi bi-check-square-fill" style="margin-right: 5px;"></i>
+                        Checkboxes
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" id="truefalse" name="truefalse" value="truefalse">
+                        <i class="bi bi-check-circle-fill" style="margin-right: 5px;"></i>
+                        True / False
+                      </a>
+                    </li>
                   </ul>
+                  <input type="hidden" id="selected_question_type" name="question_type">
                 </div>
               </div>
 
@@ -343,15 +406,15 @@ if (isset($_GET['class_id'])) {
                 <div class="row">
                   <div class="col">
                     <div class="form-check mb-4" style="margin-left: 20px;">
-                      <input class="form-check-input" type="radio" name="myRadioGroup" id="true-radio"
-                        style="font-size: 20px;">
+                      <input class="form-check-input" type="radio" name="truefalse" id="true-radio"
+                        style="font-size: 20px;" value="true">
                       <label class="form-check-label" for="true-radio" style="font-size: 20px;">
                         True
                       </label>
                     </div>
                     <div class="form-check" style="margin-left: 20px;">
-                      <input class="form-check-input" type="radio" name="myRadioGroup" id="false-radio"
-                        style="font-size: 20px;">
+                      <input class="form-check-input" type="radio" name="truefalse" id="false-radio"
+                        style="font-size: 20px;" value="false">
                       <label class="form-check-label" for="false-radio" style="font-size: 20px;">
                         False
                       </label>
@@ -434,6 +497,19 @@ if (isset($_GET['class_id'])) {
     </div>
   </form>
 
+  <script>
+    $(document).ready(function() {
+        $('.dropdown-item').click(function(e) {
+            e.preventDefault(); // Prevent the default link behavior
+
+            var questionType = $(this).attr('value'); // Get the value attribute of the clicked link
+            $('#selected_option').text($(this).text()); // Update the displayed text
+
+            // Set the selected question type in the hidden input field
+            $('#selected_question_type').val(questionType);
+        });
+    });
+  </script>
   <script>
     function goToClasswork(classId) {
       window.location.href = `class_classwork.php?class_id=${classId}`;
