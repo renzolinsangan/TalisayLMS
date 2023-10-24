@@ -25,7 +25,8 @@ if (isset($_GET['class_id'])) {
     $_SESSION['teacher_id '] = $teacher_data['teacher_id'];
     $_SESSION['student_id'] = $teacher_data['student_id'];
 
-    $sql_enrolled_students = "SELECT student_firstname, student_lastname, student_id FROM class_enrolled WHERE class_name = ? AND section = ?";
+    $sql_enrolled_students = "SELECT student_firstname, student_lastname, student_id 
+    FROM class_enrolled WHERE class_name = ? AND section = ? ORDER BY student_firstname ASC";
     $stmt_enrolled_students = $conn->prepare($sql_enrolled_students);
     $stmt_enrolled_students->bind_param("ss", $class_name, $section);
     $stmt_enrolled_students->execute();

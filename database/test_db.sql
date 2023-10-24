@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 19, 2023 at 05:44 PM
+-- Generation Time: Oct 24, 2023 at 02:31 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -43,7 +43,9 @@ CREATE TABLE `assignment_course_upload` (
 
 INSERT INTO `assignment_course_upload` (`assignment_course_upload_id`, `link`, `file`, `class_id`, `user_id`, `assignment_id`, `status`) VALUES
 (96, 'https://byjus.com/biology/cell-biology/', '', 45, 28, 28, 'submitted'),
-(97, 'https://scopegurdoninstitute.co.uk/digital-toolkit-1-investigate-the-cell-3d-model', '', 45, 28, 27, 'submitted');
+(97, 'https://scopegurdoninstitute.co.uk/digital-toolkit-1-investigate-the-cell-3d-model', '', 45, 28, 27, 'submitted'),
+(99, 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 49, 38, 33, 'submitted'),
+(100, 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 45, 28, 33, 'submitted');
 
 -- --------------------------------------------------------
 
@@ -75,8 +77,8 @@ CREATE TABLE `classwork_assignment` (
 --
 
 INSERT INTO `classwork_assignment` (`assignment_id`, `title`, `instruction`, `class_name`, `student`, `point`, `date`, `due_date`, `time`, `class_topic`, `class_id`, `teacher_id`, `link`, `file`, `youtube`, `assignment_status`) VALUES
-(32, 'Cell Model', 'Create a cell model in a one whole sheet of short bond paper, put it in Microsoft Docx, and submit it before due date.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 20, '2023-10-16', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'assigned'),
-(33, 'Cell Energetics', 'Create a story based on the information that is related about Cell Energetics. Be creative and submit it before the due date.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 20, '2023-10-15', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'assigned');
+(32, 'Cell Model', 'Create a cell model in a one whole sheet of short bond paper, put it in Microsoft Docx, and submit it before due date.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 20, '2023-10-16', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'missing'),
+(33, 'Cell Energetics', 'Create a story based on the information that is related about Cell Energetics. Be creative and submit it before the due date.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 20, '2023-10-15', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, 'https://www.youtube.com/watch?v=eJ9Zjc-jdys', 'missing');
 
 -- --------------------------------------------------------
 
@@ -118,7 +120,7 @@ CREATE TABLE `classwork_material` (
 --
 
 INSERT INTO `classwork_material` (`material_id`, `title`, `description`, `class_name`, `student`, `class_topic`, `class_id`, `teacher_id`, `date`, `link`, `file`, `youtube`) VALUES
-(114, 'Video About Cell Biology.', 'Please watch this video about Cell Biology so that for tomorrow, we will have a short recitation about the video. Thank you, have a nice day!', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 'Cell Biology', 39, 33, '2023-10-15', NULL, NULL, 'https://www.youtube.com/watch?v=URUJD5NEXC8');
+(114, 'Video About Cell Biology.', 'Please watch this video about Cell Biology so that for tomorrow, we will have a short recitation about the video. Thank you, have a nice day!', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 'Cell Biology', 39, 33, '2023-10-15', NULL, 'DFD and CFD.docx', 'https://www.youtube.com/watch?v=URUJD5NEXC8');
 
 -- --------------------------------------------------------
 
@@ -156,6 +158,7 @@ CREATE TABLE `classwork_question` (
   `class_name` varchar(100) NOT NULL,
   `student` varchar(100) NOT NULL,
   `point` int(11) NOT NULL,
+  `point_received` int(11) NOT NULL,
   `date` date NOT NULL,
   `due_date` date NOT NULL,
   `time` varchar(50) NOT NULL,
@@ -172,8 +175,9 @@ CREATE TABLE `classwork_question` (
 -- Dumping data for table `classwork_question`
 --
 
-INSERT INTO `classwork_question` (`question_id`, `title`, `question`, `instruction`, `class_name`, `student`, `point`, `date`, `due_date`, `time`, `class_topic`, `class_id`, `teacher_id`, `link`, `file`, `youtube`, `question_status`) VALUES
-(21, 'Cell Biology', 'What is Cell Biology? ', 'Explain it one paragraph with a minimum of 5 sentence. Do not use any AI Tools in generating answers, if you are caught, your grade will be equivalent to 0. Do it before the due date, have a nice day.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 40, '2023-10-15', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'turned in');
+INSERT INTO `classwork_question` (`question_id`, `title`, `question`, `instruction`, `class_name`, `student`, `point`, `point_received`, `date`, `due_date`, `time`, `class_topic`, `class_id`, `teacher_id`, `link`, `file`, `youtube`, `question_status`) VALUES
+(21, 'Cell Biology', 'What is Cell Biology? ', 'Explain it one paragraph with a minimum of 5 sentence. Do not use any AI Tools in generating answers, if you are caught, your grade will be equivalent to 0. Do it before the due date, have a nice day.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 40, 0, '2023-10-15', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, 'https://www.nature.com/scitable/topic/cell-biology-13906536/', NULL, NULL, 'missing'),
+(23, 'Cell Evolution', 'What happens in a cell evolution?', 'Explain every process that happens in a cell evolution.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan,Marco Luis Hernandez,Carl Justine Aala,Martin Clarence Guantes', 20, 0, '2023-10-24', '2023-10-25', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'assigned');
 
 -- --------------------------------------------------------
 
@@ -245,7 +249,10 @@ INSERT INTO `class_enrolled` (`class_id`, `tc_id`, `class_name`, `section`, `sub
 (43, 40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'Grade 11', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', ''),
 (44, 41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'Grade 11', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', 'archive'),
 (45, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', ''),
-(46, 43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'Grade 11', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia', '');
+(46, 43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'Grade 11', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia', ''),
+(47, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 37, 'Marco Luis', 'Hernandez', ''),
+(48, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', ''),
+(49, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 38, 'Martin Clarence', 'Guantes', '');
 
 -- --------------------------------------------------------
 
@@ -298,6 +305,29 @@ CREATE TABLE `feedback` (
 INSERT INTO `feedback` (`feedback_id`, `firstname`, `lastname`, `report_title`, `details`, `attachment`) VALUES
 (19, 'Renzo', 'Linsangan', 'gege', 'gege talon', ''),
 (20, 'Renzo', 'Linsangan', 'Talon una Ulo', 'gege', '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `friend`
+--
+
+CREATE TABLE `friend` (
+  `primary_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `friend_id` int(11) NOT NULL,
+  `name` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `friend`
+--
+
+INSERT INTO `friend` (`primary_id`, `user_id`, `friend_id`, `name`) VALUES
+(1, 28, 36, 'R.J. C. Liwag'),
+(2, 28, 37, 'Marco Luis S. Hernandez'),
+(3, 28, 29, 'Carl Justine C. Aala'),
+(4, 38, 28, 'John Renzo G. Linsangan');
 
 -- --------------------------------------------------------
 
@@ -359,6 +389,29 @@ INSERT INTO `section` (`class_id`, `class_name`, `section`, `subject`, `strand`,
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `student`
+--
+
+CREATE TABLE `student` (
+  `primary_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `name` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `student`
+--
+
+INSERT INTO `student` (`primary_id`, `user_id`, `student_id`, `name`) VALUES
+(1, 33, 36, 'R.J. C. Liwag'),
+(2, 33, 28, 'John Renzo G. Linsangan'),
+(3, 33, 37, 'Marco Luis S. Hernandez'),
+(4, 33, 29, 'Carl Justine C. Aala');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `student_assignment_course_answer`
 --
 
@@ -366,20 +419,23 @@ CREATE TABLE `student_assignment_course_answer` (
   `answer_assignment_id` int(11) NOT NULL,
   `assignment_course_upload_id` int(11) NOT NULL,
   `assignment_id` int(11) NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `date` date NOT NULL,
   `assignment_link` varchar(2000) DEFAULT NULL,
   `assignment_file` varchar(2000) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `class_id` int(11) NOT NULL,
-  `teacher_id` int(11) NOT NULL
+  `teacher_id` int(11) NOT NULL,
+  `assignment_course_status` varchar(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `student_assignment_course_answer`
 --
 
-INSERT INTO `student_assignment_course_answer` (`answer_assignment_id`, `assignment_course_upload_id`, `assignment_id`, `assignment_link`, `assignment_file`, `user_id`, `class_id`, `teacher_id`) VALUES
-(151, 96, 28, 'https://byjus.com/biology/cell-biology/', '', 28, 45, 33),
-(153, 97, 27, 'https://scopegurdoninstitute.co.uk/digital-toolkit-1-investigate-the-cell-3d-model', '', 28, 45, 33);
+INSERT INTO `student_assignment_course_answer` (`answer_assignment_id`, `assignment_course_upload_id`, `assignment_id`, `title`, `date`, `assignment_link`, `assignment_file`, `user_id`, `class_id`, `teacher_id`, `assignment_course_status`) VALUES
+(154, 99, 33, 'Cell Energetics', '2023-10-15', 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 38, 49, 33, 'turned-in late'),
+(155, 100, 33, 'Cell Energetics', '2023-10-15', 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 28, 45, 33, 'turned-in late');
 
 -- --------------------------------------------------------
 
@@ -391,18 +447,42 @@ CREATE TABLE `student_question_course_answer` (
   `answer_question_id` int(11) NOT NULL,
   `question_id` int(11) NOT NULL,
   `point` int(64) NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `date` date NOT NULL,
   `question_answer` varchar(2000) NOT NULL,
   `user_id` int(11) NOT NULL,
   `class_id` int(11) NOT NULL,
-  `teacher_id` int(11) NOT NULL
+  `teacher_id` int(11) NOT NULL,
+  `question_course_status` varchar(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `student_question_course_answer`
 --
 
-INSERT INTO `student_question_course_answer` (`answer_question_id`, `question_id`, `point`, `question_answer`, `user_id`, `class_id`, `teacher_id`) VALUES
-(25, 21, 30, 'cell biology ay mali', 28, 45, 33);
+INSERT INTO `student_question_course_answer` (`answer_question_id`, `question_id`, `point`, `title`, `date`, `question_answer`, `user_id`, `class_id`, `teacher_id`, `question_course_status`) VALUES
+(25, 21, 30, 'Cell Biology', '2023-10-15', 'Cell biology is the scientific discipline that investigates the structure, function, and behavior of cells, which are the fundamental units of life. It encompasses the study of various cellular processes, interactions, and the molecular mechanisms that underlie the functions of cells within living organisms. Cell biology is integral to understanding how life is organized and how organisms function at the cellular level.', 28, 45, 33, 'turned-in late'),
+(27, 21, 40, 'Cell Biology', '2023-10-15', 'Cell biology is a branch of biology that focuses on the study of cells, which are the basic structural and functional units of living organisms. It encompasses a wide range of topics related to cells, including their structure, function, physiology, and interactions. Cell biology explores how cells are organized, how they communicate with each other, and how they carry out various biological processes.', 38, 49, 33, 'turned-in late');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teacher`
+--
+
+CREATE TABLE `teacher` (
+  `primary_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `name` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `teacher`
+--
+
+INSERT INTO `teacher` (`primary_id`, `user_id`, `teacher_id`, `name`) VALUES
+(2, 28, 33, 'Patrick H. Star');
 
 -- --------------------------------------------------------
 
@@ -494,13 +574,14 @@ CREATE TABLE `user_account` (
 
 INSERT INTO `user_account` (`user_id`, `username`, `password`, `email`, `address`, `contact`, `firstname`, `middlename`, `lastname`, `grade_level`, `department`, `section`, `usertype`, `reset_token_hash`, `reset_token_expires_at`) VALUES
 (28, 'renzolinsangan', '$2y$10$vdNYpMxHSGPQ8URNzheJ.uAW.fC3pOhyfevUKTtEA20POmytl30Ma', 'renzolinsangan11@gmail.com', 'Block 3 Lot 44, Croatia St. Lynville Subdv. Purok 3, Latag, Lipa City, Batangas', '09657008926', 'John Renzo', 'Goyena', 'Linsangan', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL),
-(29, 'carljustine', '$2y$10$8jbVM6Wy6bb.DR6YHhRnV.BLMxZj5faVlfPQuw//NwrvaNW0qTA16', 'carljustine@gmail.com', 'Talisay, Batangas', '09223043043', 'Carl Justine', 'C ', 'Aala', 'Grade 12', 'humss', 'Freud', 'student', '4685009adc6793cf52bd8c25e9c55114c3a3b92a98aa3a6cb25ba3a47fcdc487', '2023-10-06 07:36:21'),
+(29, 'carljustine', '$2y$10$ceE9/MKm90xp3P6srqIJ6udFR2NgLpkg3gifIVQwJ4F5ChjjiD5u.', 'carljustine@gmail.com', 'Talisay, Batangas', '09223043043', 'Carl Justine', 'C ', 'Aala', 'Grade 11', 'stem', 'Einstein', 'student', '4685009adc6793cf52bd8c25e9c55114c3a3b92a98aa3a6cb25ba3a47fcdc487', '2023-10-06 07:36:21'),
 (30, 'patriciaperez', '$2y$10$BXK56vTkmz.DALWwU/595.i3DhIWmw0zz8rnq7Nt6pEAynUzIq5/q', 'patriciaperez@gmail.com', 'Talisay, Batangas', '09232424244', 'Patricia', 'C', 'Perez', 'Grade 11', 'abm', 'Pacioli', 'student', NULL, NULL),
 (31, 'marissamargarette', '$2y$10$uqnc8ZHIbxVmixLveq5SmOkGhsdrEB/gTa6TTBc.yxvRIam1MtC7e', 'marissagrc4@gmail.com', 'Purok 6, Brgy. Natatas, Tanauan City, Batangas', '09497920130', 'Marissa Margarette', 'Ocampo', 'Garcia', 'Grade 11', 'tvl', 'ShangriLa', 'student', 'b977467780a392b9124d4340aeab522e03adc312bd5711ef355f652d7a9e2ac4', '2023-10-13 12:54:16'),
 (32, 'spongebob', '$2y$10$Xw3bTrw2rYk.p4RFKQF3ieS1bClb1b.gMHuwmCDx6aq7/zKALI1q.', 'spongebobsquarepants12@gmail.com', 'Bikini Bottom, Sa may Pinya', '09523232323', 'Spongebob', 'hindi', 'Squarepants', '', 'tvl', '', 'teacher', NULL, NULL),
 (33, 'patrick', '$2y$10$J9gOlxnbm99eUvHa.UwgVOdXfXhYcMXvzEdUkSUjsGfc.vKK8to7K', 'patrickstar@gmail.com', 'Bikini Bottom, Stone House', '09232325556', 'Patrick', 'hindi', 'Star', '', 'stem', '', 'teacher', NULL, NULL),
-(36, 'rjliwag', '$2y$10$NA18/Bn3ehbXsmw/Hmuo6uoIUGWBk8j/BDWSEbyUnqPa5zbSnOfm.', 'rjliwag@gmail.com', 'Talisay, Batangas', '09451213212', 'Ronald John', 'Caguicla', 'Liwag', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL),
-(37, 'marcoluis', '$2y$10$yXO0x1CyK/zWzgUU4XFr/.6KJcVqHQ8Vs.CGxcSMmxZVAh6vDkQnW', 'marcoluishernandez@gmail.com', 'San Luis, Batangas', '09543221548', 'Marco Luis', 'S', 'Hernandez', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL);
+(36, 'rjliwag', '$2y$10$NA18/Bn3ehbXsmw/Hmuo6uoIUGWBk8j/BDWSEbyUnqPa5zbSnOfm.', 'rjliwag@gmail.com', 'Talisay, Batangas', '09451213212', 'R.J.', 'Caguicla', 'Liwag', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL),
+(37, 'marcoluis', '$2y$10$yXO0x1CyK/zWzgUU4XFr/.6KJcVqHQ8Vs.CGxcSMmxZVAh6vDkQnW', 'marcoluishernandez@gmail.com', 'San Luis, Batangas', '09543221548', 'Marco Luis', 'S', 'Hernandez', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL),
+(38, 'martinclarence', '$2y$10$h2.Fn78znTIT.Vp.833hn.adR7e/reV.8rkpBa9GcIAxGm/rl.s56', 'martinclarensyo@gmail.com', 'San Miguel, Sto. Tomas, Batangas', '09485377283', 'Martin Clarence', 'O', 'Guantes', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -529,7 +610,9 @@ INSERT INTO `user_profile` (`profile_id`, `user_id`, `profile`, `profile_status`
 (12, 30, 'pat.jpg', 'recent'),
 (13, 29, 'carl.jpg', 'recent'),
 (14, 33, 'patrick.jpg', 'recent'),
-(15, 32, 'spongebob.jpg', 'recent');
+(15, 32, 'spongebob.jpg', 'recent'),
+(16, 37, 'marco.jpg', 'recent'),
+(17, 38, 'martino.jpg', 'recent');
 
 --
 -- Indexes for dumped tables
@@ -602,6 +685,12 @@ ALTER TABLE `feedback`
   ADD PRIMARY KEY (`feedback_id`);
 
 --
+-- Indexes for table `friend`
+--
+ALTER TABLE `friend`
+  ADD PRIMARY KEY (`primary_id`);
+
+--
 -- Indexes for table `news`
 --
 ALTER TABLE `news`
@@ -614,6 +703,12 @@ ALTER TABLE `section`
   ADD PRIMARY KEY (`class_id`);
 
 --
+-- Indexes for table `student`
+--
+ALTER TABLE `student`
+  ADD PRIMARY KEY (`primary_id`);
+
+--
 -- Indexes for table `student_assignment_course_answer`
 --
 ALTER TABLE `student_assignment_course_answer`
@@ -624,6 +719,12 @@ ALTER TABLE `student_assignment_course_answer`
 --
 ALTER TABLE `student_question_course_answer`
   ADD PRIMARY KEY (`answer_question_id`);
+
+--
+-- Indexes for table `teacher`
+--
+ALTER TABLE `teacher`
+  ADD PRIMARY KEY (`primary_id`);
 
 --
 -- Indexes for table `topic`
@@ -658,7 +759,7 @@ ALTER TABLE `user_profile`
 -- AUTO_INCREMENT for table `assignment_course_upload`
 --
 ALTER TABLE `assignment_course_upload`
-  MODIFY `assignment_course_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `assignment_course_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- AUTO_INCREMENT for table `classwork_assignment`
@@ -688,7 +789,7 @@ ALTER TABLE `classwork_material_upload`
 -- AUTO_INCREMENT for table `classwork_question`
 --
 ALTER TABLE `classwork_question`
-  MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `classwork_question_upload`
@@ -706,7 +807,7 @@ ALTER TABLE `classwork_quiz`
 -- AUTO_INCREMENT for table `class_enrolled`
 --
 ALTER TABLE `class_enrolled`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `class_theme`
@@ -721,6 +822,12 @@ ALTER TABLE `feedback`
   MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
+-- AUTO_INCREMENT for table `friend`
+--
+ALTER TABLE `friend`
+  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `news`
 --
 ALTER TABLE `news`
@@ -733,16 +840,28 @@ ALTER TABLE `section`
   MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
+-- AUTO_INCREMENT for table `student`
+--
+ALTER TABLE `student`
+  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `student_assignment_course_answer`
 --
 ALTER TABLE `student_assignment_course_answer`
-  MODIFY `answer_assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=154;
+  MODIFY `answer_assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
 
 --
 -- AUTO_INCREMENT for table `student_question_course_answer`
 --
 ALTER TABLE `student_question_course_answer`
-  MODIFY `answer_question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `answer_question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT for table `teacher`
+--
+ALTER TABLE `teacher`
+  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `topic`
@@ -760,13 +879,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_account`
 --
 ALTER TABLE `user_account`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `user_profile`
 --
 ALTER TABLE `user_profile`
-  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

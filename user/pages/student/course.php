@@ -117,7 +117,13 @@ $stmt->closeCursor();
         <a class="navbar-brand brand-logo-mini" href="index.php"><img src="assets/image/trace.svg" alt="logo" /></a>
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+
         <ul class="navbar-nav navbar-nav-right">
+          <li class="nav-item nav-profile dropdown mt-2" style="margin-right: -2px; cursor: pointer;">
+            <a class="nav-link dropdown-toggle" data-toggle="modal" data-target="#myModal">
+              <i class="bi bi-plus-square mx-0" style="font-size: 28px; color: green;"></i>
+            </a>
+          </li>
           <li class="nav-item dropdown">
             <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
               data-toggle="dropdown">
@@ -250,6 +256,46 @@ $stmt->closeCursor();
               <p class="text-body-secondary">(Student)</p>
             </div>
           </div>
+          <div class="modal fade" id="myModal">
+            <form action="" method="post" class="forms-sample" id="myForm">
+              <div class="modal-dialog modal-dialog-centered" style="top: -6vh;">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Join Class</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="col-mb-4">
+                      <div id="validationAlert" class="alert alert-danger alert-dismissible fade show" role="alert"
+                        style="display: none;">
+                        Please fill in all required fields.
+                      </div>
+                    </div>
+                    <div class="form-floating mb-3">
+                      <h3>Class Code</h3>
+                      <p class="text-body-secondary">Ask your teacher for the class code, then enter it here.</p>
+                    </div>
+                    <div class="form-floating mb-4">
+                      <input type="text" name="class_code" class="form-control" id="floatingInput"
+                        placeholder="Class Code">
+                      <label for="floatingName">Class Code</label>
+                    </div>
+                    <div class="form-floating">
+                      <h6>To sign in with a class code</h6>
+                      <ul style="list-style-type: disc;">
+                        <li class="text-body-secondary">Authorized account only prohibited</li>
+                        <li class="text-body-secondary">Use a class code with 5-7 letters or numbers, and no spaces or
+                          symbols</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" name="submit_code" class="btn btn-success">Submit</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
           <div class="row">
             <?php
             if (isset($_GET['msg'])) {
@@ -341,7 +387,7 @@ $stmt->closeCursor();
                     <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
                       data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
                       <h5>Unenroll <i class="bi bi-journal-x" style="font-size: 20px;"></i></h5>
-                    </button> 
+                    </button>
                     <div class="modal fade" id="staticBackdrop<?php echo $row['class_id']; ?>" data-bs-backdrop="static"
                       data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                       <div class="modal-dialog" style="width: 50vh; margin-top: 25vh;">
@@ -378,26 +424,26 @@ $stmt->closeCursor();
         </div>
       </div>
     </div>
-    
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
+    <!-- endinject -->
 </body>
 
 </html>

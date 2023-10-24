@@ -25,6 +25,7 @@ if (isset($_POST['ask_button'])) {
   $time = $_POST['time'];
   $class_topic = $_POST['class_topic'];
   $youtube = isset($_SESSION['temp_youtube']) ? $_SESSION['temp_youtube'] : '';
+  $question_status = "assigned";
 
   // Check if there's a temporary file ID in the session
   if (isset($_SESSION['temp_file_id'])) {
@@ -32,9 +33,11 @@ if (isset($_POST['ask_button'])) {
     $link = $_SESSION['temp_link'];
     $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
 
-    $sql = "INSERT INTO classwork_question (title, question, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, link, file, youtube) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO classwork_question (title, question, instruction, class_name, student, point, date, due_date, time, 
+    class_topic, class_id, teacher_id, link, file, youtube, question_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $question, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube]);
+    $result = $stmtinsert->execute([$title, $question, $instruction, $class_name, $student, $point, $date, $due_date, $time, 
+    $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $question_status]);
 
     if ($result) {
       // Update the used column for the associated link and file
@@ -53,9 +56,11 @@ if (isset($_POST['ask_button'])) {
       echo "Failed: " . $conn->error;
     }
   } else {
-    $sql = "INSERT INTO classwork_question (title, question, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO classwork_question (title, question, instruction, class_name, student, point, date, due_date, 
+    time, class_topic, class_id, teacher_id, question_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $question, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id]);
+    $result = $stmtinsert->execute([$title, $question, $instruction, $class_name, $student, $point, $date, $due_date, 
+    $time, $class_topic, $class_id, $teacher_id, $question_status]);
 
     if ($result) {
       header("Location: class_classwork.php?class_id=$class_id");

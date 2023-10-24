@@ -27,7 +27,7 @@ if ($teacher_id) {
     $first_name = $class_info['first_name'];
     $last_name = $class_info['last_name'];
 
-    $sql_get_question_info = "SELECT title, question, instruction, point, due_date, time, link, file, youtube, question_status FROM classwork_question WHERE teacher_id=? AND question_id=?";
+    $sql_get_question_info = "SELECT title, question, instruction, point, date, due_date, time, link, file, youtube, question_status FROM classwork_question WHERE teacher_id=? AND question_id=?";
     $stmt_get_question_info = $db->prepare($sql_get_question_info);
     $stmt_get_question_info->execute([$teacher_id, $question_id]);
     $question_data = $stmt_get_question_info->fetch(PDO::FETCH_ASSOC);
@@ -37,6 +37,7 @@ if ($teacher_id) {
       $question = $question_data['question'];
       $instruction = $question_data['instruction'];
       $point = $question_data['point'];
+      $date = $question_data['date'];
       $due_date = $question_data['due_date'];
       $formatted_due_date = date("F j", strtotime($due_date));
       $time = $question_data['time'];
@@ -47,6 +48,12 @@ if ($teacher_id) {
     }
   }
 }
+
+$sql_questionCourseStatus = "SELECT question_course_status FROM student_question_course_answer 
+WHERE class_id = ? AND question_id = ? AND user_id = ?";
+$stmt_questionCourseStatus = $db->prepare($sql_questionCourseStatus);
+$stmt_questionCourseStatus->execute([$class_id, $question_id, $user_id]);
+$questionCourseStatus = $stmt_questionCourseStatus->fetchColumn();
 ?>
 <!doctype html>
 <html lang="en">
@@ -201,15 +208,13 @@ if ($teacher_id) {
       <?php
       if (isset($_POST['question_submit'])) {
         $question_answer = $_POST['question_answer'];
+        $new_status = ($question_status === "missing") ? "turned-in late" : "turned in";
 
-        $sql = "INSERT INTO student_question_course_answer (question_id, question_answer, user_id, class_id, teacher_id, point) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO student_question_course_answer (question_id, question_answer, user_id, class_id, teacher_id, 
+        point, title, date, question_course_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmtinsert = $db->prepare($sql);
-        $result = $stmtinsert->execute([$question_id, $question_answer, $user_id, $class_id, $teacher_id, $point]);
-
-        if ($result) {
-          header("Location: question_course.php?class_id=$class_id&question_id=$question_id&user_id=$user_id");
-          exit();
-        }
+        $result = $stmtinsert->execute([$question_id, $question_answer, $user_id, $class_id, $teacher_id, 
+        $point, $title, $date, $new_status]);
       }
 
       $sql = "SELECT question_answer FROM student_question_course_answer WHERE class_id=? AND question_id=?";
@@ -226,7 +231,13 @@ if ($teacher_id) {
                 <div class="card-header d-flex justify-content-between" style="border: none; background-color: white;">
                   <span>Your Answer</span>
                   <span class="text-body-secondary ml-auto">
-                    <?php echo ucfirst($question_status) ?>
+                    <?php
+                      if (!empty($questionCourseStatus)) {
+                        echo ucfirst($questionCourseStatus);
+                      } else {
+                        echo ucfirst($question_status);
+                      }
+                      ?>
                   </span>
                 </div>
                 <div style="margin: 10px;">
@@ -250,14 +261,6 @@ if ($teacher_id) {
         $sql = "UPDATE student_question_course_answer SET question_answer = ? WHERE class_id = ? AND question_id = ?";
         $stmtupdate = $db->prepare($sql);
         $result = $stmtupdate->execute([$edited_answer, $class_id, $question_id]);
-
-        if($result) {
-          $new_status = ($question_status === "missing") ? "turned-in late" : "turned in";
-
-          $update_sql = "UPDATE classwork_question SET question_status = ? WHERE question_id = ? AND teacher_id = ?";
-          $stmtupdate = $db->prepare($update_sql);
-          $update_result = $stmtupdate->execute([$new_status, $question_id, $teacher_id]);
-        }
       }
       ?>
       <form class="edited_question" action="" method="post" style="display: none;">
@@ -268,7 +271,13 @@ if ($teacher_id) {
                 <div class="card-header d-flex justify-content-between" style="border: none; background-color: white;">
                   <span>Your Answer</span>
                   <span class="text-body-secondary ml-auto">
-                    <?php echo ucfirst($question_status) ?>
+                    <?php
+                      if (!empty($questionCourseStatus)) {
+                        echo ucfirst($questionCourseStatus);
+                      } else {
+                        echo ucfirst($question_status);
+                      }
+                      ?>
                   </span>
                 </div>
                 <div style="margin: 10px;">

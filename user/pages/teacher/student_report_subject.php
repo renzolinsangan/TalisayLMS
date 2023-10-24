@@ -214,128 +214,140 @@ $stmt->close();
           ?>
         </div>
         <div class="content-wrapper">
-          <div class="row">
-            <div class="col-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="card-body">
-                      <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">Student Reports in
-                        <?php echo isset($_GET['class_name']) ? urldecode($_GET['class_name']) : 'Unknown Subject'; ?>
-                      </h1>
-                      <a href="#" class="btn btn-success" style="margin-left: 10px;">Download Data</a>
-                    </div>
-                  </div>
-                </div>
-
+          <button id="print" class="btn btn-success mb-2">Download Data</button>
+          <div id="print-content">
+            <div class="row">
+              <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                       <div class="card-body">
-                        <div class="table-responsive">
-                          <table class="table text-center">
-                            <thead class="table" style="background-color: #4BB543; color: white;">
-                              <tr>
-                                <th scope="col">Student's Name</th>
-                                <th scope="col">Class Name</th>
-                                <th scope="col">Section</th>
-                                <th scope="col">Subject</th>
-                                <th scope="col">Grade Level</th>
-                                <th scope="col">Department</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <?php
-                              include("db_conn.php");
-                              $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';
-                              $sql = "SELECT * FROM class_enrolled WHERE teacher_id = ?";
+                        <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">Student Reports in
+                          <?php echo isset($_GET['class_name']) ? urldecode($_GET['class_name']) : 'Unknown Subject'; ?>
+                        </h1>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="card-body">
+                          <div class="table-responsive">
+                            <table class="table text-center">
+                              <thead class="table" style="background-color: #4BB543; color: white;">
+                                <tr>
+                                  <th scope="col">Student's Name</th>
+                                  <th scope="col">Class Name</th>
+                                  <th scope="col">Section</th>
+                                  <th scope="col">Subject</th>
+                                  <th scope="col">Grade Level</th>
+                                  <th scope="col">Department</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <?php
+                                include("db_conn.php");
+                                $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';
+                                $sql = "SELECT * FROM class_enrolled WHERE teacher_id = ?";
 
-                              if (!empty($classFromUrl)) {
-                                $sql .= " AND class_name = ?";
-                              }
-
-                              $stmt = mysqli_prepare($conn, $sql);
-
-                              if ($stmt) {
                                 if (!empty($classFromUrl)) {
-                                  mysqli_stmt_bind_param($stmt, "is", $user_id, $classFromUrl);
+                                  $sql .= " AND class_name = ?";
+                                }
+
+                                $stmt = mysqli_prepare($conn, $sql);
+
+                                if ($stmt) {
+                                  if (!empty($classFromUrl)) {
+                                    mysqli_stmt_bind_param($stmt, "is", $user_id, $classFromUrl);
+                                  } else {
+                                    mysqli_stmt_bind_param($stmt, "i", $user_id);
+                                  }
+
+                                  mysqli_stmt_execute($stmt);
+                                  $result = mysqli_stmt_get_result($stmt);
+
+                                  while ($row = mysqli_fetch_assoc($result)) {
+                                    ?>
+                                    <tr>
+                                      <td>
+                                        <?php echo $row['student_firstname'] . ' ' . $row['student_lastname']; ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['class_name'] ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['section'] ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['subject'] ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['grade_level'] ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['strand'] ?>
+                                      </td>
+                                    </tr>
+                                    <?php
+                                  }
+                                  mysqli_stmt_close($stmt);
                                 } else {
-                                  mysqli_stmt_bind_param($stmt, "i", $user_id);
+                                  echo "Error in preparing SQL statement.";
                                 }
-
-                                mysqli_stmt_execute($stmt);
-                                $result = mysqli_stmt_get_result($stmt);
-
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                  ?>
-                                  <tr>
-                                    <td>
-                                      <?php echo $row['student_firstname'] . ' ' . $row['student_lastname']; ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['class_name'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['section'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['subject'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['grade_level'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['strand'] ?>
-                                    </td>
-                                  </tr>
-                                  <?php
-                                }
-                                mysqli_stmt_close($stmt);
-                              } else {
-                                echo "Error in preparing SQL statement.";
-                              }
-                              mysqli_close($conn);
-                              ?>
-                            </tbody>
-                          </table>
+                                mysqli_close($conn);
+                                ?>
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- partial -->
-  </div>
-  <!-- main-panel ends -->
-  </div>
-  <!-- page-body-wrapper ends -->
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+    <script>
+      const printBtn = document.getElementById('print');
+
+      function preparePrintContent() {
+        const content = document.createElement('div');
+        content.innerHTML = '<html><head><title>Print</title></head><body>';
+        content.innerHTML += document.getElementById('print-content').innerHTML;
+        content.innerHTML += '</body></html>';
+        return content;
+      }
+
+      printBtn.addEventListener('click', function () {
+        // Prepare the content to be printed
+        const printContent = preparePrintContent();
+
+        // Create a new window
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(printContent.innerHTML);
+
+        // Close the document and trigger printing
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.close();
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

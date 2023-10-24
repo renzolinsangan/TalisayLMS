@@ -179,50 +179,9 @@ $stmt->close();
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card position-relative">
-                <div class="card-body">
-                  <div class="col-md-5 grid-margin transparent">
-                    <h2>Friends</h2>
-                    <a href="" class="course">
-                      <div class="card card-tale text-center" style="height: 50vh; margin-top: 5vh;">
-                        <div class="circle-image">
-                          <img src="images/profile.png" alt="Circular Image">
-                        </div>
-                        <h2 style="margin-top: 3vh;">John Wick</h2>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 grid-margin transparent">
-              <a href="student.php" class="course">
-                <div class="card card-tale text-center" style="height: 50vh;">
-                  <div class="card-picture"></div>
-                  <div class="card-footer" style="text-align: left;">
-                    <div class="course-top">
-                      <p class="course-title">My Students</p>
-                      <p class="course-section">0 Users</p>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
         </div>
       </div>
     </div>
-
-    <!-- content-wrapper ends -->
-  </div>
-  <!-- main-panel ends -->
-  </div>
-  <!-- page-body-wrapper ends -->
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"

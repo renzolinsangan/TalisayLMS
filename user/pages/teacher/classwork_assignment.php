@@ -32,9 +32,11 @@ if (isset($_POST['assign_button'])) {
     $link = $_SESSION['temp_link'];
     $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
 
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, link, file, youtube, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, 
+    class_topic, class_id, teacher_id, link, file, youtube, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $assignment_status]);
+    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, 
+    $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $assignment_status]);
 
     if ($result) {
       // Update the used column for the associated link and file

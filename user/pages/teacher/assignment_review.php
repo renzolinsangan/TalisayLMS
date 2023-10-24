@@ -1,9 +1,53 @@
 <?php
 session_start();
+include("config.php");
+$teacher_id = $_SESSION['user_id'];
 
-if (!isset($_SESSION['id'])) {
-  header("Location:../../admin_login.php");
+if (!isset($_SESSION['user_id'])) {
+  header("Location: ../../user_login.php");
   exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+$stmt = $db->prepare($sql);
+$stmt->execute([$user_id]);
+$profile = $stmt->fetchColumn();
+
+if (isset($_GET['class_id'])) {
+  $class_id = $_GET['class_id'];
+}
+
+if (isset($_GET['assignment_id'])) {
+  $assignment_id = $_GET['assignment_id'];
+}
+
+$sql_selectAssignment = "SELECT * FROM classwork_assignment WHERE assignment_id = ? AND class_id = ? AND teacher_id = ?";
+$stmt_selectAssignment = $db->prepare($sql_selectAssignment);
+$stmt_selectAssignment->execute([$assignment_id, $class_id, $teacher_id]);
+$result = $stmt_selectAssignment->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($result as $assignmentRow) {
+    $title = $assignmentRow['title'];
+    $instruction = $assignmentRow['instruction'];
+}
+
+$sql_getStudents = "SELECT * FROM class_enrolled WHERE tc_id = ? AND teacher_id = ? ORDER BY student_firstname ASC";
+$stmt_getStudents = $db->prepare($sql_getStudents);
+$stmt_getStudents->execute([$class_id, $teacher_id]);
+$result = $stmt_getStudents->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($result as $studentRow) {
+    $student_id = $studentRow['student_id'];
+    $student_firstname = $studentRow['student_firstname'];
+    $student_lastname = $studentRow['student_lastname'];
+    $class_name = $studentRow['class_name'];
+
+    $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+    $stmt_selectProfile = $db->prepare($sql_selectProfile);
+    $stmt_selectProfile->execute([$student_id]);
+    $otherProfile = $stmt_selectProfile->fetchColumn();
 }
 ?>
 <!DOCTYPE html>
@@ -12,23 +56,22 @@ if (!isset($_SESSION['id'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Talisay Senior High School LMS Admin</title>
+  <title>Talisay Senior High School LMS User</title>
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="assets/css/report_student.css">
-  <link rel="shortcut icon" href="../../images/trace.svg" />
+  <link rel="stylesheet" href="assets/css/my_student.css">
+  <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
 <body>
   <div class="container-scroller">
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-        <a class="navbar-brand brand-logo mr-5" href="../../index.php"><img src="../../images/trace.svg" class="mr-2"
+        <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
             alt="logo" />Talisay LMS</a>
-        <a class="navbar-brand brand-logo-mini" href="../../index.php"><img src="../../images/trace.svg"
-            alt="logo" /></a>
+        <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/trace.svg" alt="logo" /></a>
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <ul class="navbar-nav navbar-nav-right">
@@ -84,10 +127,14 @@ if (!isset($_SESSION['id'])) {
           </li>
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
-              <img src="../../images/faces/profile.png" alt="profile" />
+              <img src="assets/image/<?php echo $profile ?>" alt="profile" onerror="this.src='images/profile.png'" />
             </a>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-              <a href="../../admin_logout.php" class="dropdown-item">
+              <a href="profile.php" class="dropdown-item">
+                <i class="bi bi-person-circle text-success"></i>
+                Profile
+              </a>
+              <a href="user_logout.php" class="dropdown-item">
                 <i class="ti-power-off text-success"></i>
                 Logout
               </a>
@@ -104,15 +151,15 @@ if (!isset($_SESSION['id'])) {
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item mb-3">
-            <a class="nav-link" href="../../index.php">
+            <a class="nav-link" href="index.php">
               <i class="icon-grid menu-icon"></i>
               <span class="menu-title">Dashboard</span>
             </a>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" href="../announcement/announcement.php">
-              <i class="menu-icon"><i class="bi bi-megaphone"></i></i>
-              <span class="menu-title">Announcement</span>
+            <a class="nav-link" href="course.php">
+              <i class="menu-icon"><i class="bi bi-journals"></i></i>
+              <span class="menu-title">Courses</span>
             </a>
           </li>
           <li class="nav-item mb-3">
@@ -124,9 +171,8 @@ if (!isset($_SESSION['id'])) {
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="../users/teacher.php">Teacher</a></li>
-                <li class="nav-item"><a class="nav-link" href="../users/student.php">Student</a></li>
-                <li class="nav-item"><a class="nav-link" href="../users/parent.php">Parent</a></li>
+                <li class="nav-item"><a class="nav-link" href="friend.php">My Friends</a></li>
+                <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
               </ul>
             </div>
           </li>
@@ -138,14 +184,15 @@ if (!isset($_SESSION['id'])) {
             </a>
             <div class="collapse" id="charts">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link" href="student_report.php">Student Reports</a></li>
-                <li class="nav-item"> <a class="nav-link" href="teacher_report.php">Teacher Reports</a></li>
-                <li class="nav-item"> <a class="nav-link" href="grade_report.php">Report of Grades</a></li>
+                <li class="nav-item"> <a class="nav-link"
+                    href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a></li>
+                <li class="nav-item"> <a class="nav-link"
+                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a></li>
               </ul>
             </div>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" href="../feedback/feedback.php">
+            <a class="nav-link" href="feedback.php">
               <i class="menu-icon"><i class="bi bi-chat-right-quote"></i></i>
               <span class="menu-title">Feedbacks</span>
             </a>
@@ -153,85 +200,59 @@ if (!isset($_SESSION['id'])) {
         </ul>
       </nav>
       <div class="main-panel">
-        <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
-          <a href="student_report.php" class="nav-link active" style="margin-left: 5vh;">All</a>
-          <a href="student_reportstem.php" class="stem">STEM</a>
-          <a href="student_reporthumss.php" class="humss">HUMSS</a>
-          <a href="student_reportabm.php" class="abm">ABM</a>
-          <a href="student_reporttvl.php" class="mechanic">TVL</a>
-        </div>
         <div class="content-wrapper">
-          <button id="print" class="btn btn-success mb-2">Download Data</button>
-          <div id="print-content">
-            <div class="row">
-              <div class="col-12 grid-margin stretch-card">
-                <div class="card">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="card-body">
-                        <h1 class="card-title" id="card-title" style="font-size: 30px; margin-left: 10px;">All Student
-                          Reports</h1>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card" id="studentTable">
-                    <div class="row">
-                      <div class="col-md-12">
-                        <div class="card-body">
-                          <div class="table-responsive">
-                            <table class="table text-center">
-                              <thead class="table" style="background-color: #4BB543; color: white;">
-                                <tr>
-                                  <th scope="col">Student's Name</th>
-                                  <th scope="col">House Address</th>
-                                  <th scope="col">Contact Number</th>
-                                  <th scope="col">Email Address</th>
-                                  <th scope="col">Grade Level</th>
-                                  <th scope="col">Department</th>
-                                  <th scope="col">Section</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <?php
-                                include("db_conn.php");
-                                $sql = "SELECT * FROM user_account WHERE usertype = 'student'";
-                                $result = mysqli_query($conn, $sql);
+          <div class="row mb-4">
+            <div class="col">
+              <h2>
+                <?php echo $class_name ?>
+              </h2>
+              <p class="text-body-secondary">(Assignment Review)</p>
+              <a href="toreview.php?class_id=<?php echo $class_id ?>" style="text-decoration: none; color: green;">
+                Go back to to-review page.
+              </a>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-md-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-header ml-4 mt-3 mb-3">
+                  <h2>
+                    <?php echo $title ?>
+                  </h2>
+                  <p class="text-body-secondary">Instructions:
+                    <?php echo $instruction ?>
+                  </p>
+                </div>
+                <div class="row">
+                  <?php
+                  foreach ($result as $studentRow) {
+                    $student_id = $studentRow['student_id'];
+                    $student_firstname = $studentRow['student_firstname'];
+                    $student_lastname = $studentRow['student_lastname'];
+                    $class_name = $studentRow['class_name'];
 
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                  ?>
-                                  <tr>
-                                    <td>
-                                      <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['address']; ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['contact']; ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['email']; ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['grade_level'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo strtoupper($row['department']) ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['section'] ?>
-                                    </td>
-                                  </tr>
-                                  <?php
-                                }
-                                ?>
-                              </tbody>
-                            </table>
+                    $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                    $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                    $stmt_selectProfile->execute([$student_id]);
+                    $profileResult = $stmt_selectProfile->fetchAll(PDO::FETCH_ASSOC);
+
+                    foreach ($profileResult as $profileRow) {
+                      $otherProfile = $profileRow['profile'];
+                      ?>
+                      <div class="col-md-3 mb-4">
+                        <div class="card card-tale justify-content-center align-items-center">
+                          <div class="circle-image mt-4 mb-3">
+                            <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
                           </div>
+                          <p class="text-body-secondary">
+                            <?php echo $student_firstname . ' ' . $student_lastname ?>
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                      <?php
+                    }
+                  }
+                  ?>
                 </div>
               </div>
             </div>
@@ -240,32 +261,6 @@ if (!isset($_SESSION['id'])) {
       </div>
     </div>
 
-    <script>
-      const printBtn = document.getElementById('print');
-
-      // Function to prepare the content to be printed
-      function preparePrintContent() {
-        const content = document.createElement('div');
-        content.innerHTML = '<html><head><title>Print</title></head><body>';
-        content.innerHTML += document.getElementById('print-content').innerHTML;
-        content.innerHTML += '</body></html>';
-        return content;
-      }
-
-      printBtn.addEventListener('click', function () {
-        // Prepare the content to be printed
-        const printContent = preparePrintContent();
-
-        // Create a new window
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(printContent.innerHTML);
-
-        // Close the document and trigger printing
-        printWindow.document.close();
-        printWindow.print();
-        printWindow.close();
-      });
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
       crossorigin="anonymous"></script>

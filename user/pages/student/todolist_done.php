@@ -205,16 +205,16 @@ if ($teacher_id) {
               $assignment_results = [];
               $question_results = [];
 
-              $sql_assignment = "SELECT assignment_id, title, date, assignment_status FROM classwork_assignment WHERE 
-              teacher_id = ? AND class_name = ? AND (assignment_status = 'turned in' OR assignment_status = 'turned-in late')";
+              $sql_assignment = "SELECT assignment_id, title, date, assignment_course_status FROM student_assignment_course_answer WHERE 
+              teacher_id = ? AND class_id = ? AND (assignment_course_status = 'turned in' OR assignment_course_status = 'turned-in late')";
               $stmt_assignment = $db->prepare($sql_assignment);
-              $stmt_assignment->execute([$teacher_id, $class_name]);
+              $stmt_assignment->execute([$teacher_id, $class_id]);
               $assignment_results = $stmt_assignment->fetchAll();
 
-              $sql_question = "SELECT question_id, title, date, question_status FROM classwork_question WHERE 
-              teacher_id = ? AND class_name = ? AND (question_status = 'turned in' OR question_status = 'turned-in late')";
+              $sql_question = "SELECT question_id, title, date, question_course_status FROM student_question_course_answer WHERE 
+              teacher_id = ? AND class_id = ? AND (question_course_status = 'turned in' OR question_course_status = 'turned-in late')";
               $stmt_question = $db->prepare($sql_question);
-              $stmt_question->execute([$teacher_id, $class_name]);
+              $stmt_question->execute([$teacher_id, $class_id]);
               $question_results = $stmt_question->fetchall();
 
               $combined_results = array_merge($assignment_results, $question_results);
@@ -229,7 +229,7 @@ if ($teacher_id) {
                   $date = $row['date'];
                   $timestamp = strtotime($date);
                   $formatted_date = date("F d", $timestamp);
-                  $assignment_status = $row['assignment_status'];
+                  $assignment_course_status = $row['assignment_course_status'];
                   ?>
                   <div class="d-grid gap-2 col-10 mx-auto mb-4">
                     <a class="announce" type="button"
@@ -248,7 +248,7 @@ if ($teacher_id) {
                       </div>
                       <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                         <span>
-                          <?php echo ucfirst($assignment_status) ?>
+                          <?php echo ucfirst($assignment_course_status) ?>
                         </span>
                       </div>
                     </a>
@@ -260,7 +260,7 @@ if ($teacher_id) {
                   $date = $row['date'];
                   $timestamp = strtotime($date);
                   $formatted_date = date("F d", $timestamp);
-                  $question_status = $row['question_status'];
+                  $question_course_status = $row['question_course_status'];
                   ?>
                   <div class="d-grid gap-2 col-10 mx-auto mb-4">
                     <a class="announce" type="button"
@@ -279,7 +279,7 @@ if ($teacher_id) {
                       </div>
                       <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                         <span>
-                        <?php echo ucfirst($question_status) ?>
+                        <?php echo ucfirst($question_course_status) ?>
                         </span>
                       </div>
                     </a>

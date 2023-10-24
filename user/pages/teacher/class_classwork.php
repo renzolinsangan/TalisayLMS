@@ -555,6 +555,11 @@ $stmt->closeCursor();
                         $maxWords = 4;
                         $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
                         $collapseID = "collapseMaterial" . $counter;
+                        $link = $title_row['link'];
+                        $file = $title_row['file'];
+                        $fileDirectory = "assets/uploads/";
+                        $filePath = $fileDirectory . $file;
+                        $youtube = $title_row['youtube'];
 
                         if (count($words) > $maxWords) {
                           $truncatedTitle .= '...';
@@ -578,34 +583,114 @@ $stmt->closeCursor();
                                   </p>
                                 </div>
                                 <div class="ml-auto">
-                                  <p class="text-body-secondary" style="margin-top: 12px;">Posted <?php echo $formattedDate ?></p>
-                                </div>
-                                <div class="dropdown">
-                                  <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                    style="font-size: 20px; color: green; margin-right: 10px;">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                  </a>
-
-                                  <ul class="dropdown-menu">
-                                    <li>
-                                      <a class="dropdown-item"
-                                        href="edit_material.php?updateid=<?php echo $material_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
-                                    </li>
-                                    <li>
-                                      <a class="dropdown-item"
-                                        href="delete_material.php?deleteid=<?php echo $material_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
-                                    </li>
-                                  </ul>
+                                  <p class="text-body-secondary" style="margin-top: 12px;">Posted
+                                    <?php echo $formattedDate ?>
+                                  </p>
                                 </div>
                               </button>
+                              <div class="dropdown">
+                                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                  style="font-size: 20px; color: green; margin-right: 10px;">
+                                  <i class="bi bi-three-dots-vertical"></i>
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                  <li>
+                                    <a class="dropdown-item"
+                                      href="edit_material.php?updateid=<?php echo $material_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                  </li>
+                                  <li>
+                                    <a class="dropdown-item"
+                                      href="delete_material.php?deleteid=<?php echo $material_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                  </li>
+                                </ul>
+                              </div>
                             </div>
                             <div id="<?php echo $collapseID ?>" class="collapse" aria-labelledby="accordionHeading">
                               <div class="card-body" style="border: 1px solid #ccc;">
-                                <div class="row">
+                                <div class="row mb-2">
                                   <div class="col-md-8">
-                                    <p class="text-body-secondary">Posted <?php echo $formattedDate ?></p>
-                                    <p><?php echo $description ?></p>
+                                    <p class="text-body-secondary">Posted
+                                      <?php echo $formattedDate ?>
+                                    </p>
+                                    <p>
+                                      <?php echo $description ?>
+                                    </p>
                                   </div>
+                                </div>
+                                <div class="row mb-2">
+                                  <?php if (!empty($link) && $link != 'null') {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="link card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $link ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              LINK
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php if (!empty($filePath) && !empty($file)) {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="file card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $filePath ?>" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $file ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              <?php echo strtoupper(pathinfo($file, PATHINFO_EXTENSION)); ?>
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php if (!empty($youtube) && $youtube != 'null') {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="youtube card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $youtube ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              YOUTUBE LINK
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
                                 </div>
                               </div>
                               <div class="card-footer" style="border: 1px solid #ccc; 
@@ -632,6 +717,11 @@ $stmt->closeCursor();
                         $maxWords = 4;
                         $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
                         $collapseID = "collapseAssignment" . $counter;
+                        $link = $titlerow['link'];
+                        $file = $titlerow['file'];
+                        $fileDirectory = "assets/uploads/";
+                        $filePath = $fileDirectory . $file;
+                        $youtube = $titlerow['youtube'];
 
                         if (count($words) > $maxWords) {
                           $truncatedTitle .= '...';
@@ -655,39 +745,120 @@ $stmt->closeCursor();
                                   </p>
                                 </div>
                                 <div class="ml-auto">
-                                  <p class="text-body-secondary" style="margin-top: 10px;">Due <?php echo $formattedDueDate ?></p>
-                                </div>
-                                <div class="dropdown">
-                                  <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                    style="font-size: 20px; color: green; margin-right: 10px;">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                  </a>
-
-                                  <ul class="dropdown-menu">
-                                    <li>
-                                      <a class="dropdown-item"
-                                        href="edit_assignment.php?updateid=<?php echo $assignment_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
-                                    </li>
-                                    <li>
-                                      <a class="dropdown-item"
-                                        href="delete_assignment.php?deleteid=<?php echo $assignment_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
-                                    </li>
-                                  </ul>
+                                  <p class="text-body-secondary" style="margin-top: 10px;">Due
+                                    <?php echo $formattedDueDate ?>
+                                  </p>
                                 </div>
                               </button>
+                              <div class="dropdown">
+                                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                  style="font-size: 20px; color: green; margin-right: 10px;">
+                                  <i class="bi bi-three-dots-vertical"></i>
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                  <li>
+                                    <a class="dropdown-item"
+                                      href="edit_assignment.php?updateid=<?php echo $assignment_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                  </li>
+                                  <li>
+                                    <a class="dropdown-item"
+                                      href="delete_assignment.php?deleteid=<?php echo $assignment_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                  </li>
+                                </ul>
+                              </div>
                             </div>
                             <div id="<?php echo $collapseID ?>" class="collapse" aria-labelledby="accordionHeading">
                               <div class="card-body" style="border: 1px solid #ccc;">
-                                <div class="row">
+                                <div class="row mb-2">
                                   <div class="col-md-8">
-                                    <p class="text-body-secondary">Posted <?php echo $formattedDate ?></p>
-                                    <p><?php echo $instruction ?></p>
+                                    <p class="text-body-secondary">Posted
+                                      <?php echo $formattedDate ?>
+                                    </p>
+                                    <p>
+                                      <?php echo $instruction ?>
+                                    </p>
                                   </div>
+                                </div>
+                                <div class="row mb-2">
+                                  <?php if (!empty($link) && $link != 'null') {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="link card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $link ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              LINK
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php if (!empty($filePath) && !empty($file)) {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="file card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $filePath ?>" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $file ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              <?php echo strtoupper(pathinfo($file, PATHINFO_EXTENSION)); ?>
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php if (!empty($youtube) && $youtube != 'null') {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="youtube card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $youtube ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              YOUTUBE LINK
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
                                 </div>
                               </div>
                               <div class="card-footer" style="border: 1px solid #ccc; 
                               background-color: transparent; border-radius: 0%;">
-                                <a href="#" style="color: green; margin-left: 8px; text-decoration: none;">
+                                <a href="assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>" 
+                                style="color: green; margin-left: 8px; text-decoration: none;">
                                   View Assignment
                                 </a>
                               </div>
@@ -709,6 +880,11 @@ $stmt->closeCursor();
                         $maxWords = 4;
                         $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
                         $collapseID = "collapseQuestion" . $counter;
+                        $link = $rowquestion['link'];
+                        $file = $rowquestion['file'];
+                        $fileDirectory = "assets/uploads/";
+                        $filePath = $fileDirectory . $file;
+                        $youtube = $rowquestion['youtube'];
 
                         if (count($words) > $maxWords) {
                           $truncatedTitle .= '...';
@@ -732,39 +908,120 @@ $stmt->closeCursor();
                                   </p>
                                 </div>
                                 <div class="ml-auto">
-                                  <p class="text-body-secondary" style="margin-top: 12px;">Due <?php echo $formattedDueDate ?></p>
-                                </div>
-                                <div class="dropdown">
-                                  <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                    style="font-size: 20px; color: green; margin-right: 10px;">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                  </a>
-
-                                  <ul class="dropdown-menu">
-                                    <li>
-                                      <a class="dropdown-item"
-                                        href="edit_question.php?updateid=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
-                                    </li>
-                                    <li>
-                                      <a class="dropdown-item"
-                                        href="delete_question.php?delete=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
-                                    </li>
-                                  </ul>
+                                  <p class="text-body-secondary" style="margin-top: 12px;">Due
+                                    <?php echo $formattedDueDate ?>
+                                  </p>
                                 </div>
                               </button>
+                              <div class="dropdown">
+                                <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                  style="font-size: 20px; color: green; margin-right: 10px;">
+                                  <i class="bi bi-three-dots-vertical"></i>
+                                </a>
+
+                                <ul class="dropdown-menu">
+                                  <li>
+                                    <a class="dropdown-item"
+                                      href="edit_question.php?updateid=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                  </li>
+                                  <li>
+                                    <a class="dropdown-item"
+                                      href="delete_question.php?deleteid=<?php echo $question_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                  </li>
+                                </ul>
+                              </div>
                             </div>
                             <div id="<?php echo $collapseID ?>" class="collapse" aria-labelledby="accordionHeading">
                               <div class="card-body" style="border: 1px solid #ccc;">
-                                <div class="row">
+                                <div class="row mb-2">
                                   <div class="col-md-8">
-                                    <p class="text-body-secondary">Posted <?php echo $formattedDate ?></p>
-                                    <p><?php echo $instruction ?></p>
+                                    <p class="text-body-secondary">Posted
+                                      <?php echo $formattedDate ?>
+                                    </p>
+                                    <p>
+                                      <?php echo $instruction ?>
+                                    </p>
                                   </div>
+                                </div>
+                                <div class="row mb-2">
+                                  <?php if (!empty($link) && $link != 'null') {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="link card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $link ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              LINK
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php if (!empty($filePath) && !empty($file)) {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="file card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $filePath ?>" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $file ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              <?php echo strtoupper(pathinfo($file, PATHINFO_EXTENSION)); ?>
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php if (!empty($youtube) && $youtube != 'null') {
+                                    ?>
+                                    <div class="col-md-4">
+                                      <div class="youtube card" style="background-color: white; border: 1px solid #ccc;">
+                                        <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none;">
+                                          <div class="row mt-3 ml-2">
+                                            <div class="col-md-11">
+                                              <p style="color: green; white-space: nowrap; overflow: hidden; 
+                                                  text-overflow: ellipsis; max-width: 100%;">
+                                                <?php echo $youtube ?>
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <div class="row mb-3 ml-2">
+                                            <div class="col-md-8 text-body-secondary">
+                                              YOUTUBE LINK
+                                            </div>
+                                          </div>
+                                        </a>
+                                      </div>
+                                    </div>
+                                    <?php
+                                  }
+                                  ?>
                                 </div>
                               </div>
                               <div class="card-footer" style="border: 1px solid #ccc; 
                               background-color: transparent; border-radius: 0%;">
-                                <a href="#" style="color: green; margin-left: 8px; text-decoration: none;">
+                                <a href="question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id?>"
+                                style="color: green; margin-left: 8px; text-decoration: none;">
                                   View Question
                                 </a>
                               </div>
@@ -843,19 +1100,12 @@ $stmt->closeCursor();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
       integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
       crossorigin="anonymous"></script>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
     <script src="../../vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
     <script src="../../js/off-canvas.js"></script>
     <script src="../../js/hoverable-collapse.js"></script>
     <script src="../../js/template.js"></script>
     <script src="../../js/settings.js"></script>
     <script src="../../js/todolist.js"></script>
-    <!-- endinject -->
 </body>
 
 </html>

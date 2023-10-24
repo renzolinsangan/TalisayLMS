@@ -261,7 +261,7 @@ $stmt->closeCursor();
                     style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
                     <h4>To-do List</h4>
                     <p class="text-body-secondary mt-3">Check the works assigned to you.</p>
-                    <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>" class="create mt-2"
+                    <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="create mt-2"
                       style="margin-left: auto; color: green;">View to-do list</a>
                   </div>
                 </div>

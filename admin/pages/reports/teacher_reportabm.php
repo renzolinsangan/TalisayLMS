@@ -161,88 +161,114 @@ if (!isset($_SESSION['id'])) {
           <a href="teacher_reporttvl.php" class="mechanic">TVL</a>
         </div>
         <div class="content-wrapper">
-          <div class="row">
-            <div class="col-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="card-body">
-                      <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">ABM teachers</h1>
-                      <a href="#" class="btn btn-success" style="margin-left: 10px;">Download Data</a>
+          <button id="print" class="btn btn-success mb-2">Download Data</button>
+            <div id="print-content">
+              <div class="row">
+                <div class="col-12 grid-margin stretch-card">
+                  <div class="card">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="card-body">
+                          <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">ABM teachers</h1>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                    <div class="card">
+                      <div class="row">
+                        <div class="col-md-12">
+                          <div class="card-body">
+                            <div class="table-responsive">
+                              <table class="table text-center">
+                                <thead class="table" style="background-color: #4BB543; color: white;">
+                                  <tr>
+                                    <th scope="col">Teacher's Name</th>
+                                    <th scope="col">House Address</th>
+                                    <th scope="col">Contact Number</th>
+                                    <th scope="col">Email Address</th>
+                                    <th scope="col">Department</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <?php
+                                  include("db_conn.php");
+                                  $sql = "SELECT * FROM user_account WHERE usertype='teacher' AND department='abm'";
+                                  $result = mysqli_query($conn, $sql);
 
-                <div class="card">
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="card-body">
-                        <div class="table-responsive">
-                          <table class="table text-center">
-                            <thead class="table" style="background-color: #4BB543; color: white;">
-                              <tr>
-                                <th scope="col">Teacher's Name</th>
-                                <th scope="col">House Address</th>
-                                <th scope="col">Contact Number</th>
-                                <th scope="col">Email Address</th>
-                                <th scope="col">Department</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <?php
-                              include("db_conn.php");
-                              $sql = "SELECT * FROM user_account WHERE usertype='teacher' AND department='abm'";
-                              $result = mysqli_query($conn, $sql);
-
-                              while ($row = mysqli_fetch_assoc($result)) {
-                                ?>
-                                <tr>
-                                  <td>
-                                    <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
-                                  </td>
-                                  <td>
-                                    <?php echo $row['address']; ?>
-                                  </td>
-                                  <td>
-                                    <?php echo $row['contact']; ?>
-                                  </td>
-                                  <td>
-                                    <?php echo $row['email']; ?>
-                                  </td>
-                                  <td>
-                                    <?php echo $row['department'] ?>
-                                  </td>
-                                </tr>
-                                <?php
-                              }
-                              ?>
-                            </tbody>
-                          </table>
+                                  while ($row = mysqli_fetch_assoc($result)) {
+                                    ?>
+                                    <tr>
+                                      <td>
+                                        <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['address']; ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['contact']; ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['email']; ?>
+                                      </td>
+                                      <td>
+                                        <?php echo $row['department'] ?>
+                                      </td>
+                                    </tr>
+                                    <?php
+                                  }
+                                  ?>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
+    <script>
+      const printBtn = document.getElementById('print');
+
+      // Function to prepare the content to be printed
+      function preparePrintContent() {
+        const content = document.createElement('div');
+        content.innerHTML = '<html><head><title>Print</title></head><body>';
+        content.innerHTML += document.getElementById('print-content').innerHTML;
+        content.innerHTML += '</body></html>';
+        return content;
+      }
+
+      printBtn.addEventListener('click', function () {
+        // Prepare the content to be printed
+        const printContent = preparePrintContent();
+
+        // Create a new window
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(printContent.innerHTML);
+
+        // Close the document and trigger printing
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.close();
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

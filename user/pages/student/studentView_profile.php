@@ -41,6 +41,17 @@ if ($stmt) {
   $stmt->fetch();
   $stmt->close();
 }
+
+if (isset($_POST['add_friend'])) {
+  $user_id = $_SESSION['user_id'];
+  $friend_id = $_GET['user_id'];
+  $firstLetterOfMiddlename = ucfirst(substr($middlename, 0, 1));
+  $name = $firstname . ' ' . $firstLetterOfMiddlename . '. ' . $lastname;
+
+  $sql_addFriend = "INSERT INTO friend (user_id, friend_id, name) VALUES (?, ?, ?)";
+  $stmt_addFriend = $conn->prepare($sql_addFriend);
+  $result = $stmt_addFriend->execute([$user_id, $friend_id, $name]);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -228,28 +239,30 @@ if ($stmt) {
                             + Add Friend
                           </button>
                         </div>
-                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
-                          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                          <div class="modal-dialog">
-                            <div class="modal-content">
-                              <div class="modal-header" style="border: none;">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                                  Add Friend</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                  aria-label="Close"></button>
-                              </div>
-                              <div class="modal-body">
-                                <h3>Add
-                                  <?php echo $firstname . ' ' . $lastname ?> as your friend.
-                                </h3>
-                                <p class="text-body-secondary">If you wish to cancel, press the x button.</p>
-                              </div>
-                              <div class="modal-footer" style="border: none;">
-                                <button type="button" class="btn btn-success">Add</button>
+                        <form action="" method="post">
+                          <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header" style="border: none;">
+                                  <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                                    Add Friend</h1>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <h3>Add
+                                    <?php echo $firstname . ' ' . $lastname ?> as your friend.
+                                  </h3>
+                                  <p class="text-body-secondary">If you wish to cancel, press the x button.</p>
+                                </div>
+                                <div class="modal-footer" style="border: none;">
+                                  <button type="submit" name="add_friend" class="btn btn-success">Add</button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </form>
                       </div>
                     </div>
                   </div>

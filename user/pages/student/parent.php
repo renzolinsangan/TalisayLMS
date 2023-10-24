@@ -170,53 +170,6 @@ $stmt->close();
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card position-relative">
-                <div class="card-body">
-                  <div class="col-md-5 grid-margin transparent">
-                    <h2>Parent</h2>
-                    <a href="" class="course">
-                      <div class="card card-tale text-center" style="height: 50vh; margin-top: 5vh;">
-                        <div class="circle-image">
-                          <img src="images/profile.png" alt="Circular Image">
-                        </div>
-                        <h2 style="margin-top: 3vh;">Mama mo</h2>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 grid-margin transparent">
-              <a href="friends.php" class="course">
-                <div class="card card-tale text-center" style="height: 50vh;">
-                  <div class="card-picture"></div>
-                  <div class="card-footer" style="text-align: left;">
-                    <div class="course-top">
-                      <p class="course-title">My Friends</p>
-                      <p class="course-section">0 Users</p>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <div class="col-md-6 grid-margin transparent">
-              <a href="teacher.php" class="course">
-                <div class="card card-tale text-center" style="height: 50vh;">
-                  <div class="card-picture"></div>
-                  <div class="card-footer" style="text-align: left;">
-                    <div class="course-top">
-                      <p class="course-title">My Teachers</p>
-                      <p class="course-section">0 Users</p>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
         </div>
       </div>
     </div>

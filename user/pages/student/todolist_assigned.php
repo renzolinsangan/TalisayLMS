@@ -182,10 +182,12 @@ if ($teacher_id) {
           <div class="header-links">
             <a class="btn-success" href="class_course.php?class_id=<?php echo $class_id ?>"><i
                 class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-            <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>" class="nav-link active"
-              style="margin-left: 2vh;">Assigned</a>
-            <a href="todolist_missing.php?class_id=<?php echo $class_id ?>" class="people">Missing</a>
-            <a href="todolist_done.php?class_id=<?php echo $class_id ?>" class="people">Done</a>
+            <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+              class="nav-link active" style="margin-left: 2vh;">Assigned</a>
+            <a href="todolist_missing.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+              class="people">Missing</a>
+            <a href="todolist_done.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+              class="people">Done</a>
           </div>
         </div>
         <div class="content-wrapper align-items-center justify-content-center" style="margin-top: 10vh;">
@@ -205,14 +207,28 @@ if ($teacher_id) {
               $assignment_results = [];
               $question_results = [];
 
-              $sql_assignment = "SELECT assignment_id, title, date FROM classwork_assignment WHERE teacher_id = ? AND class_name = ? AND assignment_status = 'assigned'";
+              $sql_assignment = "SELECT a.assignment_id, a.title, a.date
+                   FROM classwork_assignment a
+                   LEFT JOIN student_assignment_course_answer sa
+                   ON a.assignment_id = sa.assignment_id AND sa.user_id = ?
+                   WHERE a.teacher_id = ? AND a.class_name = ? 
+                   AND a.assignment_status = 'assigned'
+                   AND sa.assignment_id IS NULL";
+
               $stmt_assignment = $db->prepare($sql_assignment);
-              $stmt_assignment->execute([$teacher_id, $class_name]);
+              $stmt_assignment->execute([$user_id, $teacher_id, $class_name]);
               $assignment_results = $stmt_assignment->fetchAll();
 
-              $sql_question = "SELECT question_id, title, date FROM classwork_question WHERE teacher_id = ? AND class_name = ? AND question_status = 'assigned'";
+              $sql_question = "SELECT q.question_id, q.title, q.date 
+                 FROM classwork_question q
+                 LEFT JOIN student_question_course_answer sq
+                 ON q.question_id = sq.question_id AND sq.user_id = ?
+                 WHERE q.teacher_id = ? AND q.class_name = ? 
+                 AND q.question_status = 'assigned'
+                 AND sq.question_id IS NULL";
+
               $stmt_question = $db->prepare($sql_question);
-              $stmt_question->execute([$teacher_id, $class_name]);
+              $stmt_question->execute([$user_id, $teacher_id, $class_name]);
               $question_results = $stmt_question->fetchall();
 
               $combined_results = array_merge($assignment_results, $question_results);

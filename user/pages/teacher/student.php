@@ -35,7 +35,7 @@ $stmt->close();
   <!-- Plugin css for this page -->
   <!-- End plugin css for this page -->
   <!-- inject:css -->
-  <link rel="stylesheet" href="assets/css/student.css">
+  <link rel="stylesheet" href="assets/css/my_student.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -180,71 +180,77 @@ $stmt->close();
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card position-relative">
-                <div class="card-body">
-                  <div class="col-md-5 grid-margin transparent">
-                    <h2>Students</h2>
-                    <a href="" class="course">
-                      <div class="card card-tale text-center" style="height: 50vh; margin-top: 5vh;">
-                        <div class="circle-image">
-                          <img src="images/profile.png" alt="Circular Image">
+            <div class="col mb-3">
+              <h2>Students</h2>
+            </div>
+          </div>
+          <?php
+          include("config.php");
+          $user_id = $_SESSION['user_id'];
+
+          $sql_selectStudent = "SELECT * FROM student WHERE user_id = ?";
+          $stmt_selectStudent = $db->prepare($sql_selectStudent);
+          $result = $stmt_selectStudent->execute([$user_id]);
+
+          if ($result) {
+            ?>
+            <div class="row">
+              <?php
+              while ($row = $stmt_selectStudent->fetch(PDO::FETCH_ASSOC)) {
+                $student_id = $row['student_id'];
+                $student_name = $row['name'];
+
+                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                $profile_result = $stmt_selectProfile->execute([$student_id]);
+
+                if ($profile_result) {
+                  $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                  $otherProfile = $profile_row['profile'];
+                  ?>
+                  <div class="col-md-3 mb-4">
+                    <a href="studentView_profile.php?user_id=<?php echo $student_id ?>" class="course">
+                      <div class="card card-tale justify-content-center align-items-center"
+                        style="background-image: url(assets/image/user.png);">
+                        <div class="circle-image mt-4 mb-3">
+                          <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
                         </div>
-                        <h2 style="margin-top: 3vh;">SpongeBob</h2>
+                        <p class="text-body-secondary mb-4" style="font-size: 20px;">
+                          <?php echo $student_name ?>
+                        </p>
                       </div>
                     </a>
                   </div>
-                </div>
-              </div>
+                  <?php
+                }
+              }
+              ?>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 grid-margin transparent">
-              <a href="friend.php" class="course">
-                <div class="card card-tale text-center" style="height: 50vh;">
-                  <div class="card-picture">
-                  </div>
-                  <div class="card-footer" style="text-align: left;">
-                    <div class="course-top">
-                      <p class="course-title">My Friends</p>
-                      <p class="course-section">0 Users</p>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
+            <?php
+          }
+          ?>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- content-wrapper ends -->
-  </div>
-  <!-- main-panel ends -->
-  </div>
-  <!-- page-body-wrapper ends -->
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+        crossorigin="anonymous"></script>
+      <!-- container-scroller -->
+      <!-- plugins:js -->
+      <script src="../../vendors/js/vendor.bundle.base.js"></script>
+      <!-- endinject -->
+      <!-- Plugin js for this page -->
+      <!-- End plugin js for this page -->
+      <!-- inject:js -->
+      <script src="../../js/off-canvas.js"></script>
+      <script src="../../js/hoverable-collapse.js"></script>
+      <script src="../../js/template.js"></script>
+      <script src="../../js/settings.js"></script>
+      <script src="../../js/todolist.js"></script>
+      <!-- endinject -->
 </body>
 
 </html>

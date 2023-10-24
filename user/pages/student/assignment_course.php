@@ -27,7 +27,7 @@ if ($teacher_id) {
     $first_name = $class_info['first_name'];
     $last_name = $class_info['last_name'];
 
-    $sql_get_assignment_info = "SELECT title, instruction, point, due_date, time, link, file, youtube, assignment_status FROM classwork_assignment WHERE teacher_id=? AND assignment_id=?";
+    $sql_get_assignment_info = "SELECT title, instruction, point, date, due_date, time, link, file, youtube, assignment_status FROM classwork_assignment WHERE teacher_id=? AND assignment_id=?";
     $stmt_get_assignment_info = $db->prepare($sql_get_assignment_info);
     $stmt_get_assignment_info->execute([$teacher_id, $assignment_id]);
     $assignment_data = $stmt_get_assignment_info->fetch(PDO::FETCH_ASSOC);
@@ -36,6 +36,7 @@ if ($teacher_id) {
       $title = $assignment_data['title'];
       $instruction = $assignment_data['instruction'];
       $point = $assignment_data['point'];
+      $date = $assignment_data['date'];
       $due_date = $assignment_data['due_date'];
       $formatted_due_date = date("F j", strtotime($due_date));
       $time = $assignment_data['time'];
@@ -93,6 +94,12 @@ if (isset($_POST['file_submit'])) {
     }
   }
 }
+
+$sql_assignmentCourseStatus = "SELECT assignment_course_status FROM student_assignment_course_answer 
+WHERE class_id = ? AND assignment_id = ? AND user_id = ?";
+$stmt_assignmentCourseStatus = $db->prepare($sql_assignmentCourseStatus);
+$stmt_assignmentCourseStatus->execute([$class_id, $assignment_id, $user_id]);
+$assignmentCourseStatus = $stmt_assignmentCourseStatus->fetchColumn();
 ?>
 <!doctype html>
 <html lang="en">
@@ -172,7 +179,13 @@ if (isset($_POST['file_submit'])) {
                 </div>
                 <div class="col text-end mt-4" style="margin-right: 25px;">
                   <p class="text-body-secondary">
-                    <?php echo ucfirst($assignment_status) ?>
+                    <?php
+                    if (!empty($assignmentCourseStatus)) {
+                      echo ucfirst($assignmentCourseStatus);
+                    } else {
+                      echo ucfirst($assignment_status);
+                    }
+                    ?>
                   </p>
                 </div>
               </div>
@@ -270,9 +283,23 @@ if (isset($_POST['file_submit'])) {
               $assignment_answer_data = $stmt_assignment_answer->fetch(PDO::FETCH_ASSOC);
 
               if (isset($_POST['mark_done'])) {
-                $sql = "INSERT INTO student_assignment_course_answer (assignment_course_upload_id, assignment_id, assignment_link, assignment_file, user_id, class_id, teacher_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $new_status = ($assignment_status === "missing") ? "turned-in late" : "turned in";
+
+                $sql = "INSERT INTO student_assignment_course_answer (assignment_course_upload_id, assignment_id, title, date,
+                assignment_link, assignment_file, user_id, class_id, teacher_id, assignment_course_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $stmt = $db->prepare($sql);
-                $result = $stmt->execute([$assignment_course_upload_id, $assignment_id, $link, $file, $user_id, $class_id, $teacher_id]);
+                $result = $stmt->execute([
+                  $assignment_course_upload_id,
+                  $assignment_id,
+                  $title,
+                  $date,
+                  $link,
+                  $file,
+                  $user_id,
+                  $class_id,
+                  $teacher_id,
+                  $new_status
+                ]);
 
                 $stmt_assignment_answer->execute([$class_id, $assignment_id]);
                 $assignment_answer_data = $stmt_assignment_answer->fetch(PDO::FETCH_ASSOC);
@@ -282,12 +309,6 @@ if (isset($_POST['file_submit'])) {
                   WHERE class_id = ? AND assignment_id = ?";
                   $stmt_update = $db->prepare($sql_update);
                   $update_result = $stmt_update->execute([$class_id, $assignment_id]);
-
-                  $new_status = ($assignment_status === "missing") ? "turned-in late" : "turned in";
-
-                  $sql_update_status = "UPDATE classwork_assignment SET assignment_status = ? WHERE assignment_id = ?";
-                  $stmt_update_status = $db->prepare($sql_update_status);
-                  $result_update_status = $stmt_update_status->execute([$new_status, $assignment_id]);
                 }
               }
               ?>
@@ -422,7 +443,7 @@ if (isset($_POST['file_submit'])) {
                   <?php
                 }
               }
-              ?>              
+              ?>
               <div class="row justify-content-center align-items-center mt-2 mb-4">
                 <div class="d-grid gap-2 col-11 mx-auto">
                   <div class="dropdown">
