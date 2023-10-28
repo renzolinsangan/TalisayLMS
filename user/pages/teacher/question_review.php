@@ -31,7 +31,10 @@ $result = $stmt_selectQuestion->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($result as $questionRow) {
     $title = $questionRow['title'];
+    $question = $questionRow['question'];
     $instruction = $questionRow['instruction'];
+    $point = $questionRow['point'];
+    $date = $questionRow['date'];
 }
 
 $sql_getStudents = "SELECT * FROM class_enrolled WHERE tc_id = ? AND teacher_id = ? ORDER BY student_firstname ASC";
@@ -50,6 +53,28 @@ foreach ($result as $studentRow) {
     $stmt_selectProfile->execute([$student_id]);
     $otherProfile = $stmt_selectProfile->fetchColumn();
 }
+
+if (isset($_POST['submitGrade'])) {
+    $questionTitle = $_POST['questionTitle'];
+    $studentFirstName = $_POST['studentFirstName'];
+    $studentLastName = $_POST['studentLastName'];
+    $score = $_POST['score'];
+    $questionPoint = $_POST['questionPoint'];
+    $student_id = $_POST['student_id'];
+
+    $sql_questionGrade = "INSERT INTO questiongrade (questionTitle, studentFirstName, studentLastName,
+                score, questionPoint, student_id, question_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $stmt_questionGrade = $db->prepare($sql_questionGrade);
+    $questionGradeResult = $stmt_questionGrade->execute([
+        $questionTitle,
+        $studentFirstName,
+        $studentLastName,
+        $score,
+        $questionPoint,
+        $student_id,
+        $question_id
+    ]);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,6 +87,8 @@ foreach ($result as $studentRow) {
     <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
     <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <link rel="stylesheet" href="assets/css/my_student.css">
     <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -222,13 +249,17 @@ foreach ($result as $studentRow) {
                     <div class="row mb-2">
                         <div class="col-md-12 grid-margin stretch-card">
                             <div class="card">
-                                <div class="card-header ml-4 mt-3 mb-3">
-                                    <h2><?php echo $title ?></h2>
-                                    <p class="text-body-secondary">Instructions: <?php echo $instruction ?></p>
+                                <div class="ml-4 mt-3 mb-3">
+                                    <h2>
+                                        <?php echo $title ?>
+                                    </h2>
+                                    <p class="text-body-secondary">Instructions:
+                                        <?php echo $instruction ?>
+                                    </p>
                                 </div>
                                 <div class="row">
-                                    <?php
-                                    foreach ($result as $studentRow) {
+                                    <?php foreach ($result as $studentRow): ?>
+                                        <?php
                                         $student_id = $studentRow['student_id'];
                                         $student_firstname = $studentRow['student_firstname'];
                                         $student_lastname = $studentRow['student_lastname'];
@@ -237,32 +268,145 @@ foreach ($result as $studentRow) {
                                         $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
                                         $stmt_selectProfile = $db->prepare($sql_selectProfile);
                                         $stmt_selectProfile->execute([$student_id]);
-                                        $profileResult = $stmt_selectProfile->fetchAll(PDO::FETCH_ASSOC);
-
-                                        foreach ($profileResult as $profileRow) {
-                                            $otherProfile = $profileRow['profile'];
-                                            ?>
-                                            <div class="col-md-3 mb-4">
-                                                <div class="card card-tale justify-content-center align-items-center">
-                                                    <div class="circle-image mt-4 mb-3">
-                                                        <img src="../student/assets/image/<?php echo $otherProfile; ?>"
-                                                            alt="Circular Image">
-                                                    </div>
-                                                    <p class="text-body-secondary">
-                                                        <?php echo $student_firstname . ' ' . $student_lastname ?>
-                                                    </p>
+                                        $profileResult = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                                        $otherProfile = $profileResult['profile'];
+                                        ?>
+                                        <div class="col-md-3 mb-4">
+                                            <div class="card card-tale justify-content-center align-items-center"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#staticBackdrop_<?php echo $student_id; ?>"
+                                                style="cursor: pointer;">
+                                                <div class="circle-image mt-4 mb-3">
+                                                    <img src="../student/assets/image/<?php echo $otherProfile; ?>"
+                                                        alt="Circular Image">
                                                 </div>
+                                                <p class="text-body-secondary">
+                                                    <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                                </p>
                                             </div>
-                                            <?php
-                                        }
-                                    }
-                                    ?>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Modal for each student -->
+            <?php foreach ($result as $studentRow): ?>
+                <?php
+                $student_id = $studentRow['student_id'];
+                $student_firstname = $studentRow['student_firstname'];
+                $student_lastname = $studentRow['student_lastname'];
+                $class_name = $studentRow['class_name'];
+
+                // Retrieve the profile for this student
+                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                $stmt_selectProfile->execute([$student_id]);
+                $profileResult = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                $otherProfile = $profileResult['profile'];
+
+                // Retrieve student's question answer
+                $sqlQuestionAnswer = "SELECT * FROM student_question_course_answer WHERE user_id = ? AND question_id = ?";
+                $stmtQuestionAnswer = $db->prepare($sqlQuestionAnswer);
+                $stmtQuestionAnswer->execute([$student_id, $question_id]);
+                $questionResult = $stmtQuestionAnswer->fetchAll(PDO::FETCH_ASSOC);
+                ?>
+                <div class="modal fade" id="staticBackdrop_<?php echo $student_id; ?>" data-bs-backdrop="static"
+                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form action="" method="post">
+                            <div class="modal-content">
+                                <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                                    <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                        <?php echo $title ?> (
+                                        <?php echo $date ?>)
+                                        <p class="text-body-secondary">by
+                                            <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                            <input type="hidden" name="studentFirstName"
+                                                value="<?php echo $student_firstname ?>">
+                                            <input type="hidden" name="studentLastName"
+                                                value="<?php echo $student_lastname ?>">
+                                        </p>
+                                        <?php
+                                        $sql_questionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND question_id = ?";
+                                        $stmt_questionScore = $db->prepare($sql_questionScore);
+                                        $stmt_questionScore->execute([$student_id, $question_id]);
+                                        $questionScoreResult = $stmt_questionScore->fetch(PDO::FETCH_ASSOC);
+
+                                        if (empty($questionScoreResult)) {
+                                            ?>
+                                            <p>
+                                                <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                                                border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
+                                                /
+                                                <?php echo $point; ?>
+                                                <input type="hidden" name="questionPoint" value="<?php echo $point; ?>">
+                                            </p>
+                                            <?php
+                                        } else {
+                                            $questionScore = $questionScoreResult['score'];
+                                            ?>
+                                            <p>
+                                                <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                                                border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $questionScore; ?>"
+                                                    disabled>
+                                                /
+                                                <?php echo $point; ?>
+                                                <input type="hidden" name="questionPoint" value="<?php echo $point; ?>">
+                                            </p>
+                                            <?php
+                                        }
+                                        ?>
+                                    </h1>
+                                </div>
+                                <div class="modal-body">
+                                    <?php foreach ($questionResult as $questionRow): ?>
+                                        <?php
+                                        $question_answer = $questionRow['question_answer'];
+                                        $questionCourseStatus = $questionRow['question_course_status'];
+                                        $statusColor = ($questionCourseStatus === 'turned in') ? 'green' : 'red';
+                                        ?>
+                                        <span style="color: <?php echo $statusColor; ?>">
+                                            <?php echo ucfirst($questionCourseStatus) ?>
+                                        </span>
+                                        <p class="text-body-secondary mt-1">
+                                            Question:
+                                        </p>
+                                        <p style="margin-top: -6px;">
+                                            <?php echo $question ?>
+                                        </p>
+                                        <p class="text-body-secondary">Question Answer:</p>
+                                        <p style="margin-top: -6px;">
+                                            <?php echo $question_answer; ?>
+                                        </p>
+                                    <?php endforeach; ?>
+
+                                    <input type="hidden" name="questionTitle" value="<?php echo $title; ?>">
+                                    <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
+                                </div>
+                                <div class="modal-footer" style="border: none;">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <?php
+                                    if (empty($questionScoreResult)) {
+                                        ?>
+                                        <button type="submit" name="submitGrade" class="btn btn-success">Submit</button>
+                                        <?php
+                                    } else {
+                                        ?>
+                                        <button type="button" name="editGrade" class="btn btn-success">Edit</button>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

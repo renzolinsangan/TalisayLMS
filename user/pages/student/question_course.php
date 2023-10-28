@@ -213,8 +213,17 @@ $questionCourseStatus = $stmt_questionCourseStatus->fetchColumn();
         $sql = "INSERT INTO student_question_course_answer (question_id, question_answer, user_id, class_id, teacher_id, 
         point, title, date, question_course_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmtinsert = $db->prepare($sql);
-        $result = $stmtinsert->execute([$question_id, $question_answer, $user_id, $class_id, $teacher_id, 
-        $point, $title, $date, $new_status]);
+        $result = $stmtinsert->execute([
+          $question_id,
+          $question_answer,
+          $user_id,
+          $class_id,
+          $teacher_id,
+          $point,
+          $title,
+          $date,
+          $new_status
+        ]);
       }
 
       $sql = "SELECT question_answer FROM student_question_course_answer WHERE class_id=? AND question_id=?";
@@ -232,12 +241,12 @@ $questionCourseStatus = $stmt_questionCourseStatus->fetchColumn();
                   <span>Your Answer</span>
                   <span class="text-body-secondary ml-auto">
                     <?php
-                      if (!empty($questionCourseStatus)) {
-                        echo ucfirst($questionCourseStatus);
-                      } else {
-                        echo ucfirst($question_status);
-                      }
-                      ?>
+                    if (!empty($questionCourseStatus)) {
+                      echo ucfirst($questionCourseStatus);
+                    } else {
+                      echo ucfirst($question_status);
+                    }
+                    ?>
                   </span>
                 </div>
                 <div style="margin: 10px;">
@@ -272,12 +281,12 @@ $questionCourseStatus = $stmt_questionCourseStatus->fetchColumn();
                   <span>Your Answer</span>
                   <span class="text-body-secondary ml-auto">
                     <?php
-                      if (!empty($questionCourseStatus)) {
-                        echo ucfirst($questionCourseStatus);
-                      } else {
-                        echo ucfirst($question_status);
-                      }
-                      ?>
+                    if (!empty($questionCourseStatus)) {
+                      echo ucfirst($questionCourseStatus);
+                    } else {
+                      echo ucfirst($question_status);
+                    }
+                    ?>
                   </span>
                 </div>
                 <div style="margin: 10px;">
@@ -299,28 +308,31 @@ $questionCourseStatus = $stmt_questionCourseStatus->fetchColumn();
     function goToClasswork(classId) {
       window.location.href = `class_course.php?class_id=${classId}`;
     }
+    function resizeTextarea(textarea) {
+      const initialHeight = textarea.scrollHeight + "px";
+      textarea.style.height = initialHeight;
+      textarea.style.height = (textarea.scrollHeight <= textarea.clientHeight) ? initialHeight : textarea.scrollHeight + "px";
+    }
 
     const textareas = document.querySelectorAll(".auto-resize");
 
     textareas.forEach((textarea) => {
-      const initialHeight = textarea.scrollHeight + "px";
-
       textarea.addEventListener("input", function () {
-        this.style.height = initialHeight;
-        this.style.height = (this.scrollHeight <= this.clientHeight) ? initialHeight : this.scrollHeight + "px";
+        resizeTextarea(this);
       });
+
+      // Resize the textareas initially
+      resizeTextarea(textarea);
     });
 
     const textarea = document.querySelector(".auto-resize");
-    const submittedAnswerContainer = document.getElementById("submittedAnswerContainer");
-    const submittedAnswerTextarea = submittedAnswerContainer.querySelector("textarea");
 
     textarea.addEventListener("input", function () {
-      this.style.height = "auto";
-      this.style.height = this.scrollHeight + "px";
+      resizeTextarea(this);
     });
 
-    textarea.dispatchEvent(new Event("input"));
+    // Resize the textarea initially
+    resizeTextarea(textarea);
   </script>
   <script>
     document.querySelector('button[name="question_edit"]').addEventListener('click', function () {

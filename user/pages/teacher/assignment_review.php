@@ -29,8 +29,10 @@ $stmt_selectAssignment->execute([$assignment_id, $class_id, $teacher_id]);
 $result = $stmt_selectAssignment->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($result as $assignmentRow) {
-    $title = $assignmentRow['title'];
-    $instruction = $assignmentRow['instruction'];
+  $title = $assignmentRow['title'];
+  $instruction = $assignmentRow['instruction'];
+  $point = $assignmentRow['point'];
+  $date = $assignmentRow['date'];
 }
 
 $sql_getStudents = "SELECT * FROM class_enrolled WHERE tc_id = ? AND teacher_id = ? ORDER BY student_firstname ASC";
@@ -39,15 +41,29 @@ $stmt_getStudents->execute([$class_id, $teacher_id]);
 $result = $stmt_getStudents->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($result as $studentRow) {
-    $student_id = $studentRow['student_id'];
-    $student_firstname = $studentRow['student_firstname'];
-    $student_lastname = $studentRow['student_lastname'];
-    $class_name = $studentRow['class_name'];
+  $student_id = $studentRow['student_id'];
+  $student_firstname = $studentRow['student_firstname'];
+  $student_lastname = $studentRow['student_lastname'];
+  $class_name = $studentRow['class_name'];
 
-    $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-    $stmt_selectProfile = $db->prepare($sql_selectProfile);
-    $stmt_selectProfile->execute([$student_id]);
-    $otherProfile = $stmt_selectProfile->fetchColumn();
+  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+  $stmt_selectProfile = $db->prepare($sql_selectProfile);
+  $stmt_selectProfile->execute([$student_id]);
+  $otherProfile = $stmt_selectProfile->fetchColumn();
+}
+
+if (isset($_POST['assignmentGrade'])) {
+  $assignmentTitle = $_POST['assignmentTitle'];
+  $studentFirstName = $_POST['studentFirstName'];
+  $studentLastName = $_POST['studentLastName'];
+  $score = $_POST['score'];
+  $assignmentPoint = $_POST['assignmentPoint'];
+  $student_id = $_POST['student_id'];
+
+  $sql_assignmentGrade = "INSERT INTO assignmentgrade (assignmentTitle, studentFirstName, studentLastname, score, 
+  assignmentPoint, student_id) VALUES (?, ?, ?, ?, ?, ?)";
+  $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
+  $assignmentGradeResult = $stmt_assignmentGrade->execute([$assignmentTitle, $studentFirstName, $studentLastName, $score, $assignmentPoint, $student_id]);
 }
 ?>
 <!DOCTYPE html>
@@ -61,6 +77,8 @@ foreach ($result as $studentRow) {
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/my_student.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -215,7 +233,7 @@ foreach ($result as $studentRow) {
           <div class="row mb-2">
             <div class="col-md-12 grid-margin stretch-card">
               <div class="card">
-                <div class="card-header ml-4 mt-3 mb-3">
+                <div class="ml-4 mt-3 mb-3" s>
                   <h2>
                     <?php echo $title ?>
                   </h2>
@@ -240,13 +258,156 @@ foreach ($result as $studentRow) {
                       $otherProfile = $profileRow['profile'];
                       ?>
                       <div class="col-md-3 mb-4">
-                        <div class="card card-tale justify-content-center align-items-center">
+                        <div class="card card-tale justify-content-center align-items-center" data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop_<?php echo $student_id; ?>" style="cursor: pointer;">
                           <div class="circle-image mt-4 mb-3">
                             <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
                           </div>
                           <p class="text-body-secondary">
                             <?php echo $student_firstname . ' ' . $student_lastname ?>
                           </p>
+                        </div>
+                      </div>
+                      <div class="modal fade" id="staticBackdrop_<?php echo $student_id; ?>" data-bs-backdrop="static"
+                        data-bs-keyboard="false" tabindex="-1"
+                        aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <form action="" method="post">
+                            <div class="modal-content">
+                              <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                  <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                  <?php echo $title ?> (
+                                  <?php echo $date ?>)
+                                  <input type="hidden" name="assignmentTitle" value="<?php echo $title ?>">
+                                  <p class="text-body-secondary">by
+                                    <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                    <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                                    <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
+                                  </p>
+                                  <?php
+                                  $sql_assignmentScore = "SELECT score FROM assignmentgrade WHERE student_id = ? AND assignment_id = ?";
+                                  $stmt_assignmentScore = $db->prepare($sql_assignmentScore);
+                                  $stmt_assignmentScore->execute([$student_id, $assignment_id]);
+                                  $assignmentScoreResult = $stmt_assignmentScore->fetch(PDO::FETCH_ASSOC);
+
+                                  if (empty($assignmentScoreResult)) {
+                                    ?>
+                                    <p>
+                                      <input type="text" name="score" style=" height: 4vh; width: 4vh; font-size: 13px; border: none;
+                                    border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
+                                      /
+                                      <?php echo $point ?>
+                                      <input type="hidden" name="assignmentPoint" value="<?php echo $point ?>">
+                                    </p>
+                                    <?php
+                                  } else {
+                                    $assignmentScore = $assignmentScoreResult['score'];
+                                    ?>
+                                    <p>
+                                      <input type="text" name="score" style=" height: 4vh; width: 4vh; font-size: 13px; border: none;
+                                    border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
+                                        value="<?php echo $assignmentScore ?>" disabled>
+                                      /
+                                      <?php echo $point ?>
+                                      <input type="hidden" name="assignmentPoint" value="<?php echo $point ?>">
+                                    </p>
+                                    <?php
+                                  }
+                                  ?>
+                                </h1>
+                              </div>
+                              <div class="modal-body">
+                                <?php
+                                $sqlAssignmentAnswer = "SELECT * FROM student_assignment_course_answer WHERE user_id = ?
+                                AND assignment_id = ?";
+                                $stmtAssignmentAnswer = $db->prepare($sqlAssignmentAnswer);
+                                $stmtAssignmentAnswer->execute([$student_id, $assignment_id]);
+                                $assignmentResult = $stmtAssignmentAnswer->fetchAll(PDO::FETCH_ASSOC);
+
+                                foreach ($assignmentResult as $assignmentRow) {
+                                  $assignmentLink = $assignmentRow['assignment_link'];
+                                  $assignmentFile = $assignmentRow['assignment_file'];
+                                  $fileDirectory = "assets/uploads/";
+                                  $filePath = $fileDirectory . $assignmentFile;
+                                  $assignmentCourseStatus = $assignmentRow['assignment_course_status'];
+                                  $statusColor = ($assignmentCourseStatus === 'turned in') ? 'green' : 'red';
+                                  ?>
+                                  <span style="color: <?php echo $statusColor; ?>">
+                                    <?php echo ucfirst($assignmentCourseStatus) ?>
+                                  </span>
+                                  <p class="text-body-secondary mt-2">Student Work/s</p>
+                                  <div class="row mt-2">
+                                    <?php if (!empty($assignmentLink) && $assignmentLink != 'null') {
+                                      ?>
+                                      <div class="col-md-6">
+                                        <div class="card" style="border: 1px solid #ccc; border-radius: 5%;">
+                                          <a class="mt-3 ml-3" href="<?php echo $assignmentLink ?>" target="_blank"
+                                            style="text-decoration: none;">
+                                            <div class="row">
+                                              <div class="col">
+                                                <p
+                                                  style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90%;">
+                                                  <?php echo $assignmentLink ?>
+                                                </p>
+                                              </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                              <div class="col text-body-secondary">
+                                                LINK
+                                              </div>
+                                            </div>
+                                          </a>
+                                        </div>
+                                      </div>
+                                      <?php
+                                    }
+                                    ?>
+                                    <?php if (!empty($filePath) && !empty($assignmentFile)) {
+                                      ?>
+                                      <div class="col-md-6">
+                                        <div class="card" style="border: 1px solid #ccc; border-radius: 5%;">
+                                          <a class="mt-3 ml-3" href="<?php echo $filePath ?>" style="text-decoration: none;">
+                                            <div class="row">
+                                              <div class="col">
+                                                <p
+                                                  style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                                                  <?php echo $assignmentFile ?>
+                                                </p>
+                                              </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                              <div class="col text-body-secondary">
+                                                <?php echo strtoupper(pathinfo($assignmentFile, PATHINFO_EXTENSION)); ?>
+                                              </div>
+                                            </div>
+                                          </a>
+                                        </div>
+                                      </div>
+                                      <?php
+                                    }
+                                    ?>
+                                  </div>
+                                  <?php
+                                }
+                                ?>
+                              </div>
+                              <div class="modal-footer" style="border: none;">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <?php
+                                if (empty($assignmentScoreResult)) {
+                                  ?>
+                                  <button type="submit" name="assignmentGrade" class="btn btn-success">Submit</button>
+                                  <?php
+                                } else {
+                                  ?>
+                                  <button type="button" name="editGrade" class="btn btn-success">Edit</button>
+                                  <?php
+                                }
+                                ?>
+                              </div>
+                            </div>
+                          </form>
                         </div>
                       </div>
                       <?php

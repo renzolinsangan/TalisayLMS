@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 24, 2023 at 02:31 PM
+-- Generation Time: Oct 28, 2023 at 02:26 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -20,6 +20,30 @@ SET time_zone = "+00:00";
 --
 -- Database: `test_db`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assignmentgrade`
+--
+
+CREATE TABLE `assignmentgrade` (
+  `assignmentGrade_id` int(11) NOT NULL,
+  `assignmentTitle` varchar(100) NOT NULL,
+  `studentFirstName` varchar(64) NOT NULL,
+  `studentLastName` varchar(64) NOT NULL,
+  `score` int(11) NOT NULL,
+  `assignmentPoint` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `assignment_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `assignmentgrade`
+--
+
+INSERT INTO `assignmentgrade` (`assignmentGrade_id`, `assignmentTitle`, `studentFirstName`, `studentLastName`, `score`, `assignmentPoint`, `student_id`, `assignment_id`) VALUES
+(1, 'Cell Energetics', 'John Renzo', 'Linsangan', 5, 20, 28, 33);
 
 -- --------------------------------------------------------
 
@@ -177,7 +201,7 @@ CREATE TABLE `classwork_question` (
 
 INSERT INTO `classwork_question` (`question_id`, `title`, `question`, `instruction`, `class_name`, `student`, `point`, `point_received`, `date`, `due_date`, `time`, `class_topic`, `class_id`, `teacher_id`, `link`, `file`, `youtube`, `question_status`) VALUES
 (21, 'Cell Biology', 'What is Cell Biology? ', 'Explain it one paragraph with a minimum of 5 sentence. Do not use any AI Tools in generating answers, if you are caught, your grade will be equivalent to 0. Do it before the due date, have a nice day.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 40, 0, '2023-10-15', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, 'https://www.nature.com/scitable/topic/cell-biology-13906536/', NULL, NULL, 'missing'),
-(23, 'Cell Evolution', 'What happens in a cell evolution?', 'Explain every process that happens in a cell evolution.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan,Marco Luis Hernandez,Carl Justine Aala,Martin Clarence Guantes', 20, 0, '2023-10-24', '2023-10-25', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'assigned');
+(23, 'Cell Evolution', 'What happens in a cell evolution?', 'Explain every process that happens in a cell evolution.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan,Marco Luis Hernandez,Carl Justine Aala,Martin Clarence Guantes', 20, 0, '2023-10-24', '2023-10-27', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'assigned');
 
 -- --------------------------------------------------------
 
@@ -358,6 +382,30 @@ INSERT INTO `news` (`news_id`, `title`, `type`, `name`, `date`, `track`, `start_
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `questiongrade`
+--
+
+CREATE TABLE `questiongrade` (
+  `questionGrade_id` int(11) NOT NULL,
+  `questionTitle` varchar(100) NOT NULL,
+  `studentFirstName` varchar(64) NOT NULL,
+  `studentLastName` varchar(64) NOT NULL,
+  `score` int(11) NOT NULL,
+  `questionPoint` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `question_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `questiongrade`
+--
+
+INSERT INTO `questiongrade` (`questionGrade_id`, `questionTitle`, `studentFirstName`, `studentLastName`, `score`, `questionPoint`, `student_id`, `question_id`) VALUES
+(3, 'Cell Evolution', 'John Renzo', 'Linsangan', 20, 20, 28, 23);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `section`
 --
 
@@ -462,7 +510,8 @@ CREATE TABLE `student_question_course_answer` (
 
 INSERT INTO `student_question_course_answer` (`answer_question_id`, `question_id`, `point`, `title`, `date`, `question_answer`, `user_id`, `class_id`, `teacher_id`, `question_course_status`) VALUES
 (25, 21, 30, 'Cell Biology', '2023-10-15', 'Cell biology is the scientific discipline that investigates the structure, function, and behavior of cells, which are the fundamental units of life. It encompasses the study of various cellular processes, interactions, and the molecular mechanisms that underlie the functions of cells within living organisms. Cell biology is integral to understanding how life is organized and how organisms function at the cellular level.', 28, 45, 33, 'turned-in late'),
-(27, 21, 40, 'Cell Biology', '2023-10-15', 'Cell biology is a branch of biology that focuses on the study of cells, which are the basic structural and functional units of living organisms. It encompasses a wide range of topics related to cells, including their structure, function, physiology, and interactions. Cell biology explores how cells are organized, how they communicate with each other, and how they carry out various biological processes.', 38, 49, 33, 'turned-in late');
+(27, 21, 40, 'Cell Biology', '2023-10-15', 'Cell biology is a branch of biology that focuses on the study of cells, which are the basic structural and functional units of living organisms. It encompasses a wide range of topics related to cells, including their structure, function, physiology, and interactions. Cell biology explores how cells are organized, how they communicate with each other, and how they carry out various biological processes.', 38, 49, 33, 'turned-in late'),
+(29, 23, 20, 'Cell Evolution', '2023-10-24', 'Cell evolution traces the development and diversification of cells, the fundamental units of life, over billions of years. All life shares a common ancestry, and cells have evolved from simple, early forms to more complex prokaryotic and eukaryotic structures. Genetic variation, driven by mutations, has played a central role, with natural selection favoring advantageous traits that enhance an organism\'s fitness and adaptation to its environment. This ongoing process has led to the emergence of new species and the diverse cellular structures and functions seen today. Molecular biology has shed light on the genetic and molecular changes that underlie cell evolution, and the endosymbiotic theory explains the origins of some cellular structures. Cell evolution is an integral part of the broader theory of biological evolution, illustrating the interconnectedness of all life on Earth.', 28, 45, 33, 'turned in');
 
 -- --------------------------------------------------------
 
@@ -619,6 +668,12 @@ INSERT INTO `user_profile` (`profile_id`, `user_id`, `profile`, `profile_status`
 --
 
 --
+-- Indexes for table `assignmentgrade`
+--
+ALTER TABLE `assignmentgrade`
+  ADD PRIMARY KEY (`assignmentGrade_id`);
+
+--
 -- Indexes for table `assignment_course_upload`
 --
 ALTER TABLE `assignment_course_upload`
@@ -697,6 +752,12 @@ ALTER TABLE `news`
   ADD PRIMARY KEY (`news_id`);
 
 --
+-- Indexes for table `questiongrade`
+--
+ALTER TABLE `questiongrade`
+  ADD PRIMARY KEY (`questionGrade_id`);
+
+--
 -- Indexes for table `section`
 --
 ALTER TABLE `section`
@@ -754,6 +815,12 @@ ALTER TABLE `user_profile`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `assignmentgrade`
+--
+ALTER TABLE `assignmentgrade`
+  MODIFY `assignmentGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `assignment_course_upload`
@@ -834,6 +901,12 @@ ALTER TABLE `news`
   MODIFY `news_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
+-- AUTO_INCREMENT for table `questiongrade`
+--
+ALTER TABLE `questiongrade`
+  MODIFY `questionGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `section`
 --
 ALTER TABLE `section`
@@ -855,7 +928,7 @@ ALTER TABLE `student_assignment_course_answer`
 -- AUTO_INCREMENT for table `student_question_course_answer`
 --
 ALTER TABLE `student_question_course_answer`
-  MODIFY `answer_question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `answer_question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `teacher`
