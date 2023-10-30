@@ -5,7 +5,7 @@ include('db_conn.php');
 if (isset($_GET['deleteid'])) {
     $id = $_GET['deleteid'];
 
-    $sql = "DELETE FROM user_account WHERE user_id=$id";
+    $sql = "DELETE FROM parent_account WHERE parent_id=$id";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {

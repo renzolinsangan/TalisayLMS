@@ -12,21 +12,6 @@ if (isset($_GET['user_id'])) {
 
 include("db_conn.php");
 $teacher_id = $_SESSION['user_id'];
-
-$sql = "SELECT DISTINCT class_name FROM class_enrolled WHERE teacher_id = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-// Create an array to store class names
-$class_names = array();
-
-// Fetch class names and store them in the array
-while ($row = $result->fetch_assoc()) {
-  $class_names[] = $row['class_name'];
-}
-
 $user_id = $_SESSION['user_id'];
 
 $sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
@@ -50,12 +35,7 @@ $stmt->close();
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
   <link rel="stylesheet" href="assets/css/student_report.css">
-  <!-- endinject -->
   <link rel="shortcut icon" href="images/trace.svg" />
 </head>
 
@@ -180,9 +160,11 @@ $stmt->close();
             <div class="collapse" id="charts">
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link"
-                    href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a></li>
+                    href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a>
+                </li>
                 <li class="nav-item"> <a class="nav-link"
-                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a></li>
+                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a>
+                </li>
               </ul>
             </div>
           </li>
@@ -197,19 +179,34 @@ $stmt->close();
       <!-- partial -->
       <div class="main-panel">
         <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
-          <a href="student_report.php?user_id=<?php echo $teacher_id ?>" class="nav-link active"
-            style="margin-left: 5vh;">All</a>
           <?php
+          include("config.php");
+
           $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';
 
-          foreach ($class_names as $class_name) {
+          // Fetch distinct class_name and tc_id from the database
+          $sql = "SELECT DISTINCT class_name, tc_id FROM class_enrolled WHERE teacher_id = ?";
+          $stmt = $conn->prepare($sql);
+          $stmt->bind_param("i", $user_id);
+          $stmt->execute();
+          $result = $stmt->get_result();
+
+          $class_names_and_tc_ids = array();
+
+          while ($row = $result->fetch_assoc()) {
+            $class_names_and_tc_ids[] = $row;
+          }
+
+          foreach ($class_names_and_tc_ids as $class_data) {
+            $class_name = $class_data['class_name'];
+            $tc_id = $class_data['tc_id'];
+
             $safeClass = str_replace(' ', '_', $class_name);
             $cssClass = ($classFromUrl === $class_name) ? 'active' : '';
 
-            // Encode the class_name before appending it to the URL
             $encodedClass = urlencode($class_name);
 
-            echo '<a href="student_report_subject.php?user_id=' . $teacher_id . '&class_name=' . $encodedClass . '" class="' . $cssClass . '">' . $class_name . '</a>';
+            echo '<a href="grade_report_subject.php?user_id=' . $teacher_id . '&class_name=' . $encodedClass . '&class_id=' . $tc_id . '" class="' . $cssClass . '">' . $class_name . '</a>';
           }
           ?>
         </div>
@@ -222,8 +219,9 @@ $stmt->close();
                   <div class="row">
                     <div class="col-md-6">
                       <div class="card-body">
-                        <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">Reports in All Handled
-                          Students
+                        <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">Grade
+                          Reports in
+                          <?php echo isset($_GET['class_name']) ? urldecode($_GET['class_name']) : 'Unknown Subject'; ?>
                         </h1>
                       </div>
                     </div>
@@ -233,44 +231,85 @@ $stmt->close();
                       <div class="col-md-12">
                         <div class="card-body">
                           <div class="table-responsive">
-                            <table class="table table-hover text-center">
-                              <thead class="table" style="background-color: #4BB543; color: white;">
-                                <tr>
-                                  <th scope="col">Student's Name</th>
-                                  <th scope="col">Class Name</th>
-                                  <th scope="col">Section</th>
-                                  <th scope="col">Subject</th>
-                                  <th scope="col">Grade Level</th>
-                                  <th scope="col">Department</th>
-                                </tr>
+                            <table class="table table-bordered table-hover text-center">
+                              <thead class="table" style="background-color: #4BB543; color: white; align-items: left;">
+                                <th scope="col">Student Name</th>
+                                <?php
+                                include("config.php");
+                                $class_id = $_GET['class_id'];
+
+                                $sqlQuestion = "SELECT questionTitle, date, score, questionPoint FROM questiongrade WHERE class_id = ? AND teacher_id = ?";
+                                $stmtQuestion = $db->prepare($sqlQuestion);
+                                $stmtQuestion->execute([$class_id, $teacher_id]);
+                                $questionTitles = $stmtQuestion->fetchAll(PDO::FETCH_ASSOC);
+
+                                $sqlAssignment = "SELECT assignmentTitle, date, score, assignmentPoint FROM assignmentgrade WHERE class_id = ? AND teacher_id = ?";
+                                $stmtAssignment = $db->prepare($sqlAssignment);
+                                $stmtAssignment->execute([$class_id, $teacher_id]);
+                                $assignmentTitles = $stmtAssignment->fetchAll(PDO::FETCH_ASSOC);
+
+                                $allTitles = array_merge($questionTitles, $assignmentTitles);
+                                usort($allTitles, function ($a, $b) {
+                                  return strtotime($a['date']) - strtotime($b['date']);
+                                });
+
+                                foreach ($allTitles as $title) {
+                                  $formattedDate = date("F j", strtotime($title['date']));
+                                  ?>
+                                  <th scope="col" style="text-align: left;">
+                                    <p style="color: white; margin-bottom: -3px;">
+                                      <?php echo $formattedDate; ?>
+                                    </p>
+                                    <p style="border-bottom: 1px solid white; color: black;">
+                                      <?php echo $title['questionTitle'] ?? $title['assignmentTitle']; ?>
+                                    </p>
+                                    <?php
+                                    if (isset($title['questionPoint'])) {
+                                      ?>
+                                      <p style="color: white;">out of
+                                        <?php echo $title['questionPoint'] ?>
+                                      </p>
+                                      <?php
+                                    } elseif (isset($title['assignmentPoint'])) {
+                                      ?>
+                                      <p style="color: white;">out of
+                                        <?php echo $title['assignmentPoint'] ?>
+                                      </p>
+                                      <?php
+                                    }
+                                    ?>
+                                  </th>
+                                  <?php
+                                }
+                                ?>
                               </thead>
                               <tbody>
                                 <?php
-                                include("db_conn.php");
-                                $sql = "SELECT * FROM class_enrolled WHERE teacher_id=$user_id";
-                                $result = mysqli_query($conn, $sql);
+                                include("config.php");
+                                $class_id = $_GET['class_id'];
 
-                                while ($row = mysqli_fetch_assoc($result)) {
+                                $sqlAllStudent = "SELECT student_firstname, student_lastname FROM class_enrolled WHERE tc_id = ? AND teacher_id = ?";
+                                $stmtAllStudent = $db->prepare($sqlAllStudent);
+                                $stmtAllStudent->execute([$class_id, $teacher_id]);
+                                $students = $stmtAllStudent->fetchAll(PDO::FETCH_ASSOC);
+
+                                usort($students, function ($a, $b) {
+                                  return strcasecmp($a['student_lastname'], $b['student_lastname']);
+                                });
+
+                                foreach ($students as $student) {
                                   ?>
                                   <tr>
                                     <td>
-                                      <?php echo $row['student_firstname'] . ' ' . $row['student_lastname']; ?>
+                                      <?php echo $student['student_firstname'] . ' ' . $student['student_lastname'] ?>
                                     </td>
-                                    <td>
-                                      <?php echo $row['class_name'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['section'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['subject'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['grade_level'] ?>
-                                    </td>
-                                    <td>
-                                      <?php echo $row['strand'] ?>
-                                    </td>
+                                    <?php
+                                    foreach ($allTitles as $title) {
+                                      ?>
+                                      <td></td>
+                                      <?php
+                                    }
+                                    ?>
                                   </tr>
                                   <?php
                                 }

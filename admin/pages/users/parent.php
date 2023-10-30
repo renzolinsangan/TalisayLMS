@@ -5,6 +5,8 @@ if (!isset($_SESSION['id'])) {
   header("Location:../../admin_login.php");
   exit();
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -192,11 +194,13 @@ if (!isset($_SESSION['id'])) {
                             <tr>
                               <th scope="col">Username</th>
                               <th scope="col">Password</th>
+                              <th scope="col">House Address</th>
                               <th scope="col">Email</th>
+                              <th scope="col">Contact Number</th>
                               <th scope="col">First Name</th>
                               <th scope="col">Middle Name</th>
                               <th scope="col">Last Name</th>
-                              <th scope="col">Department</th>
+                              <th scope="col">Children</th>
                               <th scope="col">User Type</th>
                               <th scope="col">Action</th>
                             </tr>
@@ -205,7 +209,7 @@ if (!isset($_SESSION['id'])) {
                             <?php
                             include("db_conn.php");
 
-                            $sql = "SELECT * FROM user_account WHERE usertype = 'parent'";
+                            $sql = "SELECT * FROM parent_account WHERE usertype = 'parent'";
                             $result = mysqli_query($conn, $sql);
 
                             while ($row = mysqli_fetch_assoc($result)) {
@@ -218,7 +222,13 @@ if (!isset($_SESSION['id'])) {
                                   <?php echo $row['password'] ?>
                                 </td>
                                 <td>
+                                  <?php echo $row['address'] ?>
+                                </td>
+                                <td>
                                   <?php echo $row['email'] ?>
+                                </td>
+                                <td>
+                                  <?php echo $row['contact'] ?>
                                 </td>
                                 <td>
                                   <?php echo $row['firstname'] ?>
@@ -230,16 +240,16 @@ if (!isset($_SESSION['id'])) {
                                   <?php echo $row['lastname'] ?>
                                 </td>
                                 <td>
-                                  <?php echo $row['department'] ?>
+                                  <?php echo $row['children'] ?>
                                 </td>
                                 <td>
                                   <?php echo $row['usertype'] ?>
                                 </td>
                                 <td style="font-size: 18px;">
-                                  <a href="edit_parent.php?updateid=<?php echo $row['user_id'] ?>" class="link-dark"
-                                    style="margin-right: 5px;"><i class="bi bi-pencil-square"></i></a>
-                                  <a href="delete_parent.php?deleteid=<?php echo $row['user_id'] ?>" class="link-dark"><i
-                                      class="bi bi-trash-fill"></i></a>
+                                  <a href="edit_parent.php?updateid=<?php echo $row['parent_id'] ?>" class="link-dark"
+                                  style="margin-right: 5px;"><i class="bi bi-pencil-square"></i></a>
+                                  <a href="delete_parent.php?deleteid=<?php echo $row['parent_id'] ?>" 
+                                  class="link-dark"><i class="bi bi-trash-fill"></i></a>
                                 </td>
                               </tr>
                               <?php

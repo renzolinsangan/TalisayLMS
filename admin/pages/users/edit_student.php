@@ -94,7 +94,7 @@ if (isset($_POST['submit'])) {
                             <div class="col mb-4">
                                 <label class="form-label">Password (8 characters)</label>
                                 <input type="password" class="form-control" name="password"
-                                    value="<?php echo $password ?>"">
+                                    value="<?php echo $password ?>">
                             </div>
 
                             <div class=" email mb-4">

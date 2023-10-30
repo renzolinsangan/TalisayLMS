@@ -148,7 +148,6 @@ $stmt->close();
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="friend.php">My Friends</a></li>
                 <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
               </ul>
             </div>
@@ -204,16 +203,20 @@ $stmt->close();
                 $stmt_selectProfile = $db->prepare($sql_selectProfile);
                 $profile_result = $stmt_selectProfile->execute([$student_id]);
 
+                $defaultProfile = "images/profile.png";
+
                 if ($profile_result) {
                   $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
                   $otherProfile = $profile_row['profile'];
+                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
                   ?>
                   <div class="col-md-3 mb-4">
                     <a href="studentView_profile.php?user_id=<?php echo $student_id ?>" class="course">
                       <div class="card card-tale justify-content-center align-items-center"
                         style="background-image: url(assets/image/user.png);">
                         <div class="circle-image mt-4 mb-3">
-                          <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
+                          <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
+                          onerror="this.src='images/profile.png'">
                         </div>
                         <p class="text-body-secondary mb-4" style="font-size: 20px;">
                           <?php echo $student_name ?>

@@ -8,22 +8,24 @@ if (!isset($_SESSION['id'])) {
 include_once("config.php");
 
 if (isset($_POST['submit'])) {
-    $id = $row['user_id'];
     $username = $_POST['username'];
     $password = $_POST['password'];
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    $address = $_POST['address'];
     $email = $_POST['email'];
+    $contact = $_POST['contact'];
     $firstname = $_POST['firstname'];
     $middlename = $_POST['middlename'];
     $lastname = $_POST['lastname'];
-    $department = $_POST['department'];
+    $children = $_POST['children'];
     $usertype = $_POST['usertype'];
 
-    $sql = "INSERT INTO user_account (username, password, email, firstname, middlename, lastname, department, usertype) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO parent_account (username, password, address, email, contact, firstname, middlename, lastname, children, usertype) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $db->prepare($sql);
-    $result = $stmtinsert->execute([$username, $password, $email, $firstname, $middlename, $lastname, $department, $usertype]);
+    $result = $stmtinsert->execute([$username, $hashedPassword, $address, $email, $contact, $firstname, $middlename, $lastname, $children, $usertype]);
 
     if ($result) {
-        header("Location: parent.php?msg=Student created successfully!");
+        header("Location: parent.php?msg=Parent created successfully!");
     } else {
         echo "Failed: " . mysqli_error($conn);
     }
@@ -36,10 +38,14 @@ if (isset($_POST['submit'])) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Talisay Senior High School LMS Admin</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/virtual-select.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/create_student.css">
     <link rel="shortcut icon" href="../../images/trace.svg" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script type="text/javascript" src="multi-select"></script>
+    <script type="text/javascript" src="js/virtual-select.min.js"></script>
 </head>
 
 <body>
@@ -76,10 +82,27 @@ if (isset($_POST['submit'])) {
                                 <input type="password" class="form-control" name="password">
                             </div>
 
-                            <div class="email mb-4">
+                            <div></div>
+
+                            <div class="col mb-4">
+                                <label class="form-label">House Address</label>
+                                <input type="text" class="form-control" name="address">
+                            </div>
+
+                            <div></div>
+
+                            <div class="col mb-4">
                                 <label class="form-label">Email</label>
                                 <input type="email" class="form-control" name="email">
                             </div>
+
+                            <div class="col mb-4">
+                                <label class="form-label">Contact Number</label>
+                                <input type="tel" class="form-control" name="contact" id="contact"
+                                    pattern="^(09|\+639)\d{9}$" maxlength="11">
+                            </div>
+
+                            <div></div>
 
                             <div class="col mb-4">
                                 <label class="form-label">First Name</label>
@@ -99,15 +122,23 @@ if (isset($_POST['submit'])) {
                             <div></div>
 
                             <div class="col mb-5">
-                                <label class="form-label">Department</label>
+                                <label class="form-label">Children</label>
                                 <div class="position-relative">
-                                    <select name="department" id="department"
-                                        class="form-control custom-select lightened-select">
-                                        <option disabled selected value=""></option>
-                                        <option value="stem">STEM</option>
-                                        <option value="humss">HUMSS</option>
-                                        <option value="abm">ABM</option>
-                                        <option value="mechanic">MECHANICS</option>
+                                    <select id="multipleSelect" multiple name="children"
+                                        placeholder="Select Parent's Child" data-search="true"
+                                        data-silent-initial-value-set="true" style="height: 45px;">
+                                        <?php
+                                        include("db_conn.php");
+
+                                        $sql_children = "SELECT * FROM user_account WHERE usertype = 'student'";
+                                        $childrenResult = mysqli_query($conn, $sql_children);
+
+                                        while ($childrenRow = mysqli_fetch_assoc($childrenResult)) {
+                                            $childFirstName = $childrenRow['firstname'];
+                                            $childLastName = $childrenRow['lastname'];
+                                            echo '<option value="' . $childFirstName . ' ' . $childLastName . '">' . $childFirstName . ' ' . $childLastName . '</option>';
+                                        }
+                                        ?>
                                     </select>
                                 </div>
                             </div>
@@ -131,13 +162,11 @@ if (isset($_POST['submit'])) {
                                 <button type="submit" class="btn btn-outline-success" name="submit"
                                     style="padding: 7px; font-size: 15px;">Sign Up</button>
                             </div>
-
                         </div>
                     </form>
                 </div>
             </section>
         </div>
-
         <div class="footer"></div>
     </div>
 
@@ -152,17 +181,99 @@ if (isset($_POST['submit'])) {
             // Get the input fields and text area
             var usernameInput = document.querySelector('input[name="username"]');
             var passwordInput = document.querySelector('input[name="password"]');
+            var addressInput = document.querySelector('input[name="address"]');
             var emailInput = document.querySelector('input[name="email"]');
+            var contactInput = document.querySelector('input[name="contact"]');
             var firstnameInput = document.querySelector('input[name="firstname"]');
             var middlenameInput = document.querySelector('input[name="middlename"]');
             var lastnameInput = document.querySelector('input[name="lastname"]');
-            var departmentDropdown = document.querySelector('select[name="department"]');
+            var childrenDropdown = document.querySelector('select[name="children"]');
             var usertypeDropdown = document.querySelector('select[name="usertype"]');
 
+            if (usernameInput.value.trim() === '') {
+                isEmpty = true;
+                usernameInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                usernameInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            if (passwordInput.value === '' || passwordInput.value.length < 8 || passwordInput.value.length > 100) {
+                // Set the isEmpty flag to true
+                isEmpty = true;
+                passwordInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                passwordInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            if (addressInput.value.trim() === '') {
+                isEmpty = true;
+                addressInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                addressInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            var allNumbersPattern = /^[0-9]+$/;
+            if (allNumbersPattern.test(passwordInput.value)) {
+                // Set the isEmpty flag to true
+                isEmpty = true;
+                passwordInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            }
+
+            var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+            if (!emailPattern.test(emailInput.value)) {
+                // Set the isEmpty flag to true
+                isEmpty = true;
+                emailInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                emailInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            if (contactInput.value.length !== 11 || !contactInput.value.startsWith("09")) {
+                // Set the isEmpty flag to true
+                isEmpty = true;
+                contactInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                contactInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            var namePattern = /^[A-Za-z\s.]+$/;
+
+            if (!namePattern.test(firstnameInput.value)) {
+                // Set the isEmpty flag to true
+                isEmpty = true;
+                firstnameInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                firstnameInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            if (!namePattern.test(middlenameInput.value)) {
+                // Set the isEmpty flag to true
+                isEmpty = true;
+                middlenameInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                middlenameInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            if (!namePattern.test(lastnameInput.value)) {
+                // Set the isEmpty flag to true
+                isEmpty = true;
+                lastnameInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                lastnameInput.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
+            if (usertypeDropdown.value === '') {
+                isEmpty = true;
+                usertypeDropdown.classList.add('is-invalid'); // Add a class to highlight the invalid input
+            } else {
+                usertypeDropdown.classList.remove('is-invalid'); // Remove the class if it's valid
+            }
+
             // Check if any required fields are empty
-            if (usernameInput.value === '' || passwordInput.value === '' || emailInput.value === '' ||
+            if (usernameInput.value === '' || passwordInput.value === '' || addressInput.value === '' ||
+                emailInput.value === '' || contactInput.value === '' ||
                 firstnameInput.value === '' || middlenameInput.value === '' || lastnameInput.value === '' ||
-                departmentDropdown.value === '' || usertypeDropdown.value === '') {
+                childrenDropdown.value === '' || usertypeDropdown.value === '') {
                 // Prevent form submission
                 event.preventDefault();
 
@@ -177,6 +288,16 @@ if (isset($_POST['submit'])) {
                     validationAlert.focus();
                 }, 100); // Adjust the timeout value as needed
             }
+        });
+    </script>
+    <script type="text/javascript" src="js/virtual-select.min.js"></script>
+    <script>
+        VirtualSelect.init({
+            ele: '#multipleSelect'
+        });
+
+        VirtualSelect.init({
+            ele: '#classTopicSelect'
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

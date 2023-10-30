@@ -21,27 +21,19 @@ $stmt->close();
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Talisay Senior High School LMS User</title>
-  <!-- plugins:css -->
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
   <link rel="stylesheet" href="assets/css/add_friend.css">
-  <!-- endinject -->
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
 <body>
   <div class="container-scroller">
-    <!-- partial:../../partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
@@ -122,7 +114,6 @@ $stmt->close();
         </button>
       </div>
     </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -194,16 +185,19 @@ $stmt->close();
                 $stmt_selectProfile = $db->prepare($sql_selectProfile);
                 $profile_result = $stmt_selectProfile->execute([$friend_id]);
 
+                $defaultProfile = "images/profile.png";
+
                 if ($profile_result) {
                   $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                  $otherProfile = $profile_row['profile'];
+                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
                   ?>
                   <div class="col-md-3 mb-4">
                     <a href="studentView_profile.php?user_id=<?php echo $friend_id ?>" class="course">
                       <div class="card card-tale justify-content-center align-items-center"
                         style="background-image: url(assets/image/user.png);">
                         <div class="circle-image mt-4 mb-3">
-                          <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
+                          <img src="assets/image/<?php echo $otherProfile; ?>" alt="Circular Image" 
+                          onerror="this.src='images/profile.png'">
                         </div>
                         <p class="text-body-secondary mb-4" style="font-size: 20px;">
                           <?php echo $friend_name ?>

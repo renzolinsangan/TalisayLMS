@@ -33,6 +33,7 @@ foreach ($result as $assignmentRow) {
   $instruction = $assignmentRow['instruction'];
   $point = $assignmentRow['point'];
   $date = $assignmentRow['date'];
+  $assignmentStatus = $assignmentRow['assignment_status'];
 }
 
 $sql_getStudents = "SELECT * FROM class_enrolled WHERE tc_id = ? AND teacher_id = ? ORDER BY student_firstname ASC";
@@ -60,10 +61,11 @@ if (isset($_POST['assignmentGrade'])) {
   $assignmentPoint = $_POST['assignmentPoint'];
   $student_id = $_POST['student_id'];
 
-  $sql_assignmentGrade = "INSERT INTO assignmentgrade (assignmentTitle, studentFirstName, studentLastname, score, 
-  assignmentPoint, student_id) VALUES (?, ?, ?, ?, ?, ?)";
+  $sql_assignmentGrade = "INSERT INTO assignmentgrade (assignmentTitle, studentFirstName, studentLastname, date, score, 
+  assignmentPoint, student_id, teacher_id, class_id, assignment_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
-  $assignmentGradeResult = $stmt_assignmentGrade->execute([$assignmentTitle, $studentFirstName, $studentLastName, $score, $assignmentPoint, $student_id]);
+  $assignmentGradeResult = $stmt_assignmentGrade->execute([$assignmentTitle, $studentFirstName, 
+  $studentLastName, $date, $score, $assignmentPoint, $student_id, $teacher_id, $class_id, $assignment_id]);
 }
 ?>
 <!DOCTYPE html>
@@ -286,6 +288,38 @@ if (isset($_POST['assignmentGrade'])) {
                                     <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
                                   </p>
                                   <?php
+                                  $sqlAssignmentAnswer = "SELECT assignment_course_status FROM student_assignment_course_answer WHERE user_id = ?
+                                    AND assignment_id = ?";
+                                  $stmtAssignmentAnswer = $db->prepare($sqlAssignmentAnswer);
+                                  $stmtAssignmentAnswer->execute([$student_id, $assignment_id]);
+                                  $assignmentResult = $stmtAssignmentAnswer->fetchAll(PDO::FETCH_ASSOC);
+
+                                  $hasTurnedInStatus = false;
+
+                                  foreach ($assignmentResult as $assignmentRow) {
+                                    $assignmentCourseStatus = $assignmentRow['assignment_course_status'];
+
+                                    if ($assignmentCourseStatus === 'turned in' || $assignmentCourseStatus === 'turned-in late') {
+                                      $hasTurnedInStatus = true;
+                                      break;
+                                    }
+                                  }
+
+                                  $statusColorClass = '';
+
+                                  if (!$hasTurnedInStatus) {
+                                    $statusColorClass = ($assignmentStatus === 'assigned') ? 'text-success' : 'text-danger';
+                                  }
+
+                                  if (!$hasTurnedInStatus) {
+                                    ?>
+                                    <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                      <?php echo ucfirst($assignmentStatus) ?>
+                                    </p>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php
                                   $sql_assignmentScore = "SELECT score FROM assignmentgrade WHERE student_id = ? AND assignment_id = ?";
                                   $stmt_assignmentScore = $db->prepare($sql_assignmentScore);
                                   $stmt_assignmentScore->execute([$student_id, $assignment_id]);
@@ -306,8 +340,8 @@ if (isset($_POST['assignmentGrade'])) {
                                     ?>
                                     <p>
                                       <input type="text" name="score" style=" height: 4vh; width: 4vh; font-size: 13px; border: none;
-                                    border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
-                                        value="<?php echo $assignmentScore ?>" disabled>
+                                      border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
+                                        value="<?php echo $assignmentScore ?>" readonly>
                                       /
                                       <?php echo $point ?>
                                       <input type="hidden" name="assignmentPoint" value="<?php echo $point ?>">
@@ -324,6 +358,8 @@ if (isset($_POST['assignmentGrade'])) {
                                 $stmtAssignmentAnswer = $db->prepare($sqlAssignmentAnswer);
                                 $stmtAssignmentAnswer->execute([$student_id, $assignment_id]);
                                 $assignmentResult = $stmtAssignmentAnswer->fetchAll(PDO::FETCH_ASSOC);
+
+                                $hasTurnedInStatus = false;
 
                                 foreach ($assignmentResult as $assignmentRow) {
                                   $assignmentLink = $assignmentRow['assignment_link'];

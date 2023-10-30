@@ -17,7 +17,7 @@ if (!isset($_SESSION['id'])) {
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="assets/css/teacher_report.css">
+  <link rel="stylesheet" href="assets/css/report_teacher.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
 </head>
 

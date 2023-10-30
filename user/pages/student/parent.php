@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("db_conn.php");
+include("config.php");
 
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../../user_login.php");
@@ -10,38 +10,43 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 $sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($profile);
-$stmt->fetch();
-$stmt->close();
+$stmt = $db->prepare($sql);
+$stmt->execute([$user_id]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($row) {
+  $profile = $row['profile'];
+}
+
+
+$sqlStudentName = "SELECT firstname, lastname FROM user_account WHERE user_id = ?";
+$stmtStudentName = $db->prepare($sqlStudentName);
+$stmtStudentName->execute([$user_id]);
+$studentNameRow = $stmtStudentName->fetch(PDO::FETCH_ASSOC);
+
+if ($studentNameRow) {
+  $firstname = $studentNameRow['firstname'];
+  $lastname = $studentNameRow['lastname'];
+  $fullname = $firstname . ' ' . $lastname;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Talisay Senior High School LMS User</title>
-  <!-- plugins:css -->
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <link rel="stylesheet" href="assets/css/parents.css">
-  <!-- endinject -->
+  <link rel="stylesheet" href="assets/css/add_friend.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
 <body>
   <div class="container-scroller">
-    <!-- partial:../../partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
@@ -122,7 +127,6 @@ $stmt->close();
         </button>
       </div>
     </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -167,39 +171,78 @@ $stmt->close();
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
+          <div class="row">
+            <div class="col mb-3">
+              <h2>Parents</h2>
+            </div>
+          </div>
+          <?php
+          include("config.php");
+
+          $sqlSelectChildren = "SELECT * FROM parent_account WHERE children = ?";
+          $stmtSelectChildren = $db->prepare($sqlSelectChildren);
+          $selectChildrenResult = $stmtSelectChildren->execute([$fullname]);
+
+          if ($selectChildrenResult) {
+            ?>
+            <div class="row">
+              <?php
+              while ($row = $stmtSelectChildren->fetch(PDO::FETCH_ASSOC)) {
+                $parent_id = $row['parent_id'];
+                $parentFirstname = $row['firstname'];
+                $parentLastname = $row['lastname'];
+                $parentFullname = $parentFirstname . ' ' . $parentLastname;
+
+                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                $profile_result = $stmt_selectProfile->execute([$parent_id]);
+
+                $defaultProfile = "images/profile.png";
+
+                if ($profile_result) {
+                  $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
+                  ?>
+                  <div class="col-md-3 mb-4">
+                    <a href="parentView_profile.php?parent_id=<?php echo $parent_id ?>" class="course">
+                      <div class="card card-tale justify-content-center align-items-center"
+                        style="background-image: url(assets/image/user.png);">
+                        <div class="circle-image mt-4 mb-3">
+                          <img src="assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
+                          onerror="this.src='images/profile.png'">
+                        </div>
+                        <p class="text-body-secondary mb-4" style="font-size: 20px;">
+                          <?php echo $parentFullname ?>
+                        </p>
+                      </div>
+                    </a>
+                  </div>
+                  <?php
+                }
+              }
+              ?>
+            </div>
+            <?php
+          }
+          ?>
         </div>
       </div>
     </div>
 
-    <!-- content-wrapper ends -->
-  </div>
-  <!-- main-panel ends -->
-  </div>
-  <!-- page-body-wrapper ends -->
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

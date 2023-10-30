@@ -189,7 +189,6 @@ $stmt->closeCursor();
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="friend.php">My Friends</a></li>
                 <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
               </ul>
             </div>

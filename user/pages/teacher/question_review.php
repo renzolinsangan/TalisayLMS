@@ -35,6 +35,7 @@ foreach ($result as $questionRow) {
     $instruction = $questionRow['instruction'];
     $point = $questionRow['point'];
     $date = $questionRow['date'];
+    $questionStatus = $questionRow['question_status'];
 }
 
 $sql_getStudents = "SELECT * FROM class_enrolled WHERE tc_id = ? AND teacher_id = ? ORDER BY student_firstname ASC";
@@ -62,16 +63,19 @@ if (isset($_POST['submitGrade'])) {
     $questionPoint = $_POST['questionPoint'];
     $student_id = $_POST['student_id'];
 
-    $sql_questionGrade = "INSERT INTO questiongrade (questionTitle, studentFirstName, studentLastName,
-                score, questionPoint, student_id, question_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sql_questionGrade = "INSERT INTO questiongrade (questionTitle, studentFirstName, studentLastName, date,
+        score, questionPoint, student_id, teacher_id, class_id, question_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt_questionGrade = $db->prepare($sql_questionGrade);
     $questionGradeResult = $stmt_questionGrade->execute([
         $questionTitle,
         $studentFirstName,
         $studentLastName,
+        $date,
         $score,
         $questionPoint,
         $student_id,
+        $teacher_id,
+        $class_id,
         $question_id
     ]);
 }
@@ -292,7 +296,6 @@ if (isset($_POST['submitGrade'])) {
                     </div>
                 </div>
             </div>
-
             <!-- Modal for each student -->
             <?php foreach ($result as $studentRow): ?>
                 <?php
@@ -313,6 +316,23 @@ if (isset($_POST['submitGrade'])) {
                 $stmtQuestionAnswer = $db->prepare($sqlQuestionAnswer);
                 $stmtQuestionAnswer->execute([$student_id, $question_id]);
                 $questionResult = $stmtQuestionAnswer->fetchAll(PDO::FETCH_ASSOC);
+
+                $hasTurnedInStatus = false;
+
+                foreach ($questionResult as $questionRow) {
+                    $questionCourseStatus = $questionRow['question_course_status'];
+                    if ($questionCourseStatus === 'turned in' || $questionCourseStatus === 'turned-in late') {
+                        $hasTurnedInStatus = true;
+                        break;
+                    }
+                }
+
+                $statusColorClass = '';
+
+                if (!$hasTurnedInStatus) {
+                    $statusColorClass = ($questionStatus === 'assigned') ? 'text-success' : 'text-danger';
+                }
+
                 ?>
                 <div class="modal fade" id="staticBackdrop_<?php echo $student_id; ?>" data-bs-backdrop="static"
                     data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>"
@@ -332,6 +352,15 @@ if (isset($_POST['submitGrade'])) {
                                                 value="<?php echo $student_lastname ?>">
                                         </p>
                                         <?php
+                                        if (!$hasTurnedInStatus) {
+                                            ?>
+                                            <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                                <?php echo ucfirst($questionStatus) ?>
+                                            </p>
+                                            <?php
+                                        }
+                                        ?>
+                                        <?php
                                         $sql_questionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND question_id = ?";
                                         $stmt_questionScore = $db->prepare($sql_questionScore);
                                         $stmt_questionScore->execute([$student_id, $question_id]);
@@ -341,7 +370,7 @@ if (isset($_POST['submitGrade'])) {
                                             ?>
                                             <p>
                                                 <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                                                border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
+        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
                                                 /
                                                 <?php echo $point; ?>
                                                 <input type="hidden" name="questionPoint" value="<?php echo $point; ?>">
@@ -352,8 +381,8 @@ if (isset($_POST['submitGrade'])) {
                                             ?>
                                             <p>
                                                 <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                                                border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $questionScore; ?>"
-                                                    disabled>
+        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $questionScore; ?>"
+                                                    readonly>
                                                 /
                                                 <?php echo $point; ?>
                                                 <input type="hidden" name="questionPoint" value="<?php echo $point; ?>">
@@ -361,6 +390,7 @@ if (isset($_POST['submitGrade'])) {
                                             <?php
                                         }
                                         ?>
+
                                     </h1>
                                 </div>
                                 <div class="modal-body">

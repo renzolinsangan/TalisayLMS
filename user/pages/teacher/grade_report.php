@@ -1,13 +1,17 @@
 <?php
 session_start();
-include("db_conn.php");
-$teacher_id = $_SESSION['user_id'];
 
 if (!isset($_SESSION['user_id'])) {
-  header("Location: ../../user_login.php");
+  header("Location:../../user_login.php");
   exit();
 }
 
+if (isset($_GET['user_id'])) {
+  $user_id = $_GET['user_id'];
+}
+
+include("db_conn.php");
+$teacher_id = $_SESSION['user_id'];
 $user_id = $_SESSION['user_id'];
 
 $sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
@@ -22,22 +26,15 @@ $stmt->close();
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Talisay Senior High School LMS User</title>
-  <!-- plugins:css -->
+  <title>Talisay Senior High School LMS</title>
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <link rel="stylesheet" href="assets/css/friend.css">
-  <!-- endinject -->
-  <link rel="shortcut icon" href="assets/image/trace.svg" />
+  <link rel="stylesheet" href="assets/css/student_report.css">
+  <link rel="shortcut icon" href="images/trace.svg" />
 </head>
 
 <body>
@@ -148,7 +145,6 @@ $stmt->close();
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="friend.php">My Friends</a></li>
                 <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
               </ul>
             </div>
@@ -178,30 +174,83 @@ $stmt->close();
       </nav>
       <!-- partial -->
       <div class="main-panel">
+        <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
+          <?php
+          include("config.php");
+
+          $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';
+
+          // Fetch distinct class_name and tc_id from the database
+          $sql = "SELECT DISTINCT class_name, tc_id FROM class_enrolled WHERE teacher_id = ?";
+          $stmt = $conn->prepare($sql);
+          $stmt->bind_param("i", $user_id);
+          $stmt->execute();
+          $result = $stmt->get_result();
+
+          $class_names_and_tc_ids = array();
+
+          while ($row = $result->fetch_assoc()) {
+            $class_names_and_tc_ids[] = $row;
+          }
+
+          foreach ($class_names_and_tc_ids as $class_data) {
+            $class_name = $class_data['class_name'];
+            $tc_id = $class_data['tc_id'];
+
+            $safeClass = str_replace(' ', '_', $class_name);
+            $cssClass = ($classFromUrl === $class_name) ? 'active' : '';
+
+            $encodedClass = urlencode($class_name);
+
+            echo '<a href="grade_report_subject.php?user_id=' . $teacher_id . '&class_name=' . $encodedClass . '&class_id=' . $tc_id . '" class="' . $cssClass . '">' . $class_name . '</a>';
+          }
+          ?>
+        </div>
         <div class="content-wrapper">
+          <div class="col">
+            <h2>Select Class you want to Download Data.</h2>
+          </div>
         </div>
       </div>
     </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+    <script>
+      const printBtn = document.getElementById('print');
+
+      function preparePrintContent() {
+        const content = document.createElement('div');
+        content.innerHTML = '<html><head><title>Print</title></head><body>';
+        content.innerHTML += document.getElementById('print-content').innerHTML;
+        content.innerHTML += '</body></html>';
+        return content;
+      }
+
+      printBtn.addEventListener('click', function () {
+        // Prepare the content to be printed
+        const printContent = preparePrintContent();
+
+        // Create a new window
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(printContent.innerHTML);
+
+        // Close the document and trigger printing
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.close();
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

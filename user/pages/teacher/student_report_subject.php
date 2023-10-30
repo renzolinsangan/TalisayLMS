@@ -167,7 +167,6 @@ $stmt->close();
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="friend.php">My Friends</a></li>
                 <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
               </ul>
             </div>
@@ -233,7 +232,7 @@ $stmt->close();
                       <div class="col-md-12">
                         <div class="card-body">
                           <div class="table-responsive">
-                            <table class="table text-center">
+                            <table class="table table-hover text-center">
                               <thead class="table" style="background-color: #4BB543; color: white;">
                                 <tr>
                                   <th scope="col">Student's Name</th>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 28, 2023 at 02:26 PM
+-- Generation Time: Oct 30, 2023 at 07:40 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -32,9 +32,12 @@ CREATE TABLE `assignmentgrade` (
   `assignmentTitle` varchar(100) NOT NULL,
   `studentFirstName` varchar(64) NOT NULL,
   `studentLastName` varchar(64) NOT NULL,
+  `date` date NOT NULL,
   `score` int(11) NOT NULL,
   `assignmentPoint` int(11) NOT NULL,
   `student_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
   `assignment_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -42,8 +45,8 @@ CREATE TABLE `assignmentgrade` (
 -- Dumping data for table `assignmentgrade`
 --
 
-INSERT INTO `assignmentgrade` (`assignmentGrade_id`, `assignmentTitle`, `studentFirstName`, `studentLastName`, `score`, `assignmentPoint`, `student_id`, `assignment_id`) VALUES
-(1, 'Cell Energetics', 'John Renzo', 'Linsangan', 5, 20, 28, 33);
+INSERT INTO `assignmentgrade` (`assignmentGrade_id`, `assignmentTitle`, `studentFirstName`, `studentLastName`, `date`, `score`, `assignmentPoint`, `student_id`, `teacher_id`, `class_id`, `assignment_id`) VALUES
+(6, 'Cell Energetics', 'John Renzo', 'Linsangan', '2023-10-15', 10, 20, 28, 33, 39, 33);
 
 -- --------------------------------------------------------
 
@@ -201,7 +204,7 @@ CREATE TABLE `classwork_question` (
 
 INSERT INTO `classwork_question` (`question_id`, `title`, `question`, `instruction`, `class_name`, `student`, `point`, `point_received`, `date`, `due_date`, `time`, `class_topic`, `class_id`, `teacher_id`, `link`, `file`, `youtube`, `question_status`) VALUES
 (21, 'Cell Biology', 'What is Cell Biology? ', 'Explain it one paragraph with a minimum of 5 sentence. Do not use any AI Tools in generating answers, if you are caught, your grade will be equivalent to 0. Do it before the due date, have a nice day.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan', 40, 0, '2023-10-15', '2023-10-17', '11:59 PM', 'Cell Biology', 39, 33, 'https://www.nature.com/scitable/topic/cell-biology-13906536/', NULL, NULL, 'missing'),
-(23, 'Cell Evolution', 'What happens in a cell evolution?', 'Explain every process that happens in a cell evolution.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan,Marco Luis Hernandez,Carl Justine Aala,Martin Clarence Guantes', 20, 0, '2023-10-24', '2023-10-27', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'assigned');
+(23, 'Cell Evolution', 'What happens in a cell evolution?', 'Explain every process that happens in a cell evolution.', 'STEM-Einstein - General Biology', 'R.J Liwag,John Renzo Linsangan,Marco Luis Hernandez,Carl Justine Aala,Martin Clarence Guantes', 20, 0, '2023-10-24', '2023-10-27', '11:59 PM', 'Cell Biology', 39, 33, NULL, NULL, NULL, 'missing');
 
 -- --------------------------------------------------------
 
@@ -377,7 +380,34 @@ CREATE TABLE `news` (
 --
 
 INSERT INTO `news` (`news_id`, `title`, `type`, `name`, `date`, `track`, `start_date`, `end_date`, `detail`, `attachment`) VALUES
-(7, 'Smog O Vog', 'news', 'DOST_PHIVOLCS', '2023-10-13', 'all', '2023-10-13', '2023-10-16', 'Narito ang mga kaalaman tungkol sa Volcanic Smog o Vog at mga pamamaraan upang makaiwas sa panganib na dulot nito. \r\nAng vog ay isang uri ng polusyon sa hangin na sanhi ng mga bulkan. Binubo ito ng mga pinong patak na naglalaman ng volcanic gas tulad ng Sulfur Dioxide (SO2).\r\n• Ano ang Sulfur Dioxide o SO2?\r\nAng sulfur dioxide ay isang nakakalasong usok na maa-aring maka-apekto sa kalusugan ng tao at hayop, pati na rin sa mga halaman. Maaring ma expose ang isang indibidwal kung ito ay malalanghap o sa pamamagitan ng skin contact\r\n• Ano ang epekto ng vog?\r\nMaaring magdulot ito ng iritasyon sa mga mata, lalamunan at respiratory tract na maaaring maging malubha depende sa kosentrasyon o tagal ng pagkalanghap nito.\r\n• Sinu-sino ang mga sensitibo sa masamang epekto ng vog? \r\nMga may kondisyon sa kalusugan tulad ng hika, sakit sa baga at sakit sa puso. Matatanda, mga buntis at mga bata.\r\n• Ano ang dapat gawin?\r\nLimitahan ang pagkakalantad o exposure sa vog. Iwasan ang mga aktibidad sa labas o manatili na lamang sa loob ng bahay at isara ang mga bintana at pintuan upang maiwasang makapasok ang vog sa loob ng bahay.\r\n• Paano pu-protektahan ang sarili?\r\nMagsuot ng facemask o mas mabuti kung N95 facemasks o gas mask. Uminom ng maraming tubig upang maibsan ang iritasyon o paninikip ng daluyan ng paghinga. Kung kabilang sa mga sensitibong grupo, siguraduhing subaybayan ang inyong klagayan at magpatingin agad sa doktor o sa barangay health unit kung kinakailangan. Kung makakaranas ng matinding epekto, magpatingin agad sa doktor o sa barangay health unit.', 'picture_652681a2d64fd.jpg');
+(7, 'Smog O Vog', 'news', 'DOST_PHIVOLCS', '2023-10-30', 'all', '2023-10-30', '2023-11-04', 'Narito ang mga kaalaman tungkol sa Volcanic Smog o Vog at mga pamamaraan upang makaiwas sa panganib na dulot nito. \r\nAng vog ay isang uri ng polusyon sa hangin na sanhi ng mga bulkan. Binubo ito ng mga pinong patak na naglalaman ng volcanic gas tulad ng Sulfur Dioxide (SO2).\r\n• Ano ang Sulfur Dioxide o SO2?\r\nAng sulfur dioxide ay isang nakakalasong usok na maa-aring maka-apekto sa kalusugan ng tao at hayop, pati na rin sa mga halaman. Maaring ma expose ang isang indibidwal kung ito ay malalanghap o sa pamamagitan ng skin contact\r\n• Ano ang epekto ng vog?\r\nMaaring magdulot ito ng iritasyon sa mga mata, lalamunan at respiratory tract na maaaring maging malubha depende sa kosentrasyon o tagal ng pagkalanghap nito.\r\n• Sinu-sino ang mga sensitibo sa masamang epekto ng vog? \r\nMga may kondisyon sa kalusugan tulad ng hika, sakit sa baga at sakit sa puso. Matatanda, mga buntis at mga bata.\r\n• Ano ang dapat gawin?\r\nLimitahan ang pagkakalantad o exposure sa vog. Iwasan ang mga aktibidad sa labas o manatili na lamang sa loob ng bahay at isara ang mga bintana at pintuan upang maiwasang makapasok ang vog sa loob ng bahay.\r\n• Paano pu-protektahan ang sarili?\r\nMagsuot ng facemask o mas mabuti kung N95 facemasks o gas mask. Uminom ng maraming tubig upang maibsan ang iritasyon o paninikip ng daluyan ng paghinga. Kung kabilang sa mga sensitibong grupo, siguraduhing subaybayan ang inyong klagayan at magpatingin agad sa doktor o sa barangay health unit kung kinakailangan. Kung makakaranas ng matinding epekto, magpatingin agad sa doktor o sa barangay health unit.', 'picture_652681a2d64fd.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `parent_account`
+--
+
+CREATE TABLE `parent_account` (
+  `parent_id` int(11) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `address` varchar(1000) NOT NULL,
+  `email` varchar(64) NOT NULL,
+  `contact` varchar(11) NOT NULL,
+  `firstname` varchar(64) NOT NULL,
+  `middlename` varchar(64) NOT NULL,
+  `lastname` varchar(64) NOT NULL,
+  `children` varchar(64) NOT NULL,
+  `usertype` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `parent_account`
+--
+
+INSERT INTO `parent_account` (`parent_id`, `username`, `password`, `address`, `email`, `contact`, `firstname`, `middlename`, `lastname`, `children`, `usertype`) VALUES
+(1, 'rickylinsangan', '$2y$10$4hzOQ7y1I2i300RmkL/8XubwDKaYI9t97auk3uhLwJT6aVaMtqu6u', 'Block 3 Lot 44, Croatia St. Lynville Subdv. Purok 3, Latag, Lipa City, Batangas', 'rickylinsangan18@yahoo.com', '09352162476', 'Ricardo', 'Espino', 'Linsangan', 'John Renzo Linsangan', 'parent');
 
 -- --------------------------------------------------------
 
@@ -390,9 +420,12 @@ CREATE TABLE `questiongrade` (
   `questionTitle` varchar(100) NOT NULL,
   `studentFirstName` varchar(64) NOT NULL,
   `studentLastName` varchar(64) NOT NULL,
+  `date` date NOT NULL,
   `score` int(11) NOT NULL,
   `questionPoint` int(11) NOT NULL,
   `student_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
   `question_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -400,8 +433,9 @@ CREATE TABLE `questiongrade` (
 -- Dumping data for table `questiongrade`
 --
 
-INSERT INTO `questiongrade` (`questionGrade_id`, `questionTitle`, `studentFirstName`, `studentLastName`, `score`, `questionPoint`, `student_id`, `question_id`) VALUES
-(3, 'Cell Evolution', 'John Renzo', 'Linsangan', 20, 20, 28, 23);
+INSERT INTO `questiongrade` (`questionGrade_id`, `questionTitle`, `studentFirstName`, `studentLastName`, `date`, `score`, `questionPoint`, `student_id`, `teacher_id`, `class_id`, `question_id`) VALUES
+(10, 'Cell Evolution', 'John Renzo', 'Linsangan', '2023-10-24', 20, 20, 28, 33, 39, 23),
+(11, 'Cell Biology', 'John Renzo', 'Linsangan', '2023-10-15', 25, 40, 28, 33, 39, 21);
 
 -- --------------------------------------------------------
 
@@ -654,14 +688,14 @@ INSERT INTO `user_profile` (`profile_id`, `user_id`, `profile`, `profile_status`
 (7, 28, 'WIN_20230930_10_36_37_Pro.jpg', 'old'),
 (8, 28, 'WIN_20230925_19_14_23_Pro.jpg', 'old'),
 (9, 28, '384487562_278785975040200_1993586305900934592_n.jpg', 'recent'),
-(10, 36, 'rj.jpg', 'recent'),
 (11, 31, '380293503_304768402179479_6674034346742619703_n.jpg', 'recent'),
 (12, 30, 'pat.jpg', 'recent'),
 (13, 29, 'carl.jpg', 'recent'),
 (14, 33, 'patrick.jpg', 'recent'),
 (15, 32, 'spongebob.jpg', 'recent'),
 (16, 37, 'marco.jpg', 'recent'),
-(17, 38, 'martino.jpg', 'recent');
+(17, 38, 'martino.jpg', 'recent'),
+(18, 36, 'rj.jpg', 'recent');
 
 --
 -- Indexes for dumped tables
@@ -752,6 +786,12 @@ ALTER TABLE `news`
   ADD PRIMARY KEY (`news_id`);
 
 --
+-- Indexes for table `parent_account`
+--
+ALTER TABLE `parent_account`
+  ADD PRIMARY KEY (`parent_id`);
+
+--
 -- Indexes for table `questiongrade`
 --
 ALTER TABLE `questiongrade`
@@ -820,7 +860,7 @@ ALTER TABLE `user_profile`
 -- AUTO_INCREMENT for table `assignmentgrade`
 --
 ALTER TABLE `assignmentgrade`
-  MODIFY `assignmentGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `assignmentGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `assignment_course_upload`
@@ -901,10 +941,16 @@ ALTER TABLE `news`
   MODIFY `news_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
+-- AUTO_INCREMENT for table `parent_account`
+--
+ALTER TABLE `parent_account`
+  MODIFY `parent_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `questiongrade`
 --
 ALTER TABLE `questiongrade`
-  MODIFY `questionGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `questionGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `section`
@@ -958,7 +1004,7 @@ ALTER TABLE `user_account`
 -- AUTO_INCREMENT for table `user_profile`
 --
 ALTER TABLE `user_profile`
-  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
