@@ -50,12 +50,12 @@ if ($teacher_id) {
 </head>
 
 <body>
-  <div class="container-scroller">
-    <!-- partial:../../partials/_navbar.html -->
+<div class="container-scroller">
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
             alt="logo" />Talisay LMS</a>
+        <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/trace.svg" alt="logo" /></a>
       </div>
       <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
         <ul class="navbar-nav navbar-nav-right">
@@ -131,7 +131,6 @@ if ($teacher_id) {
         </button>
       </div>
     </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -145,6 +144,12 @@ if ($teacher_id) {
             <a class="nav-link" href="course.php">
               <i class="menu-icon"><i class="bi bi-journals"></i></i>
               <span class="menu-title">Courses</span>
+            </a>
+          </li>
+          <li class="nav-item mb-3">
+            <a href="archive.php" class="nav-link">
+              <i class="menu-icon"><i class="bi bi-archive"></i></i>
+              <span class="menu-title">Archive Courses</span>
             </a>
           </li>
           <li class="nav-item mb-3">
@@ -184,13 +189,12 @@ if ($teacher_id) {
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
         <div class="header-sticky">
           <div class="header-links">
-            <a class="btn-success" href="class_course.php?class_id=<?php echo $class_id ?>"><i
-                class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-            <a href="toreview.php?class_id=<?php echo $class_id ?>" class="nav-link active"
+            <a class="btn-success" href="archive.php?class_id=<?php echo $class_id ?>"><i class="bi bi-arrow-bar-left"
+                style="color: white;"></i></a>
+            <a href="archivetoreview.php?class_id=<?php echo $class_id ?>" class="nav-link active"
               style="margin-left: 2vh;">To-review</a>
             <a href="#" class="people">Reviewed</a>
           </div>
@@ -238,24 +242,24 @@ if ($teacher_id) {
                   ?>
                   <div class="d-grid gap-2 col-10 mx-auto mb-4">
                     <a class="announce" type="button"
-                      href="assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>"
+                      href="archive_assignmentReview.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>"
                       style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                       <div
                         style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
                         <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
                       </div>
-                      <p
-                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; 
+                      <p style="font-size: 17px; margin-top: -36px; margin-left: 7vh; 
                         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
                         <?php echo $title ?>
                       </p>
                       <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                         <p class="text-body-secondary"
-                        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                          style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
                           <?php echo $class_name ?> -
                           <span>
-                            Due <?php echo $formatted_date ?>
-                        </span>
+                            Due
+                            <?php echo $formatted_date ?>
+                          </span>
                         </p>
                       </div>
                     </a>
@@ -271,23 +275,23 @@ if ($teacher_id) {
                   ?>
                   <div class="d-grid gap-2 col-10 mx-auto mb-4">
                     <a class="announce" type="button"
-                      href="question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>"
+                      href="archive_questionReview.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>"
                       style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                       <div
                         style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
                         <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
                       </div>
-                      <p
-                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; 
+                      <p style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; 
                         overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
                         <?php echo $title ?>
                       </p>
                       <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                         <p class="text-body-secondary"
-                        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                          style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
                           <?php echo $class_name ?> -
                           <span>
-                            Due <?php echo $formatted_date ?>
+                            Due
+                            <?php echo $formatted_date ?>
                           </span>
                         </p>
                       </div>

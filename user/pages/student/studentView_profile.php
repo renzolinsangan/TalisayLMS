@@ -232,21 +232,75 @@ if (isset($_POST['add_friend'])) {
                     </div>
                     <div class="col-md-3">
                       <div class="d-flex flex-column justify-content-between h-100">
+                        <?php
+                        include("config.php");
+
+                        if (isset($_POST['unfriend'])) {
+                          $sql_deleteFriendship = "DELETE FROM friend WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
+                          $stmt_deleteFriendship = $db->prepare($sql_deleteFriendship);
+                          $stmt_deleteFriendship->execute([$user_id, $otherUser_id, $otherUser_id, $user_id]);
+                        }
+
+                        $isFriend = false;
+
+                        $sql_addedFriend = "SELECT friend_id FROM friend WHERE user_id = ? AND friend_id = ?";
+                        $stmt_addedFriend = $db->prepare($sql_addedFriend);
+                        $result = $stmt_addedFriend->execute([$user_id, $otherUser_id]);
+
+                        if ($stmt_addedFriend->rowCount() > 0) {
+                          $isFriend = true;
+                        }
+                        ?>
                         <div></div>
                         <div class="text-right">
-                          <button class="btn edit" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop"
-                            style="color: green;">
-                            + Add Friend
-                          </button>
+                          <?php if ($isFriend): ?>
+                            <button class="btn unfriend" type="button" data-bs-toggle="modal"
+                              data-bs-target="#staticBackdropUnfriend" style="color: red;">
+                              <i class="bi bi-trash"></i> Unfriend
+                            </button>
+                          <?php else: ?>
+                            <button class="btn add-friend" type="button" data-bs-toggle="modal"
+                              data-bs-target="#staticBackdropAddFriend" style="color: green;">
+                              + Add Friend
+                            </button>
+                          <?php endif; ?>
                         </div>
                         <form action="" method="post">
-                          <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
-                            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                          <div class="modal fade" id="staticBackdropUnfriend" data-bs-backdrop="static"
+                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                            aria-hidden="true">
                             <div class="modal-dialog">
                               <div class="modal-content">
                                 <div class="modal-header" style="border: none;">
                                   <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                                    Add Friend</h1>
+                                    Unfriend
+                                  </h1>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <h3>Remove
+                                    <?php echo $firstname . ' ' . $lastname ?> from your friends.
+                                  </h3>
+                                  <p class="text-body-secondary">If you wish to cancel, press the x button.</p>
+                                </div>
+                                <div class="modal-footer" style="border: none;">
+                                  <button type="submit" name="unfriend" class="btn btn-danger">Unfriend</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                        <form action="" method="post">
+                          <div class="modal fade" id="staticBackdropAddFriend" data-bs-backdrop="static"
+                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header" style="border: none;">
+                                  <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                                    Add Friend
+                                  </h1>
                                   <button type="button" class="btn-close" data-bs-dismiss="modal"
                                     aria-label="Close"></button>
                                 </div>
@@ -257,7 +311,7 @@ if (isset($_POST['add_friend'])) {
                                   <p class="text-body-secondary">If you wish to cancel, press the x button.</p>
                                 </div>
                                 <div class="modal-footer" style="border: none;">
-                                  <button type="submit" name="add_friend" class="btn btn-success">Add</button>
+                                  <button type="submit" name="add_friend" class="btn btn-success">Add Friend</button>
                                 </div>
                               </div>
                             </div>

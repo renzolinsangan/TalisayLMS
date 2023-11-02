@@ -1,14 +1,4 @@
 <?php
-function generateClassCode($length = 7)
-{
-  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  $classCode = '';
-  for ($i = 0; $i < $length; $i++) {
-    $classCode .= $characters[rand(0, strlen($characters) - 1)];
-  }
-  return $classCode;
-}
-
 session_start();
 if (!isset($_SESSION['user_id'])) {
   header("Location: ../../user_login.php");
@@ -25,25 +15,6 @@ $teacher_data = $stmt_fetch_teacher->fetch(PDO::FETCH_ASSOC);
 $first_name = $teacher_data['firstname'];
 $last_name = $teacher_data['lastname'];
 $department = $teacher_data['department'];
-
-if (isset($_POST['submit'])) {
-  $class_name = $_POST['class_name'];
-  $section = $_POST['section'];
-  $subject = $_POST['subject'];
-  $strand = $_POST['strand'];
-  $class_code = generateClassCode();
-
-  $sql = "INSERT INTO section (class_name, section, subject, strand, teacher_id, class_code, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-  $stmtinsert = $db->prepare($sql);
-  $result = $stmtinsert->execute([$class_name, $section, $subject, $strand, $teacher_id, $class_code, $first_name, $last_name]);
-
-  if ($result) {
-    header("Location: course.php?msg=Class created successfully!");
-    exit();
-  } else {
-    echo "Error: ";
-  }
-}
 
 $user_id = $_SESSION['user_id'];
 
@@ -273,7 +244,7 @@ if (isset($_POST['unarchive'])) {
               $lastName = ucfirst(strtolower($_SESSION['last_name']));
               $_SESSION['teacher_name'] = $firstName . " " . $lastName;
 
-              $class_id = $row['class_id']; // Assuming you have a class_id column
+              $class_id = $row['class_id'];
               $sql = "SELECT theme FROM class_theme WHERE teacher_id = :teacher_id AND class_id = :class_id AND theme_status = 'recent'";
               $stmt = $db->prepare($sql);
               $stmt->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
@@ -291,7 +262,7 @@ if (isset($_POST['unarchive'])) {
               <div class="col-md-4 grid-margin transparent">
                 <div class="card card-tale text-center"
                   style="height: 50vh; flex-direction: column; justify-content: space-between;">
-                  <a href="class_course.php?class_id=<?php echo $row['class_id']; ?>&class_name=<?php echo $row['class_name'] ?>"
+                  <a href="archive_classCourse.php?class_id=<?php echo $row['class_id']; ?>&class_name=<?php echo $row['class_name'] ?>"
                     class="course">
                     <div class="card-header"
                       style="text-align: left; background-image: url(assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">

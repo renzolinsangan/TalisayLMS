@@ -20,7 +20,7 @@ if (isset($_POST['submit'])) {
     $children = $_POST['children'];
     $usertype = $_POST['usertype'];
 
-    $sql = "INSERT INTO parent_account (username, password, address, email, contact, firstname, middlename, lastname, children, usertype) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO user_account (username, password, address, email, contact, firstname, middlename, lastname, children, usertype) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $db->prepare($sql);
     $result = $stmtinsert->execute([$username, $hashedPassword, $address, $email, $contact, $firstname, $middlename, $lastname, $children, $usertype]);
 

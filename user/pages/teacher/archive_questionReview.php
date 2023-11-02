@@ -195,6 +195,12 @@ if (isset($_POST['submitGrade'])) {
             </a>
           </li>
           <li class="nav-item mb-3">
+            <a href="archive.php" class="nav-link">
+              <i class="menu-icon"><i class="bi bi-archive"></i></i>
+              <span class="menu-title">Archive Courses</span>
+            </a>
+          </li>
+          <li class="nav-item mb-3">
             <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false"
               aria-controls="form-elements">
               <i class="menu-icon"><i class="bi bi-people"></i></i>
@@ -241,7 +247,8 @@ if (isset($_POST['submitGrade'])) {
                 <?php echo $class_name ?>
               </h2>
               <p class="text-body-secondary">(Question Review)</p>
-              <a href="toreview.php?class_id=<?php echo $class_id ?>" style="text-decoration: none; color: green;">
+              <a href="archivetoreview.php?class_id=<?php echo $class_id ?>"
+                style="text-decoration: none; color: green;">
                 Go back to to-review page.
               </a>
             </div>
@@ -361,7 +368,7 @@ if (isset($_POST['submitGrade'])) {
                       ?>
                       <p>
                         <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
+        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" readonly>
                         /
                         <?php echo $point; ?>
                         <input type="hidden" name="questionPoint" value="<?php echo $point; ?>">
@@ -410,18 +417,7 @@ if (isset($_POST['submitGrade'])) {
                   <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
                 </div>
                 <div class="modal-footer" style="border: none;">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                  <?php
-                  if (empty($questionScoreResult)) {
-                    ?>
-                    <button type="submit" name="submitGrade" class="btn btn-success">Submit</button>
-                    <?php
-                  } else {
-                    ?>
-                    <button type="button" name="editGrade" class="btn btn-success">Edit</button>
-                    <?php
-                  }
-                  ?>
+                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Exit</button>
                 </div>
               </div>
             </form>

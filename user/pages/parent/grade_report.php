@@ -1,47 +1,82 @@
 <?php
 session_start();
-include("db_conn.php");
 
 if (!isset($_SESSION['user_id'])) {
-  header("Location: ../../user_login.php");
+  header("Location:../../user_login.php");
   exit();
 }
 
+if (isset($_GET['user_id'])) {
+  $user_id = $_GET['user_id'];
+}
+
+include("config.php");
+$teacher_id = $_SESSION['user_id'];
 $user_id = $_SESSION['user_id'];
 
 $sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($profile);
-$stmt->fetch();
-$stmt->close();
+$stmt = $db->prepare($sql);
+$stmt->execute([$user_id]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($row) {
+  $profile = $row['profile'];
+}
+
+$sql_children = "SELECT children FROM user_account WHERE user_id = ?";
+$stmt_children = $db->prepare($sql_children);
+$stmt_children->execute([$user_id]);
+$row = $stmt_children->fetch(PDO::FETCH_ASSOC);
+
+if ($row) {
+  $children = $row['children'];
+  $nameParts = explode(' ', $children);
+
+  if (count($nameParts) >= 2) {
+    $childFirstName = $nameParts[0] . ' ' . $nameParts[1];
+    $childLastName = $nameParts[2];
+
+    $sql_chosenChildren = "SELECT user_id, firstname, lastname FROM user_account WHERE firstname = ? AND lastname = ?";
+    $stmt_chosenChildren = $db->prepare($sql_chosenChildren);
+    $stmt_chosenChildren->execute([$childFirstName, $childLastName]);
+    $childRow = $stmt_chosenChildren->fetch(PDO::FETCH_ASSOC);
+
+    if ($childRow && isset($childRow['firstname']) && isset($childRow['lastname'])) {
+      $childrenID = $childRow['user_id'];
+      $childrenFirstName = $childRow['firstname'];
+      $childrenLastName = $childRow['lastname'];
+      $childrenFullName = $childrenFirstName . ' ' . $childrenLastName;
+
+      $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+      $stmt_selectProfile = $db->prepare($sql_selectProfile);
+      $profile_result = $stmt_selectProfile->execute([$childrenID]);
+      $defaultProfile = "images/profile.png";
+
+      if ($profile_result) {
+        $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+        $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
+      }
+    }
+  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Talisay Senior High School LMS User</title>
-  <!-- plugins:css -->
+  <title>Talisay Senior High School LMS</title>
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <link rel="stylesheet" href="assets/css/teacher.css">
-  <!-- endinject -->
-  <link rel="shortcut icon" href="assets/image/trace.svg" />
+  <link rel="stylesheet" href="assets/css/report_grade.css">
+  <link rel="shortcut icon" href="images/trace.svg" />
 </head>
 
 <body>
   <div class="container-scroller">
-    <!-- partial:../../partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
@@ -122,7 +157,6 @@ $stmt->close();
         </button>
       </div>
     </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -133,31 +167,26 @@ $stmt->close();
             </a>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" href="course.php">
-              <i class="menu-icon"><i class="bi bi-journals"></i></i>
-              <span class="menu-title">Courses</span>
+            <a class="nav-link" href="children.php">
+              <i class="menu-icon"><i class="bi bi-people"></i></i>
+              <span class="menu-title">My Children</span>
             </a>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false"
-              aria-controls="form-elements">
-              <i class="menu-icon"><i class="bi bi-people"></i></i>
-              <span class="menu-title">Users</span>
+            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+              <i class="menu-icon"><i class="bi bi-exclamation-triangle"></i></i>
+              <span class="menu-title">Grade Report</span>
               <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="form-elements">
+            <div class="collapse" id="charts">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="friends.php">My Friends</a></li>
-                <li class="nav-item"><a class="nav-link" href="teacher.php">My Teachers</a></li>
-                <li class="nav-item"><a class="nav-link" href="parent.php">My Parent</a></li>
+                <li class="nav-item">
+                  <a class="nav-link" href="grade_report.php?user_id=<?php echo $childrenID ?>">
+                    <?php echo $childrenLastName ?>
+                  </a>
+                </li>
               </ul>
             </div>
-          </li>
-          <li class="nav-item mb-3">
-            <a class="nav-link" href="awards.php">
-              <i class="menu-icon"><i class="bi bi-award"></i></i>
-              <span class="menu-title">Awards</span>
-            </a>
           </li>
           <li class="nav-item mb-3">
             <a class="nav-link" href="feedback.php">
@@ -167,85 +196,64 @@ $stmt->close();
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col mb-3">
-              <h2>Teachers</h2>
-            </div>
-          </div>
+        <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
           <?php
-          include("config.php");
-          $user_id = $_SESSION['user_id'];
+          $sql_childrenSubjects = "SELECT tc_id, subject, teacher_id FROM class_enrolled WHERE student_id = ?";
+          $stmt_childrenSubjects = $db->prepare($sql_childrenSubjects);
+          $stmt_childrenSubjects->execute([$childrenID]);
+          $enrolledSubjects = $stmt_childrenSubjects->fetchAll(PDO::FETCH_ASSOC);
 
-          $sql_selectTeacher = "SELECT * FROM teacher WHERE user_id = ?";
-          $stmt_selectTeacher = $db->prepare($sql_selectTeacher);
-          $result = $stmt_selectTeacher->execute([$user_id]);
-
-          if ($result) {
-            ?>
-            <div class="row">
-              <?php
-              while ($row = $stmt_selectTeacher->fetch(PDO::FETCH_ASSOC)) {
-                $teacher_id = $row['teacher_id'];
-                $teacher_name = $row['name'];
-
-                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                $profile_result = $stmt_selectProfile->execute([$teacher_id]);
-
-                $defaultProfile = "images/profile.png";
-
-                if ($profile_result) {
-                  $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                  $otherProfile = $profile_row['profile'];
-                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
-                  ?>
-                  <div class="col-md-4 mb-4">
-                    <a href="teacherView_profile.php?user_id=<?php echo $teacher_id ?>" class="course">
-                      <div class="card card-tale justify-content-center align-items-center"
-                        style="background-image: url(assets/image/user.png);">
-                        <div class="circle-image mt-4 mb-3">
-                          <img src="../teacher/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
-                          onerror="this.src='images/profile.png'">
-                        </div>
-                        <p class="text-body-secondary mb-4" style="font-size: 20px;">
-                          <?php echo $teacher_name ?>
-                        </p>
-                      </div>
-                    </a>
-                  </div>
-                  <?php
-                }
-              }
+          if (!empty($enrolledSubjects)) {
+            foreach ($enrolledSubjects as $enrolledSubject) {
+              $class_id = $enrolledSubject['tc_id'];
+              $subjectName = $enrolledSubject['subject'];
+              $cssClass = (isset($_GET['subject']) && $_GET['subject'] === $subjectName) ? 'active' : '';
+              $encodedSubject = urlencode($subjectName);
+              $teacher_id = $enrolledSubject['teacher_id'];
               ?>
-            </div>
-            <?php
+              <a href="subjectGrade_report.php?user_id=<?php echo $childrenID; ?>&class_id=<?php echo $class_id ?>&subject=<?php echo $encodedSubject; ?>&teacher_id=<?php echo $teacher_id ?>"
+                class="nav-link <?php echo $cssClass; ?>">
+                <?php echo $subjectName ?>
+              </a>
+              <?php
+            }
           }
           ?>
         </div>
+        <div class="content-wrapper">
+          <div class="row">
+            <div class="col d-flex align-items-center">
+              <div class="circle-image mb-3 mr-3">
+                <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
+                  onerror="this.src='images/profile.png'">
+              </div>
+              <h2>
+                <?php echo $childrenFullName ?>
+              </h2>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col mt-4">
+              <h3>Select subject above to view progress and performance in every subject.</h3>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

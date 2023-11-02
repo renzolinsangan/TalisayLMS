@@ -272,12 +272,6 @@ $questionScore = $stmtQuestionScore->fetchColumn();
                 <div style="margin: 10px;">
                   <textarea name="question_answer" class="form-control auto-resize" id="floatingInput" <?php echo $textAreaDisabled ?>><?php echo $question_answer_data['question_answer'] ?? ''; ?></textarea>
                 </div>
-                <div class="text-end mt-4" style="margin-right: 12px;">
-                  <button name="question_edit" class="btn btn-outline-secondary" type="button"
-                    style="<?php echo $question_answer_data ? '' : 'display: none;' ?>">Edit Answer</button>
-                  <button name="question_submit" class="btn btn-outline-secondary" type="submit"
-                    style="<?php echo $question_answer_data ? 'display: none;' : '' ?>">Submit</button>
-                </div>
               </div>
             </div>
           </div>
@@ -326,7 +320,7 @@ $questionScore = $stmtQuestionScore->fetchColumn();
 
   <script>
     function goToClasswork(classId) {
-      window.location.href = `class_course.php?class_id=${classId}`;
+      window.location.href = `archive_classCourse.php?class_id=${classId}`;
     }
     function resizeTextarea(textarea) {
       const initialHeight = textarea.scrollHeight + "px";

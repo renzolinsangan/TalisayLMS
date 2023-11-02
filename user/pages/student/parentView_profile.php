@@ -9,13 +9,38 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-$stmt = $conn->prepare($sql);
+$sql_profile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+$stmt = $conn->prepare($sql_profile);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $stmt->bind_result($profile);
 $stmt->fetch();
 $stmt->close();
+
+if (isset($_GET['user_id'])) {
+  $getUser_id = $_GET['user_id'];
+}
+
+$otherUser_id = $getUser_id;
+
+$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $otherUser_id);
+$stmt->execute();
+$stmt->bind_result($otherProfile);
+$stmt->fetch();
+$stmt->close();
+
+$sql_student_info = "SELECT email, contact, address, firstname, middlename, lastname, children, usertype FROM user_account WHERE user_id=?";
+$stmt = $conn->prepare($sql_student_info);
+
+if ($stmt) {
+  $stmt->bind_param("i", $otherUser_id);
+  $stmt->execute();
+  $stmt->bind_result($email, $contact, $address, $firstname, $middlename, $lastname, $children, $usertype);
+  $stmt->fetch();
+  $stmt->close();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +59,9 @@ $stmt->close();
   <!-- Plugin css for this page -->
   <!-- End plugin css for this page -->
   <!-- inject:css -->
-  <link rel="stylesheet" href="assets/css/teacher.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/profile.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -167,85 +194,103 @@ $stmt->close();
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
-            <div class="col mb-3">
-              <h2>Teachers</h2>
-            </div>
-          </div>
-          <?php
-          include("config.php");
-          $user_id = $_SESSION['user_id'];
-
-          $sql_selectTeacher = "SELECT * FROM teacher WHERE user_id = ?";
-          $stmt_selectTeacher = $db->prepare($sql_selectTeacher);
-          $result = $stmt_selectTeacher->execute([$user_id]);
-
-          if ($result) {
-            ?>
-            <div class="row">
-              <?php
-              while ($row = $stmt_selectTeacher->fetch(PDO::FETCH_ASSOC)) {
-                $teacher_id = $row['teacher_id'];
-                $teacher_name = $row['name'];
-
-                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                $profile_result = $stmt_selectProfile->execute([$teacher_id]);
-
-                $defaultProfile = "images/profile.png";
-
-                if ($profile_result) {
-                  $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                  $otherProfile = $profile_row['profile'];
-                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
-                  ?>
-                  <div class="col-md-4 mb-4">
-                    <a href="teacherView_profile.php?user_id=<?php echo $teacher_id ?>" class="course">
-                      <div class="card card-tale justify-content-center align-items-center"
-                        style="background-image: url(assets/image/user.png);">
-                        <div class="circle-image mt-4 mb-3">
-                          <img src="../teacher/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
-                          onerror="this.src='images/profile.png'">
-                        </div>
-                        <p class="text-body-secondary mb-4" style="font-size: 20px;">
-                          <?php echo $teacher_name ?>
+            <div class="col-md-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row justify-content-between">
+                    <div class="col-md-3">
+                      <div class="circle-image"
+                        style="margin-left: 20px; background-image: url('<?php echo empty($otherProfile) ? 'images/profile.png' : '../parent/assets/image/' . $otherProfile; ?>');">
+                      </div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center mt-3">
+                      <div class="col-md-12">
+                        <h2>
+                          <?php echo $firstname . " " . (!empty($middlename) ? strtoupper(substr($middlename, 0, 1)) . "." : "") . " " . $lastname ?>
+                        </h2>
+                        <p class="text-body-secondary">(
+                          <?php echo $usertype ?>)
                         </p>
                       </div>
-                    </a>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="d-flex flex-column justify-content-between h-100">
+                        <div></div>
+                      </div>
+                    </div>
                   </div>
-                  <?php
-                }
-              }
-              ?>
+                </div>
+              </div>
             </div>
-            <?php
-          }
-          ?>
+            <div class="row">
+              <div class="col-md-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row justify-content-left align-items-center">
+                      <div class="col-md-3">
+                        <h3>
+                          <?php echo ucfirst($usertype) ?> Information
+                        </h3>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <hr class="mt-3" style="border-top: 2px solid black;">
+                      </div>
+                    </div>
+                    <div class="row justify-content-left align-items-center">
+                      <div class="col-md-5">
+                        <h3 class="mb-3">Basic Information</h3>
+                        <ul>
+                          <li>
+                            <p>Children:
+                              <?php echo $children ?>
+                            </p>
+                          </li>
+                          <li>
+                            <p>House Address:
+                              <?php echo $address ?>
+                            </p>
+                          </li>
+                        </ul>
+                        <h3 class="mt-4">Contact Information</h3>
+                        <ul>
+                          <li>
+                            <p>Email Address:
+                              <?php echo $email ?>
+                            </p>
+                          </li>
+                          <li>
+                            <p>Contact Number:
+                              <?php echo $contact ?>
+                            </p>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+        crossorigin="anonymous"></script>
+      <script src="../../vendors/js/vendor.bundle.base.js"></script>
+      <script src="../../js/off-canvas.js"></script>
+      <script src="../../js/hoverable-collapse.js"></script>
+      <script src="../../js/template.js"></script>
+      <script src="../../js/settings.js"></script>
+      <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

@@ -296,73 +296,6 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
                 }
               }
               ?>
-              <?php
-              $sql_assignment_answer = "SELECT assignment_link, assignment_file FROM student_assignment_course_answer WHERE class_id = ? AND assignment_id = ?";
-              $stmt_assignment_answer = $db->prepare($sql_assignment_answer);
-              $stmt_assignment_answer->execute([$class_id, $assignment_id]);
-              $assignment_answer_data = $stmt_assignment_answer->fetch(PDO::FETCH_ASSOC);
-
-              if (isset($_POST['mark_done'])) {
-                $new_status = ($assignment_status === "missing") ? "turned-in late" : "turned in";
-
-                $sql = "INSERT INTO student_assignment_course_answer (assignment_course_upload_id, assignment_id, title, date,
-                assignment_link, assignment_file, user_id, class_id, teacher_id, assignment_course_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt = $db->prepare($sql);
-                $result = $stmt->execute([
-                  $assignment_course_upload_id,
-                  $assignment_id,
-                  $title,
-                  $date,
-                  $link,
-                  $file,
-                  $user_id,
-                  $class_id,
-                  $teacher_id,
-                  $new_status
-                ]);
-
-                $stmt_assignment_answer->execute([$class_id, $assignment_id]);
-                $assignment_answer_data = $stmt_assignment_answer->fetch(PDO::FETCH_ASSOC);
-
-                if ($assignment_answer_data) {
-                  $sql_update = "UPDATE assignment_course_upload SET status = 'submitted' 
-                  WHERE class_id = ? AND assignment_id = ?";
-                  $stmt_update = $db->prepare($sql_update);
-                  $update_result = $stmt_update->execute([$class_id, $assignment_id]);
-                }
-              }
-              ?>
-              <div class="row justify-content-center align-items-center mt-2 mb-4">
-                <div class="d-grid gap-2 col-11 mx-auto">
-                  <div class="dropdown">
-                    <div class="d-grid gap-2 col-12 mx-auto">
-                      <button class="btn btn-outline-success mb-2" type="button" data-bs-toggle="dropdown"
-                        style="<?php echo $assignment_answer_data ? 'display: none;' : '' ?>">+ Add or
-                        Create</button>
-                      <ul class="dropdown-menu w-100">
-                        <li>
-                          <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#linkModal"
-                            style="font-size: 18px; cursor: pointer;">
-                            <i class="bi bi-link" style="margin-right: 10px; font-size: 23px"></i>
-                            Link
-                          </a>
-                        </li>
-                        <li>
-                          <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#fileModal"
-                            style="font-size: 18px; cursor: pointer;">
-                            <i class="bi bi-file-earmark-arrow-up" style="margin-right: 10px; font-size: 23px "></i>
-                            File
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                  <button class="btn btn-success" id="unsubmitButton" name="unsubmit" type="button"
-                    style="<?php echo $assignment_answer_data ? '' : 'display: none;' ?>">Edit Answer</button>
-                  <button class="btn btn-success" id="turnInButton" name="mark_done" type="submit"
-                    style="<?php echo $assignment_answer_data ? 'display: none;' : '' ?>">Turn-in</button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -380,115 +313,6 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
                   <p class="text-body-secondary">
                     <?php echo ucfirst($assignment_status) ?>
                   </p>
-                </div>
-              </div>
-              <?php
-              $sql = "SELECT assignment_course_upload_id, link, file, status FROM assignment_course_upload WHERE class_id=? AND assignment_id=?";
-              $stmt = $db->prepare($sql);
-              $stmt->execute([$class_id, $assignment_id]);
-
-              while ($row = $stmt->fetch()) {
-                $file = $row['file'];
-                $status = $row['status'];
-                if (!empty($row['link'])) {
-                  $assignment_course_upload_id = $row['assignment_course_upload_id'];
-                  $link = $row['link'];
-                  ?>
-                  <div class="row justify-content-center align-items-center mb-3">
-                    <div class="col-md-11">
-                      <div class="card">
-                        <a class="mb-2" href="<?php echo $link ?>" target="_blank"
-                          style="text-decoration: none; margin-left: 15px;">
-                          <div class="row mt-3" style="margin-bottom: -15px;">
-                            <div class="col-md-11">
-                              <p
-                                style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                                <?php echo $link ?>
-                              </p>
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div class="col-md-9 text-body-secondary">
-                              LINK
-                            </div>
-                          </div>
-                        </a>
-                        <a
-                          href="delete_link_assignment.php?deleteid=<?php echo $assignment_course_upload_id ?>&class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>">
-                          <div class="row mb-2">
-                            <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
-                              <i class="bi bi-trash-fill trash-icon"></i>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  <?php
-                } elseif (!empty($row['file'])) {
-                  $assignment_course_upload_id = $row['assignment_course_upload_id'];
-                  $fileUrl = $row['file'];
-                  $fileExtension = pathinfo($fileUrl, PATHINFO_EXTENSION);
-                  $displayText = ($fileExtension === 'pdf') ? 'PDF File' : strtoupper($fileExtension) . ' File';
-                  ?>
-                  <div class="row justify-content-center align-items-center mb-3">
-                    <div class="col-md-11">
-                      <div class="card">
-                        <a href="<?php echo $fileUrl; ?>" target="_blank" style="text-decoration: none; margin-left: 30px;">
-                          <div class="row mt-3" style="margin-bottom: -15px;">
-                            <div class="col-md-9">
-                              <p
-                                style="color: green; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                                <?php echo $fileUrl ?>
-                              </p>
-                            </div>
-                          </div>
-                          <div class="row">
-                            <div class="col-md-9 text-body-secondary">
-                              <?php echo strtoupper($fileExtension) ?>
-                            </div>
-                          </div>
-                        </a>
-                        <a
-                          href="delete_file_assignment.php?deleteid=<?php echo $assignment_course_upload_id ?>&class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>">
-                          <div class="row mb-2">
-                            <div class="col text-end" style="margin-right: 15px; font-size: 25px; color: red;">
-                              <i class="bi bi-trash-fill trash-icon"></i>
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  <?php
-                }
-              }
-              ?>
-              <div class="row justify-content-center align-items-center mt-2 mb-4">
-                <div class="d-grid gap-2 col-11 mx-auto">
-                  <div class="dropdown">
-                    <div class="d-grid gap-2 col-12 mx-auto">
-                      <button class="btn btn-outline-success mb-2" type="button" data-bs-toggle="dropdown">+ Add or
-                        Create</button>
-                      <ul class="dropdown-menu w-100">
-                        <li>
-                          <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#linkModal"
-                            style="font-size: 18px; cursor: pointer;">
-                            <i class="bi bi-link" style="margin-right: 10px; font-size: 23px"></i>
-                            Link
-                          </a>
-                        </li>
-                        <li>
-                          <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#fileModal"
-                            style="font-size: 18px; cursor: pointer;">
-                            <i class="bi bi-file-earmark-arrow-up" style="margin-right: 10px; font-size: 23px "></i>
-                            File
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                  <button class="btn btn-success" id="turnInButton" name="mark_done" type="submit">Turn-in</button>
                 </div>
               </div>
             </div>
@@ -572,49 +396,10 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
       </div>
     </div>
   </div>
-  <form action="" method="post" class="form-link" id="myLinkForm">
-    <div class="modal fade" id="linkModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-      aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-body mb-4">
-            <h5 class="mb-4">Add Link</h5>
-            <div class="form-floating">
-              <input type="text" class="form-control" id="linkInput" placeholder="Link" name="link">
-              <label for="linkInput">Link</label>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="addLink" name="add_link">Add Link</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
-  <form action="" method="post" class="form-link" enctype="multipart/form-data" id="myFileForm">
-    <div class="modal fade" id="fileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-      aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-body mb-4">
-            <h5 class="mb-4">Add File</h5>
-            <div class="form-floating">
-              <input type="file" name="file">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" name="file_submit">Add File</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </form>
 
   <script>
     function goToClasswork(classId) {
-      window.location.href = `class_course.php?class_id=${classId}`;
+      window.location.href = `archive_classCourse.php?class_id=${classId}`;
     }
   </script>
   <script>

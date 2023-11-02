@@ -181,7 +181,7 @@ if ($studentNameRow) {
           <?php
           include("config.php");
 
-          $sqlSelectChildren = "SELECT * FROM parent_account WHERE children = ?";
+          $sqlSelectChildren = "SELECT * FROM user_account WHERE children = ?";
           $stmtSelectChildren = $db->prepare($sqlSelectChildren);
           $selectChildrenResult = $stmtSelectChildren->execute([$fullname]);
 
@@ -190,14 +190,14 @@ if ($studentNameRow) {
             <div class="row">
               <?php
               while ($row = $stmtSelectChildren->fetch(PDO::FETCH_ASSOC)) {
-                $parent_id = $row['parent_id'];
+                $user_id = $row['user_id'];
                 $parentFirstname = $row['firstname'];
                 $parentLastname = $row['lastname'];
                 $parentFullname = $parentFirstname . ' ' . $parentLastname;
 
                 $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
                 $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                $profile_result = $stmt_selectProfile->execute([$parent_id]);
+                $profile_result = $stmt_selectProfile->execute([$user_id]);
 
                 $defaultProfile = "images/profile.png";
 
@@ -205,12 +205,12 @@ if ($studentNameRow) {
                   $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
                   $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
                   ?>
-                  <div class="col-md-3 mb-4">
-                    <a href="parentView_profile.php?parent_id=<?php echo $parent_id ?>" class="course">
+                  <div class="col-md-4 mb-4">
+                    <a href="parentView_profile.php?user_id=<?php echo $user_id ?>" class="course">
                       <div class="card card-tale justify-content-center align-items-center"
                         style="background-image: url(assets/image/user.png);">
                         <div class="circle-image mt-4 mb-3">
-                          <img src="assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
+                          <img src="../parent/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
                           onerror="this.src='images/profile.png'">
                         </div>
                         <p class="text-body-secondary mb-4" style="font-size: 20px;">

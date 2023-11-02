@@ -51,7 +51,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 } elseif ($_SESSION['usertype'] === "student") {
                     header("Location: pages/student/index.php");
                 } elseif ($_SESSION['usertype'] === "parent") {
-                    header("Location: pages/teacher/index.php");
+                    header("Location: pages/parent/index.php");
                 } else {
                     header("Location: user_login.php?error=Invalid usertype");
                 }
@@ -73,7 +73,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 } elseif ($_SESSION['usertype'] === "student") {
                     header("Location: pages/student/index.php");
                 } elseif ($_SESSION['usertype'] === "parent") {
-                    header("Location: pages/teacher/index.php");
+                    header("Location: pages/parent/index.php");
                 } else {
                     header("Location: user_login.php?error=Invalid usertype");
                 }

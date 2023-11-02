@@ -45,7 +45,7 @@ if ($teacher_id) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <link rel="stylesheet" href="assets/css/toreview.css">
+  <link rel="stylesheet" href="assets/css/todolist.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
@@ -156,25 +156,17 @@ if ($teacher_id) {
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="friend.php">My Friends</a></li>
-                <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
+                <li class="nav-item"><a class="nav-link" href="friends.php">My Friends</a></li>
+                <li class="nav-item"><a class="nav-link" href="teacher.php">My Teachers</a></li>
+                <li class="nav-item"><a class="nav-link" href="parent.php">My Parent</a></li>
               </ul>
             </div>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
-              <i class="menu-icon"><i class="bi bi-exclamation-triangle"></i></i>
-              <span class="menu-title">Reports</span>
-              <i class="menu-arrow"></i>
+            <a class="nav-link" href="awards.php">
+              <i class="menu-icon"><i class="bi bi-award"></i></i>
+              <span class="menu-title">Awards</span>
             </a>
-            <div class="collapse" id="charts">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link"
-                    href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a></li>
-                <li class="nav-item"> <a class="nav-link"
-                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a></li>
-              </ul>
-            </div>
           </li>
           <li class="nav-item mb-3">
             <a class="nav-link" href="feedback.php">
@@ -188,75 +180,76 @@ if ($teacher_id) {
       <div class="main-panel">
         <div class="header-sticky">
           <div class="header-links">
-            <a class="btn-success" href="class_course.php?class_id=<?php echo $class_id ?>"><i
+            <a class="btn-success" href="archive_classCourse.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"><i
                 class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-            <a href="toreview.php?class_id=<?php echo $class_id ?>" class="nav-link active"
-              style="margin-left: 2vh;">To-review</a>
-            <a href="#" class="people">Reviewed</a>
+            <a href="archive_todolistAssigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="people"
+              style="margin-left: 2vh;">Assigned</a>
+            <a href="archive_todolistMissing.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="people">Missing</a>
+            <a href="archive_todolistDone.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="nav-link active">Done</a>
           </div>
         </div>
         <div class="content-wrapper align-items-center justify-content-center" style="margin-top: 10vh;">
-          <div class="row align-items-center justify-content-center">
+          <div class="row align-items-center justify-content-center mb-2">
             <div class="col-md-3">
               <div class="card">
                 <div class="card-body">
-                  <h2 style="margin-bottom: -1px;">To-review</h2>
-                  <span class="text-body-secondary ml-1">(Students Work)</span>
+                  <h2 style="margin-bottom: -1px;">To-do List</h2>
+                  <span class="text-body-secondary ml-1">(Turned-in)</span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="row mt-4">
+          <div class="row">
             <div class="col">
               <?php
               $assignment_results = [];
               $question_results = [];
 
-              $sql_assignment = "SELECT assignment_id, title, class_name, due_date FROM classwork_assignment WHERE class_id = ?";
+              $sql_assignment = "SELECT assignment_id, title, date, assignment_course_status FROM student_assignment_course_answer WHERE 
+              teacher_id = ? AND class_id = ? AND (assignment_course_status = 'turned in' OR assignment_course_status = 'turned-in late')";
               $stmt_assignment = $db->prepare($sql_assignment);
-              $stmt_assignment->execute([$class_id]);
+              $stmt_assignment->execute([$teacher_id, $class_id]);
               $assignment_results = $stmt_assignment->fetchAll();
 
-              $sql_question = "SELECT question_id, title, class_name, due_date FROM classwork_question WHERE class_id = ?";
+              $sql_question = "SELECT question_id, title, date, question_course_status FROM student_question_course_answer WHERE 
+              teacher_id = ? AND class_id = ? AND (question_course_status = 'turned in' OR question_course_status = 'turned-in late')";
               $stmt_question = $db->prepare($sql_question);
-              $stmt_question->execute([$class_id]);
+              $stmt_question->execute([$teacher_id, $class_id]);
               $question_results = $stmt_question->fetchall();
 
               $combined_results = array_merge($assignment_results, $question_results);
               usort($combined_results, function ($a, $b) {
-                return strtotime($a['due_date']) - strtotime($b['due_date']);
+                return strtotime($a['date']) - strtotime($b['date']);
               });
 
               foreach ($combined_results as $row) {
                 if (isset($row['assignment_id'])) {
                   $assignment_id = $row['assignment_id'];
                   $title = $row['title'];
-                  $class_name = $row['class_name'];
-                  $due_date = $row['due_date'];
-                  $timestamp = strtotime($due_date);
+                  $date = $row['date'];
+                  $timestamp = strtotime($date);
                   $formatted_date = date("F d", $timestamp);
+                  $assignment_course_status = $row['assignment_course_status'];
                   ?>
                   <div class="d-grid gap-2 col-10 mx-auto mb-4">
                     <a class="announce" type="button"
-                      href="assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>"
+                      href="archive_assignmentCourse.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>&user_id=<?php echo $user_id ?>"
                       style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                       <div
                         style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
                         <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
                       </div>
                       <p
-                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; 
-                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         <?php echo $title ?>
                       </p>
+                      <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                        <?php echo $class_name ?>
+                      </div>
                       <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
-                        <p class="text-body-secondary"
-                        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                          <?php echo $class_name ?> -
-                          <span>
-                            Due <?php echo $formatted_date ?>
+                        <span>
+                          <?php echo ucfirst($assignment_course_status) ?>
                         </span>
-                        </p>
                       </div>
                     </a>
                   </div>
@@ -264,32 +257,30 @@ if ($teacher_id) {
                 } elseif (isset($row['question_id'])) {
                   $question_id = $row['question_id'];
                   $title = $row['title'];
-                  $class_name = $row['class_name'];
-                  $due_date = $row['due_date'];
-                  $timestamp = strtotime($due_date);
+                  $date = $row['date'];
+                  $timestamp = strtotime($date);
                   $formatted_date = date("F d", $timestamp);
+                  $question_course_status = $row['question_course_status'];
                   ?>
                   <div class="d-grid gap-2 col-10 mx-auto mb-4">
                     <a class="announce" type="button"
-                      href="question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>"
+                      href="archive_questionCourse.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>&user_id=<?php echo $user_id ?>"
                       style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                       <div
                         style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
                         <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
                       </div>
                       <p
-                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; 
-                        overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         <?php echo $title ?>
                       </p>
+                      <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                        <?php echo $class_name ?>
+                      </div>
                       <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
-                        <p class="text-body-secondary"
-                        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                          <?php echo $class_name ?> -
-                          <span>
-                            Due <?php echo $formatted_date ?>
-                          </span>
-                        </p>
+                        <span>
+                        <?php echo ucfirst($question_course_status) ?>
+                        </span>
                       </div>
                     </a>
                   </div>
@@ -310,11 +301,6 @@ if ($teacher_id) {
       integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
       crossorigin="anonymous"></script>
     <script src="../../vendors/js/vendor.bundle.base.js"></script>
-    <script src="../../js/off-canvas.js"></script>
-    <script src="../../js/hoverable-collapse.js"></script>
-    <script src="../../js/template.js"></script>
-    <script src="../../js/settings.js"></script>
-    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

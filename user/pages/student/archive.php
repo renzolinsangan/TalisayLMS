@@ -318,7 +318,7 @@ $stmt->closeCursor();
               <div class="col-md-4 grid-margin transparent">
                 <div class="card card-tale text-center"
                   style="height: 50vh; flex-direction: column; justify-content: space-between;">
-                  <a href="class_course.php?class_id=<?php echo $row['class_id']; ?>" class="course">
+                  <a href="archive_classCourse.php?class_id=<?php echo $row['class_id']; ?>" class="course">
                     <div class="card-header"
                       style="text-align: left; background-image: url(../teacher/assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">
                       <div class="course-top">

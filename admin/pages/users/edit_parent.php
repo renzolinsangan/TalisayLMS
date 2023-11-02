@@ -7,7 +7,7 @@ if (!isset($_SESSION['id'])) {
 }
 include_once("db_conn.php");
 $id = $_GET['updateid'];
-$sql = "SELECT * FROM parent_account WHERE parent_id=$id";
+$sql = "SELECT * FROM user_account WHERE user_id=$id";
 $result = mysqli_query($conn, $sql);
 $row = mysqli_fetch_assoc($result);
 
@@ -35,9 +35,9 @@ if (isset($_POST['submit'])) {
     $children = $_POST['children'];
     $usertype = $_POST['usertype'];
 
-    $sql = "UPDATE parent_account SET username='$username', password='$hashedPassword', address='$address', email='$email', 
+    $sql = "UPDATE user_account SET username='$username', password='$hashedPassword', address='$address', email='$email', 
     contact='$contact', firstname='$firstname', middlename='$middlename', lastname='$lastname', children='$children', 
-    usertype='$usertype' WHERE parent_id=$id";
+    usertype='$usertype' WHERE user_id=$id";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 30, 2023 at 07:40 PM
+-- Generation Time: Nov 02, 2023 at 04:23 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -46,7 +46,7 @@ CREATE TABLE `assignmentgrade` (
 --
 
 INSERT INTO `assignmentgrade` (`assignmentGrade_id`, `assignmentTitle`, `studentFirstName`, `studentLastName`, `date`, `score`, `assignmentPoint`, `student_id`, `teacher_id`, `class_id`, `assignment_id`) VALUES
-(6, 'Cell Energetics', 'John Renzo', 'Linsangan', '2023-10-15', 10, 20, 28, 33, 39, 33);
+(6, 'Cell Energetics', 'John Renzo', 'Linsangan', '2023-10-15', 10, 20, 28, 33, 52, 33);
 
 -- --------------------------------------------------------
 
@@ -69,10 +69,11 @@ CREATE TABLE `assignment_course_upload` (
 --
 
 INSERT INTO `assignment_course_upload` (`assignment_course_upload_id`, `link`, `file`, `class_id`, `user_id`, `assignment_id`, `status`) VALUES
-(96, 'https://byjus.com/biology/cell-biology/', '', 45, 28, 28, 'submitted'),
-(97, 'https://scopegurdoninstitute.co.uk/digital-toolkit-1-investigate-the-cell-3d-model', '', 45, 28, 27, 'submitted'),
+(96, 'https://byjus.com/biology/cell-biology/', '', 52, 28, 28, 'submitted'),
+(97, 'https://scopegurdoninstitute.co.uk/digital-toolkit-1-investigate-the-cell-3d-model', '', 52, 28, 27, 'submitted'),
 (99, 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 49, 38, 33, 'submitted'),
-(100, 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 45, 28, 33, 'submitted');
+(100, 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 52, 28, 33, 'submitted'),
+(101, 'https://getbootstrap.com/docs/5.3/components/modal/', '', 45, 28, 32, '');
 
 -- --------------------------------------------------------
 
@@ -272,14 +273,14 @@ CREATE TABLE `class_enrolled` (
 --
 
 INSERT INTO `class_enrolled` (`class_id`, `tc_id`, `class_name`, `section`, `subject`, `grade_level`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`, `student_id`, `student_firstname`, `student_lastname`, `archive_status`) VALUES
-(42, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J', 'Liwag', ''),
+(42, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J', 'Liwag', 'archive'),
 (43, 40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'Grade 11', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', ''),
 (44, 41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'Grade 11', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', 'archive'),
-(45, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', ''),
 (46, 43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'Grade 11', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia', ''),
-(47, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 37, 'Marco Luis', 'Hernandez', ''),
-(48, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', ''),
-(49, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 38, 'Martin Clarence', 'Guantes', '');
+(47, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 37, 'Marco Luis', 'Hernandez', 'archive'),
+(48, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', 'archive'),
+(49, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 38, 'Martin Clarence', 'Guantes', 'archive'),
+(52, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', 'archive');
 
 -- --------------------------------------------------------
 
@@ -351,10 +352,10 @@ CREATE TABLE `friend` (
 --
 
 INSERT INTO `friend` (`primary_id`, `user_id`, `friend_id`, `name`) VALUES
-(1, 28, 36, 'R.J. C. Liwag'),
 (2, 28, 37, 'Marco Luis S. Hernandez'),
 (3, 28, 29, 'Carl Justine C. Aala'),
-(4, 38, 28, 'John Renzo G. Linsangan');
+(4, 38, 28, 'John Renzo G. Linsangan'),
+(5, 28, 38, 'Martin Clarence O. Guantes');
 
 -- --------------------------------------------------------
 
@@ -385,33 +386,6 @@ INSERT INTO `news` (`news_id`, `title`, `type`, `name`, `date`, `track`, `start_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `parent_account`
---
-
-CREATE TABLE `parent_account` (
-  `parent_id` int(11) NOT NULL,
-  `username` varchar(64) NOT NULL,
-  `password` varchar(64) NOT NULL,
-  `address` varchar(1000) NOT NULL,
-  `email` varchar(64) NOT NULL,
-  `contact` varchar(11) NOT NULL,
-  `firstname` varchar(64) NOT NULL,
-  `middlename` varchar(64) NOT NULL,
-  `lastname` varchar(64) NOT NULL,
-  `children` varchar(64) NOT NULL,
-  `usertype` varchar(64) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `parent_account`
---
-
-INSERT INTO `parent_account` (`parent_id`, `username`, `password`, `address`, `email`, `contact`, `firstname`, `middlename`, `lastname`, `children`, `usertype`) VALUES
-(1, 'rickylinsangan', '$2y$10$4hzOQ7y1I2i300RmkL/8XubwDKaYI9t97auk3uhLwJT6aVaMtqu6u', 'Block 3 Lot 44, Croatia St. Lynville Subdv. Purok 3, Latag, Lipa City, Batangas', 'rickylinsangan18@yahoo.com', '09352162476', 'Ricardo', 'Espino', 'Linsangan', 'John Renzo Linsangan', 'parent');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `questiongrade`
 --
 
@@ -434,8 +408,9 @@ CREATE TABLE `questiongrade` (
 --
 
 INSERT INTO `questiongrade` (`questionGrade_id`, `questionTitle`, `studentFirstName`, `studentLastName`, `date`, `score`, `questionPoint`, `student_id`, `teacher_id`, `class_id`, `question_id`) VALUES
-(10, 'Cell Evolution', 'John Renzo', 'Linsangan', '2023-10-24', 20, 20, 28, 33, 39, 23),
-(11, 'Cell Biology', 'John Renzo', 'Linsangan', '2023-10-15', 25, 40, 28, 33, 39, 21);
+(10, 'Cell Evolution', 'John Renzo', 'Linsangan', '2023-10-24', 20, 20, 28, 33, 52, 23),
+(11, 'Cell Biology', 'John Renzo', 'Linsangan', '2023-10-15', 25, 40, 28, 33, 52, 21),
+(12, 'Cell Biology', 'Martin Clarence', 'Guantes', '2023-10-15', 25, 40, 38, 33, 39, 21);
 
 -- --------------------------------------------------------
 
@@ -461,7 +436,7 @@ CREATE TABLE `section` (
 --
 
 INSERT INTO `section` (`class_id`, `class_name`, `section`, `subject`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`, `archive_status`) VALUES
-(39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', ''),
+(39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 'archive'),
 (40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', ''),
 (41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 'archive'),
 (43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', ''),
@@ -487,7 +462,6 @@ CREATE TABLE `student` (
 
 INSERT INTO `student` (`primary_id`, `user_id`, `student_id`, `name`) VALUES
 (1, 33, 36, 'R.J. C. Liwag'),
-(2, 33, 28, 'John Renzo G. Linsangan'),
 (3, 33, 37, 'Marco Luis S. Hernandez'),
 (4, 33, 29, 'Carl Justine C. Aala');
 
@@ -517,7 +491,7 @@ CREATE TABLE `student_assignment_course_answer` (
 
 INSERT INTO `student_assignment_course_answer` (`answer_assignment_id`, `assignment_course_upload_id`, `assignment_id`, `title`, `date`, `assignment_link`, `assignment_file`, `user_id`, `class_id`, `teacher_id`, `assignment_course_status`) VALUES
 (154, 99, 33, 'Cell Energetics', '2023-10-15', 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 38, 49, 33, 'turned-in late'),
-(155, 100, 33, 'Cell Energetics', '2023-10-15', 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 28, 45, 33, 'turned-in late');
+(155, 100, 33, 'Cell Energetics', '2023-10-15', 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 28, 52, 33, 'turned-in late');
 
 -- --------------------------------------------------------
 
@@ -543,9 +517,9 @@ CREATE TABLE `student_question_course_answer` (
 --
 
 INSERT INTO `student_question_course_answer` (`answer_question_id`, `question_id`, `point`, `title`, `date`, `question_answer`, `user_id`, `class_id`, `teacher_id`, `question_course_status`) VALUES
-(25, 21, 30, 'Cell Biology', '2023-10-15', 'Cell biology is the scientific discipline that investigates the structure, function, and behavior of cells, which are the fundamental units of life. It encompasses the study of various cellular processes, interactions, and the molecular mechanisms that underlie the functions of cells within living organisms. Cell biology is integral to understanding how life is organized and how organisms function at the cellular level.', 28, 45, 33, 'turned-in late'),
+(25, 21, 30, 'Cell Biology', '2023-10-15', 'Cell biology is the scientific discipline that investigates the structure, function, and behavior of cells, which are the fundamental units of life. It encompasses the study of various cellular processes, interactions, and the molecular mechanisms that underlie the functions of cells within living organisms. Cell biology is integral to understanding how life is organized and how organisms function at the cellular level.', 28, 52, 33, 'turned-in late'),
 (27, 21, 40, 'Cell Biology', '2023-10-15', 'Cell biology is a branch of biology that focuses on the study of cells, which are the basic structural and functional units of living organisms. It encompasses a wide range of topics related to cells, including their structure, function, physiology, and interactions. Cell biology explores how cells are organized, how they communicate with each other, and how they carry out various biological processes.', 38, 49, 33, 'turned-in late'),
-(29, 23, 20, 'Cell Evolution', '2023-10-24', 'Cell evolution traces the development and diversification of cells, the fundamental units of life, over billions of years. All life shares a common ancestry, and cells have evolved from simple, early forms to more complex prokaryotic and eukaryotic structures. Genetic variation, driven by mutations, has played a central role, with natural selection favoring advantageous traits that enhance an organism\'s fitness and adaptation to its environment. This ongoing process has led to the emergence of new species and the diverse cellular structures and functions seen today. Molecular biology has shed light on the genetic and molecular changes that underlie cell evolution, and the endosymbiotic theory explains the origins of some cellular structures. Cell evolution is an integral part of the broader theory of biological evolution, illustrating the interconnectedness of all life on Earth.', 28, 45, 33, 'turned in');
+(29, 23, 20, 'Cell Evolution', '2023-10-24', 'What happens from cell evolution is that, cell evolution traces the development and diversification of cells, the fundamental units of life, over billions of years. All life shares a common ancestry, and cells have evolved from simple, early forms to more complex prokaryotic and eukaryotic structures. Genetic variation, driven by mutations, has played a central role, with natural selection favoring advantageous traits that enhance an organism\'s fitness and adaptation to its environment. This ongoing process has led to the emergence of new species and the diverse cellular structures and functions seen today. Molecular biology has shed light on the genetic and molecular changes that underlie cell evolution, and the endosymbiotic theory explains the origins of some cellular structures. Cell evolution is an integral part of the broader theory of biological evolution, illustrating the interconnectedness of all life on Earth.', 28, 52, 33, 'turned in');
 
 -- --------------------------------------------------------
 
@@ -565,7 +539,7 @@ CREATE TABLE `teacher` (
 --
 
 INSERT INTO `teacher` (`primary_id`, `user_id`, `teacher_id`, `name`) VALUES
-(2, 28, 33, 'Patrick H. Star');
+(5, 28, 33, 'Patrick H. Star');
 
 -- --------------------------------------------------------
 
@@ -646,6 +620,7 @@ CREATE TABLE `user_account` (
   `grade_level` varchar(50) NOT NULL,
   `department` varchar(50) NOT NULL,
   `section` varchar(64) NOT NULL,
+  `children` varchar(500) NOT NULL,
   `usertype` varchar(50) NOT NULL,
   `reset_token_hash` varchar(64) DEFAULT NULL,
   `reset_token_expires_at` datetime DEFAULT NULL
@@ -655,16 +630,17 @@ CREATE TABLE `user_account` (
 -- Dumping data for table `user_account`
 --
 
-INSERT INTO `user_account` (`user_id`, `username`, `password`, `email`, `address`, `contact`, `firstname`, `middlename`, `lastname`, `grade_level`, `department`, `section`, `usertype`, `reset_token_hash`, `reset_token_expires_at`) VALUES
-(28, 'renzolinsangan', '$2y$10$vdNYpMxHSGPQ8URNzheJ.uAW.fC3pOhyfevUKTtEA20POmytl30Ma', 'renzolinsangan11@gmail.com', 'Block 3 Lot 44, Croatia St. Lynville Subdv. Purok 3, Latag, Lipa City, Batangas', '09657008926', 'John Renzo', 'Goyena', 'Linsangan', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL),
-(29, 'carljustine', '$2y$10$ceE9/MKm90xp3P6srqIJ6udFR2NgLpkg3gifIVQwJ4F5ChjjiD5u.', 'carljustine@gmail.com', 'Talisay, Batangas', '09223043043', 'Carl Justine', 'C ', 'Aala', 'Grade 11', 'stem', 'Einstein', 'student', '4685009adc6793cf52bd8c25e9c55114c3a3b92a98aa3a6cb25ba3a47fcdc487', '2023-10-06 07:36:21'),
-(30, 'patriciaperez', '$2y$10$BXK56vTkmz.DALWwU/595.i3DhIWmw0zz8rnq7Nt6pEAynUzIq5/q', 'patriciaperez@gmail.com', 'Talisay, Batangas', '09232424244', 'Patricia', 'C', 'Perez', 'Grade 11', 'abm', 'Pacioli', 'student', NULL, NULL),
-(31, 'marissamargarette', '$2y$10$uqnc8ZHIbxVmixLveq5SmOkGhsdrEB/gTa6TTBc.yxvRIam1MtC7e', 'marissagrc4@gmail.com', 'Purok 6, Brgy. Natatas, Tanauan City, Batangas', '09497920130', 'Marissa Margarette', 'Ocampo', 'Garcia', 'Grade 11', 'tvl', 'ShangriLa', 'student', 'b977467780a392b9124d4340aeab522e03adc312bd5711ef355f652d7a9e2ac4', '2023-10-13 12:54:16'),
-(32, 'spongebob', '$2y$10$Xw3bTrw2rYk.p4RFKQF3ieS1bClb1b.gMHuwmCDx6aq7/zKALI1q.', 'spongebobsquarepants12@gmail.com', 'Bikini Bottom, Sa may Pinya', '09523232323', 'Spongebob', 'hindi', 'Squarepants', '', 'tvl', '', 'teacher', NULL, NULL),
-(33, 'patrick', '$2y$10$J9gOlxnbm99eUvHa.UwgVOdXfXhYcMXvzEdUkSUjsGfc.vKK8to7K', 'patrickstar@gmail.com', 'Bikini Bottom, Stone House', '09232325556', 'Patrick', 'hindi', 'Star', '', 'stem', '', 'teacher', NULL, NULL),
-(36, 'rjliwag', '$2y$10$NA18/Bn3ehbXsmw/Hmuo6uoIUGWBk8j/BDWSEbyUnqPa5zbSnOfm.', 'rjliwag@gmail.com', 'Talisay, Batangas', '09451213212', 'R.J.', 'Caguicla', 'Liwag', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL),
-(37, 'marcoluis', '$2y$10$yXO0x1CyK/zWzgUU4XFr/.6KJcVqHQ8Vs.CGxcSMmxZVAh6vDkQnW', 'marcoluishernandez@gmail.com', 'San Luis, Batangas', '09543221548', 'Marco Luis', 'S', 'Hernandez', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL),
-(38, 'martinclarence', '$2y$10$h2.Fn78znTIT.Vp.833hn.adR7e/reV.8rkpBa9GcIAxGm/rl.s56', 'martinclarensyo@gmail.com', 'San Miguel, Sto. Tomas, Batangas', '09485377283', 'Martin Clarence', 'O', 'Guantes', 'Grade 11', 'stem', 'Einstein', 'student', NULL, NULL);
+INSERT INTO `user_account` (`user_id`, `username`, `password`, `email`, `address`, `contact`, `firstname`, `middlename`, `lastname`, `grade_level`, `department`, `section`, `children`, `usertype`, `reset_token_hash`, `reset_token_expires_at`) VALUES
+(28, 'renzolinsangan', '$2y$10$vdNYpMxHSGPQ8URNzheJ.uAW.fC3pOhyfevUKTtEA20POmytl30Ma', 'renzolinsangan11@gmail.com', 'Block 3 Lot 44, Croatia St. Lynville Subdv. Purok 3, Latag, Lipa City, Batangas', '09657008926', 'John Renzo', 'Goyena', 'Linsangan', 'Grade 11', 'stem', 'Einstein', '', 'student', NULL, NULL),
+(29, 'carljustine', '$2y$10$ceE9/MKm90xp3P6srqIJ6udFR2NgLpkg3gifIVQwJ4F5ChjjiD5u.', 'carljustine@gmail.com', 'Talisay, Batangas', '09223043043', 'Carl Justine', 'C ', 'Aala', 'Grade 11', 'stem', 'Einstein', '', 'student', '4685009adc6793cf52bd8c25e9c55114c3a3b92a98aa3a6cb25ba3a47fcdc487', '2023-10-06 07:36:21'),
+(30, 'patriciaperez', '$2y$10$BXK56vTkmz.DALWwU/595.i3DhIWmw0zz8rnq7Nt6pEAynUzIq5/q', 'patriciaperez@gmail.com', 'Talisay, Batangas', '09232424244', 'Patricia', 'C', 'Perez', 'Grade 11', 'abm', 'Pacioli', '', 'student', NULL, NULL),
+(31, 'marissamargarette', '$2y$10$uqnc8ZHIbxVmixLveq5SmOkGhsdrEB/gTa6TTBc.yxvRIam1MtC7e', 'marissagrc4@gmail.com', 'Purok 6, Brgy. Natatas, Tanauan City, Batangas', '09497920130', 'Marissa Margarette', 'Ocampo', 'Garcia', 'Grade 11', 'tvl', 'ShangriLa', '', 'student', 'b977467780a392b9124d4340aeab522e03adc312bd5711ef355f652d7a9e2ac4', '2023-10-13 12:54:16'),
+(32, 'spongebob', '$2y$10$Xw3bTrw2rYk.p4RFKQF3ieS1bClb1b.gMHuwmCDx6aq7/zKALI1q.', 'spongebobsquarepants12@gmail.com', 'Bikini Bottom, Sa may Pinya', '09523232323', 'Spongebob', 'hindi', 'Squarepants', '', 'tvl', '', '', 'teacher', NULL, NULL),
+(33, 'patrick', '$2y$10$J9gOlxnbm99eUvHa.UwgVOdXfXhYcMXvzEdUkSUjsGfc.vKK8to7K', 'patrickstar@gmail.com', 'Bikini Bottom, Stone House', '09232325556', 'Patrick', 'hindi', 'Star', '', 'stem', '', '', 'teacher', NULL, NULL),
+(36, 'rjliwag', '$2y$10$NA18/Bn3ehbXsmw/Hmuo6uoIUGWBk8j/BDWSEbyUnqPa5zbSnOfm.', 'rjliwag@gmail.com', 'Talisay, Batangas', '09451213212', 'R.J.', 'Caguicla', 'Liwag', 'Grade 11', 'stem', 'Einstein', '', 'student', NULL, NULL),
+(37, 'marcoluis', '$2y$10$yXO0x1CyK/zWzgUU4XFr/.6KJcVqHQ8Vs.CGxcSMmxZVAh6vDkQnW', 'marcoluishernandez@gmail.com', 'San Luis, Batangas', '09543221548', 'Marco Luis', 'S', 'Hernandez', 'Grade 11', 'stem', 'Einstein', '', 'student', NULL, NULL),
+(38, 'martinclarence', '$2y$10$h2.Fn78znTIT.Vp.833hn.adR7e/reV.8rkpBa9GcIAxGm/rl.s56', 'martinclarensyo@gmail.com', 'San Miguel, Sto. Tomas, Batangas', '09485377283', 'Martin Clarence', 'O', 'Guantes', 'Grade 11', 'stem', 'Einstein', '', 'student', NULL, NULL),
+(39, 'rickylinsangan', '$2y$10$Iipff.OyvD2UR.BgjNpiWO0BCOyxAXW.ygsn7aqbxZ0zS.AhrsEZa', 'rickylinsangan18@yahoo.com', 'Block 3 Lot 44, Croatia St. Lynville Subdv. Purok 3, Latag, Lipa City, Batangas', '09352162476', 'Ricardo', 'Espino', 'Linsangan', '', '', '', 'John Renzo Linsangan', 'parent', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -695,7 +671,9 @@ INSERT INTO `user_profile` (`profile_id`, `user_id`, `profile`, `profile_status`
 (15, 32, 'spongebob.jpg', 'recent'),
 (16, 37, 'marco.jpg', 'recent'),
 (17, 38, 'martino.jpg', 'recent'),
-(18, 36, 'rj.jpg', 'recent');
+(18, 36, 'rj.jpg', 'recent'),
+(19, 39, '301910_286560318029842_1109225643_n.jpg', 'old'),
+(20, 39, '20257948_1604707099548971_5136766947339151974_n.jpg', 'recent');
 
 --
 -- Indexes for dumped tables
@@ -786,12 +764,6 @@ ALTER TABLE `news`
   ADD PRIMARY KEY (`news_id`);
 
 --
--- Indexes for table `parent_account`
---
-ALTER TABLE `parent_account`
-  ADD PRIMARY KEY (`parent_id`);
-
---
 -- Indexes for table `questiongrade`
 --
 ALTER TABLE `questiongrade`
@@ -866,7 +838,7 @@ ALTER TABLE `assignmentgrade`
 -- AUTO_INCREMENT for table `assignment_course_upload`
 --
 ALTER TABLE `assignment_course_upload`
-  MODIFY `assignment_course_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `assignment_course_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
 
 --
 -- AUTO_INCREMENT for table `classwork_assignment`
@@ -914,7 +886,7 @@ ALTER TABLE `classwork_quiz`
 -- AUTO_INCREMENT for table `class_enrolled`
 --
 ALTER TABLE `class_enrolled`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `class_theme`
@@ -932,7 +904,7 @@ ALTER TABLE `feedback`
 -- AUTO_INCREMENT for table `friend`
 --
 ALTER TABLE `friend`
-  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `news`
@@ -941,16 +913,10 @@ ALTER TABLE `news`
   MODIFY `news_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `parent_account`
---
-ALTER TABLE `parent_account`
-  MODIFY `parent_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `questiongrade`
 --
 ALTER TABLE `questiongrade`
-  MODIFY `questionGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `questionGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `section`
@@ -980,7 +946,7 @@ ALTER TABLE `student_question_course_answer`
 -- AUTO_INCREMENT for table `teacher`
 --
 ALTER TABLE `teacher`
-  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `topic`
@@ -998,13 +964,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_account`
 --
 ALTER TABLE `user_account`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `user_profile`
 --
 ALTER TABLE `user_profile`
-  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

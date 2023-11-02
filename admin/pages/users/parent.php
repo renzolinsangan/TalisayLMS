@@ -209,7 +209,7 @@ if (!isset($_SESSION['id'])) {
                             <?php
                             include("db_conn.php");
 
-                            $sql = "SELECT * FROM parent_account WHERE usertype = 'parent'";
+                            $sql = "SELECT * FROM user_account WHERE usertype = 'parent'";
                             $result = mysqli_query($conn, $sql);
 
                             while ($row = mysqli_fetch_assoc($result)) {
@@ -246,9 +246,9 @@ if (!isset($_SESSION['id'])) {
                                   <?php echo $row['usertype'] ?>
                                 </td>
                                 <td style="font-size: 18px;">
-                                  <a href="edit_parent.php?updateid=<?php echo $row['parent_id'] ?>" class="link-dark"
+                                  <a href="edit_parent.php?updateid=<?php echo $row['user_id'] ?>" class="link-dark"
                                   style="margin-right: 5px;"><i class="bi bi-pencil-square"></i></a>
-                                  <a href="delete_parent.php?deleteid=<?php echo $row['parent_id'] ?>" 
+                                  <a href="delete_parent.php?deleteid=<?php echo $row['user_id'] ?>" 
                                   class="link-dark"><i class="bi bi-trash-fill"></i></a>
                                 </td>
                               </tr>

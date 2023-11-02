@@ -184,7 +184,6 @@ $stmt->close();
 
           $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';
 
-          // Fetch distinct class_name and tc_id from the database
           $sql = "SELECT DISTINCT class_name, tc_id FROM class_enrolled WHERE teacher_id = ?";
           $stmt = $conn->prepare($sql);
           $stmt->bind_param("i", $user_id);
@@ -232,18 +231,18 @@ $stmt->close();
                         <div class="card-body">
                           <div class="table-responsive">
                             <table class="table table-bordered table-hover text-center">
-                              <thead class="table" style="background-color: #4BB543; color: white; align-items: left;">
+                              <thead class="table" style="background-color: #4BB543; color: white;">
                                 <th scope="col">Student Name</th>
                                 <?php
                                 include("config.php");
                                 $class_id = $_GET['class_id'];
 
-                                $sqlQuestion = "SELECT questionTitle, date, score, questionPoint FROM questiongrade WHERE class_id = ? AND teacher_id = ?";
+                                $sqlQuestion = "SELECT title, date, point FROM classwork_question WHERE class_id = ? AND teacher_id = ?";
                                 $stmtQuestion = $db->prepare($sqlQuestion);
                                 $stmtQuestion->execute([$class_id, $teacher_id]);
                                 $questionTitles = $stmtQuestion->fetchAll(PDO::FETCH_ASSOC);
 
-                                $sqlAssignment = "SELECT assignmentTitle, date, score, assignmentPoint FROM assignmentgrade WHERE class_id = ? AND teacher_id = ?";
+                                $sqlAssignment = "SELECT title, date, point FROM classwork_assignment WHERE class_id = ? AND teacher_id = ?";
                                 $stmtAssignment = $db->prepare($sqlAssignment);
                                 $stmtAssignment->execute([$class_id, $teacher_id]);
                                 $assignmentTitles = $stmtAssignment->fetchAll(PDO::FETCH_ASSOC);
@@ -261,23 +260,11 @@ $stmt->close();
                                       <?php echo $formattedDate; ?>
                                     </p>
                                     <p style="border-bottom: 1px solid white; color: black;">
-                                      <?php echo $title['questionTitle'] ?? $title['assignmentTitle']; ?>
+                                      <?php echo $title['title']; ?>
                                     </p>
-                                    <?php
-                                    if (isset($title['questionPoint'])) {
-                                      ?>
-                                      <p style="color: white;">out of
-                                        <?php echo $title['questionPoint'] ?>
-                                      </p>
-                                      <?php
-                                    } elseif (isset($title['assignmentPoint'])) {
-                                      ?>
-                                      <p style="color: white;">out of
-                                        <?php echo $title['assignmentPoint'] ?>
-                                      </p>
-                                      <?php
-                                    }
-                                    ?>
+                                    <p style="color: white;">out of
+                                      <?php echo $title['point']; ?>
+                                    </p>
                                   </th>
                                   <?php
                                 }
@@ -288,7 +275,7 @@ $stmt->close();
                                 include("config.php");
                                 $class_id = $_GET['class_id'];
 
-                                $sqlAllStudent = "SELECT student_firstname, student_lastname FROM class_enrolled WHERE tc_id = ? AND teacher_id = ?";
+                                $sqlAllStudent = "SELECT student_id, student_firstname, student_lastname FROM class_enrolled WHERE tc_id = ? AND teacher_id = ?";
                                 $stmtAllStudent = $db->prepare($sqlAllStudent);
                                 $stmtAllStudent->execute([$class_id, $teacher_id]);
                                 $students = $stmtAllStudent->fetchAll(PDO::FETCH_ASSOC);
@@ -305,9 +292,42 @@ $stmt->close();
                                     </td>
                                     <?php
                                     foreach ($allTitles as $title) {
-                                      ?>
-                                      <td></td>
-                                      <?php
+                                      $student_id = $student['student_id'];
+                                      $title = $title['title'];
+
+                                      $sqlQuestionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND questionTitle = ?";
+                                      $stmtQuestionScore = $db->prepare($sqlQuestionScore);
+                                      $stmtQuestionScore->execute([$student_id, $title]);
+                                      $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
+
+                                      $sqlAssignmentScore = "SELECT score FROM assignmentgrade WHERE student_id = ? AND assignmentTitle = ?";
+                                      $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
+                                      $stmtAssignmentScore->execute([$student_id, $title]);
+                                      $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
+
+                                      if ($questionScore && $assignmentScore) {
+                                        ?>
+                                        <td>
+                                          <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] ?>
+                                        </td>
+                                        <?php
+                                      } elseif ($questionScore) {
+                                        ?>
+                                        <td>
+                                          <?php echo $questionScore['score'] ?>
+                                        </td>
+                                        <?php
+                                      } elseif ($assignmentScore) {
+                                        ?>
+                                        <td>
+                                          <?php echo $assignmentScore['score'] ?>
+                                        </td>
+                                        <?php
+                                      } else {
+                                        ?>
+                                        <td></td>
+                                        <?php
+                                      }
                                     }
                                     ?>
                                   </tr>
@@ -341,14 +361,11 @@ $stmt->close();
       }
 
       printBtn.addEventListener('click', function () {
-        // Prepare the content to be printed
         const printContent = preparePrintContent();
 
-        // Create a new window
         const printWindow = window.open('', '_blank');
         printWindow.document.write(printContent.innerHTML);
 
-        // Close the document and trigger printing
         printWindow.document.close();
         printWindow.print();
         printWindow.close();

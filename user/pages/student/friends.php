@@ -191,7 +191,7 @@ $stmt->close();
                   $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
                   $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
                   ?>
-                  <div class="col-md-3 mb-4">
+                  <div class="col-md-4 mb-4">
                     <a href="studentView_profile.php?user_id=<?php echo $friend_id ?>" class="course">
                       <div class="card card-tale justify-content-center align-items-center"
                         style="background-image: url(assets/image/user.png);">

@@ -180,12 +180,12 @@ if ($teacher_id) {
       <div class="main-panel">
         <div class="header-sticky">
           <div class="header-links">
-            <a class="btn-success" href="class_course.php?class_id=<?php echo $class_id ?>"><i
+            <a class="btn-success" href="class_course.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"><i
                 class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-            <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>" class="people"
+            <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="people"
               style="margin-left: 2vh;">Assigned</a>
-            <a href="todolist_missing.php?class_id=<?php echo $class_id ?>" class="people">Missing</a>
-            <a href="todolist_done.php?class_id=<?php echo $class_id ?>" class="nav-link active">Done</a>
+            <a href="todolist_missing.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="people">Missing</a>
+            <a href="todolist_done.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="nav-link active">Done</a>
           </div>
         </div>
         <div class="content-wrapper align-items-center justify-content-center" style="margin-top: 10vh;">

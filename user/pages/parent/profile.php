@@ -7,59 +7,61 @@ if (!isset($_SESSION['user_id'])) {
   exit();
 }
 
-$teacher_id = $_SESSION['user_id'];
 $user_id = $_SESSION['user_id'];
 
-$sql_profile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-$stmt = $conn->prepare($sql_profile);
+$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+$stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $stmt->bind_result($profile);
 $stmt->fetch();
 $stmt->close();
 
-if (isset($_GET['user_id'])) {
-  $getUser_id = $_GET['user_id'];
+if (isset($_POST['submit'])) {
+  if (isset($_FILES['profile']) && !empty($_FILES['profile']['name'])) {
+    $upload_directory = 'assets/image/';
+    if ($_FILES['profile']['error'] === UPLOAD_ERR_OK) {
+      $file_name = basename($_FILES['profile']['name']);
+      $target_path = $file_name;
+      if (move_uploaded_file($_FILES['profile']['tmp_name'], $upload_directory . $file_name)) {
+        $update_status_sql = "UPDATE user_profile SET profile_status = 'old' WHERE user_id = ?";
+        $stmt_update_status = $conn->prepare($update_status_sql);
+        $stmt_update_status->execute([$user_id]);
+
+        $insert_sql = "INSERT INTO user_profile (user_id, profile, profile_status) VALUES (?, ?, 'recent')";
+        $stmt_insert = $conn->prepare($insert_sql);
+        $result = $stmt_insert->execute([$user_id, $target_path]);
+
+        if ($result) {
+          header("Location: profile.php");
+          exit;
+        } else {
+          echo "Error updating profile picture.";
+        }
+      } else {
+        echo "Error uploading the profile picture.";
+      }
+    } else {
+      echo "Error: Profile picture upload failed with error code " . $_FILES['profile']['error'];
+    }
+  }
 }
 
-$otherUser_id = $getUser_id;
-
-$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $otherUser_id);
-$stmt->execute();
-$stmt->bind_result($otherProfile);
-$stmt->fetch();
-$stmt->close();
-
-$sql_student_info = "SELECT address, firstname, middlename, lastname, grade_level, department, section, usertype FROM user_account WHERE user_id=?";
+$sql_student_info = "SELECT email, address, contact, firstname, middlename, lastname, children, usertype FROM user_account WHERE user_id=?";
 $stmt = $conn->prepare($sql_student_info);
 
 if ($stmt) {
-  $stmt->bind_param("i", $otherUser_id);
+  $stmt->bind_param("i", $user_id);
   $stmt->execute();
-  $stmt->bind_result($address, $firstname, $middlename, $lastname, $grade_level, $department, $section, $usertype);
+  $stmt->bind_result($email, $address, $contact, $firstname, $middlename, $lastname, $children, $usertype);
   $stmt->fetch();
   $stmt->close();
-}
-
-
-if (isset($_POST['add_student'])) {
-  $user_id = $_SESSION['user_id'];
-  $student_id = $_GET['user_id'];
-  $firstLetterOfMiddlename = ucfirst(substr($middlename, 0, 1));
-  $name = $firstname . ' ' . $firstLetterOfMiddlename . '. ' . $lastname;
-
-  $sql_addFriend = "INSERT INTO student (user_id, student_id, name) VALUES (?, ?, ?)";
-  $stmt_addFriend = $conn->prepare($sql_addFriend);
-  $result = $stmt_addFriend->execute([$user_id, $student_id, $name]);
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Talisay Senior High School LMS User</title>
@@ -164,7 +166,7 @@ if (isset($_POST['add_student'])) {
     </nav>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item mb-3">
             <a class="nav-link" href="index.php">
@@ -173,38 +175,16 @@ if (isset($_POST['add_student'])) {
             </a>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" href="course.php">
-              <i class="menu-icon"><i class="bi bi-journals"></i></i>
-              <span class="menu-title">Courses</span>
-            </a>
-          </li>
-          <li class="nav-item mb-3">
-            <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false"
-              aria-controls="form-elements">
+            <a class="nav-link" href="children.php">
               <i class="menu-icon"><i class="bi bi-people"></i></i>
-              <span class="menu-title">Users</span>
-              <i class="menu-arrow"></i>
+              <span class="menu-title">My Children</span>
             </a>
-            <div class="collapse" id="form-elements">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
-              </ul>
-            </div>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+            <a class="nav-link" href="grade_report.php">
               <i class="menu-icon"><i class="bi bi-exclamation-triangle"></i></i>
-              <span class="menu-title">Reports</span>
-              <i class="menu-arrow"></i>
+              <span class="menu-title">Children Grade Report</span>
             </a>
-            <div class="collapse" id="charts">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"> <a class="nav-link"
-                    href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a></li>
-                <li class="nav-item"> <a class="nav-link"
-                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a></li>
-              </ul>
-            </div>
           </li>
           <li class="nav-item mb-3">
             <a class="nav-link" href="feedback.php">
@@ -223,7 +203,7 @@ if (isset($_POST['add_student'])) {
                   <div class="row justify-content-between">
                     <div class="col-md-3">
                       <div class="circle-image"
-                        style="margin-left: 20px; background-image: url('<?php echo empty($otherProfile) ? '../student/images/profile.png' : '../student/assets/image/' . $otherProfile; ?>');">
+                        style="margin-left: 20px; background-image: url('<?php echo empty($profile) ? 'images/profile.png' : 'assets/image/' . $profile; ?>');">
                       </div>
                     </div>
                     <div class="col-md-6 d-flex align-items-center mt-3">
@@ -231,9 +211,6 @@ if (isset($_POST['add_student'])) {
                         <h2>
                           <?php echo $firstname . " " . (!empty($middlename) ? strtoupper(substr($middlename, 0, 1)) . "." : "") . " " . $lastname ?>
                         </h2>
-                        <h3 class="mt-2" style="color: green;">
-                          <?php echo strtoupper($department) ?>
-                        </h3>
                         <p class="text-body-secondary">(
                           <?php echo $usertype ?>)
                         </p>
@@ -241,91 +218,36 @@ if (isset($_POST['add_student'])) {
                     </div>
                     <div class="col-md-3">
                       <div class="d-flex flex-column justify-content-between h-100">
-                        <?php
-                        include("config.php");
-
-                        if (isset($_POST['unfriend'])) {
-                          $sql_deleteFriendship = "DELETE FROM student WHERE (user_id = ? AND student_id = ?) OR (user_id = ? AND student_id = ?)";
-                          $stmt_deleteFriendship = $db->prepare($sql_deleteFriendship);
-                          $stmt_deleteFriendship->execute([$user_id, $otherUser_id, $otherUser_id, $user_id]);
-                        }
-
-                        $isFriend = false;
-
-                        $sql_addedFriend = "SELECT student_id FROM student WHERE user_id = ? AND student_id = ?";
-                        $stmt_addedFriend = $db->prepare($sql_addedFriend);
-                        $result = $stmt_addedFriend->execute([$user_id, $otherUser_id]);
-
-                        if ($stmt_addedFriend->rowCount() > 0) {
-                          $isFriend = true;
-                        }
-                        ?>
                         <div></div>
                         <div class="text-right">
-                          <?php if ($isFriend): ?>
-                            <button class="btn unfriend" type="button" data-bs-toggle="modal"
-                              data-bs-target="#staticBackdropUnfriend" style="color: red;">
-                              <i class="bi bi-trash"></i> Unfriend
-                            </button>
-                          <?php else: ?>
-                            <button class="btn add-student" type="button" data-bs-toggle="modal"
-                              data-bs-target="#staticBackdropAddFriend" style="color: green;">
-                              + Add Student
-                            </button>
-                          <?php endif; ?>
+                          <button class="btn edit" type="button" data-bs-toggle="modal"
+                            data-bs-target="#staticBackdrop">
+                            Edit Profile
+                          </button>
+                          <form action="" method="post" enctype="multipart/form-data">
+                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static"
+                              data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                              aria-hidden="true">
+                              <div class="modal-dialog" style="width: 50vh; margin-top: 25vh;">
+                                <div class="modal-content">
+                                  <div class="modal-body">
+                                    <div class="text-start mb-3">
+                                      <label for="fileInput" class="form-label mb-3">Upload Profile</label>
+                                      <input type="file" name="profile" class="form-control" id="fileInput"
+                                        accept="image/*" capture="camera">
+                                    </div>
+                                    <div class="modal-button mt-3 d-flex justify-content-end align-items-end">
+                                      <button type="button" class="btn" data-bs-dismiss="modal"
+                                        style="margin-right: 2vh; padding: 0; outline: none;">Cancel</button>
+                                      <button type="submit" class="btn" name="submit"
+                                        style="color: green; margin-top: 2vh; padding: 0; outline: none;">Submit</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
                         </div>
-                        <form action="" method="post">
-                          <div class="modal fade" id="staticBackdropUnfriend" data-bs-backdrop="static"
-                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header" style="border: none;">
-                                  <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                                    Remove Student
-                                  </h1>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                  <h3>Remove
-                                    <?php echo $firstname . ' ' . $lastname ?> from your students.
-                                  </h3>
-                                  <p class="text-body-secondary">If you wish to cancel, press the x button.</p>
-                                </div>
-                                <div class="modal-footer" style="border: none;">
-                                  <button type="submit" name="unfriend" class="btn btn-danger">Unfriend</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </form>
-                        <form action="" method="post">
-                          <div class="modal fade" id="staticBackdropAddFriend" data-bs-backdrop="static"
-                            data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header" style="border: none;">
-                                  <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                                    Add Student
-                                  </h1>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                  <h3>Add
-                                    <?php echo $firstname . ' ' . $lastname ?> as your student.
-                                  </h3>
-                                  <p class="text-body-secondary">If you wish to cancel, press the x button.</p>
-                                </div>
-                                <div class="modal-footer" style="border: none;">
-                                  <button type="submit" name="add_student" class="btn btn-success">Add Student</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </form>
                       </div>
                     </div>
                   </div>
@@ -353,23 +275,26 @@ if (isset($_POST['add_student'])) {
                         <h3 class="mb-3">Basic Information</h3>
                         <ul>
                           <li>
-                            <p>Department:
-                              <?php echo strtoupper($department) ?>
-                            </p>
-                          </li>
-                          <li>
-                            <p>Section:
-                              <?php echo $section ?>
-                            </p>
-                          </li>
-                          <li>
-                            <p>Year Level:
-                              <?php echo $grade_level ?>
+                            <p>Children:
+                              <?php echo $children ?>
                             </p>
                           </li>
                           <li>
                             <p>House Address:
                               <?php echo $address ?>
+                            </p>
+                          </li>
+                        </ul>
+                        <h3 class="mt-4">Contact Information</h3>
+                        <ul>
+                          <li>
+                            <p>Email Address:
+                              <?php echo $email ?>
+                            </p>
+                          </li>
+                          <li>
+                            <p>Contact Number:
+                              <?php echo $contact ?>
                             </p>
                           </li>
                         </ul>
