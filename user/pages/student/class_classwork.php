@@ -751,7 +751,6 @@ $stmt->closeCursor();
     <script>
       $(document).ready(function () {
         $(".body-card button").click(function () {
-          // Toggle the background color between #ccc and transparent
           if ($(this).css("background-color") === "rgba(0, 0, 0, 0)") {
             $(this).css("background-color", "#ccc");
           } else {

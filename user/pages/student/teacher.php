@@ -30,6 +30,8 @@ $stmt->close();
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <!-- endinject -->
   <!-- Plugin css for this page -->
   <!-- End plugin css for this page -->
@@ -182,44 +184,62 @@ $stmt->close();
           $sql_selectTeacher = "SELECT * FROM teacher WHERE user_id = ?";
           $stmt_selectTeacher = $db->prepare($sql_selectTeacher);
           $result = $stmt_selectTeacher->execute([$user_id]);
+          $teachersExist = false;
 
           if ($result) {
+            $teachersExist = $stmt_selectTeacher->rowCount() > 0;
+            if($teachersExist) {
+              ?>
+              <div class="row">
+                <?php
+                while ($row = $stmt_selectTeacher->fetch(PDO::FETCH_ASSOC)) {
+                  $teacher_id = $row['teacher_id'];
+                  $teacher_name = $row['name'];
+  
+                  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                  $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                  $profile_result = $stmt_selectProfile->execute([$teacher_id]);
+  
+                  $defaultProfile = "images/profile.png";
+  
+                  if ($profile_result) {
+                    $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                    $otherProfile = $profile_row['profile'];
+                    $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
+                    ?>
+                    <div class="col-md-4 mb-4">
+                      <a href="teacherView_profile.php?user_id=<?php echo $teacher_id ?>" class="course">
+                        <div class="card card-tale justify-content-center align-items-center"
+                          style="background-image: url(assets/image/user.png);">
+                          <div class="circle-image mt-4 mb-3">
+                            <img src="../teacher/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
+                            onerror="this.src='images/profile.png'">
+                          </div>
+                          <p class="text-body-secondary mb-4" style="font-size: 20px;">
+                            <?php echo $teacher_name ?>
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                    <?php
+                  }
+                }
+                ?>
+              </div>
+              <?php
+            }
+          }
+          if (!$teachersExist) {
             ?>
             <div class="row">
-              <?php
-              while ($row = $stmt_selectTeacher->fetch(PDO::FETCH_ASSOC)) {
-                $teacher_id = $row['teacher_id'];
-                $teacher_name = $row['name'];
-
-                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                $profile_result = $stmt_selectProfile->execute([$teacher_id]);
-
-                $defaultProfile = "images/profile.png";
-
-                if ($profile_result) {
-                  $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                  $otherProfile = $profile_row['profile'];
-                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
-                  ?>
-                  <div class="col-md-4 mb-4">
-                    <a href="teacherView_profile.php?user_id=<?php echo $teacher_id ?>" class="course">
-                      <div class="card card-tale justify-content-center align-items-center"
-                        style="background-image: url(assets/image/user.png);">
-                        <div class="circle-image mt-4 mb-3">
-                          <img src="../teacher/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
-                          onerror="this.src='images/profile.png'">
-                        </div>
-                        <p class="text-body-secondary mb-4" style="font-size: 20px;">
-                          <?php echo $teacher_name ?>
-                        </p>
-                      </div>
-                    </a>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>You have no teacher.</h3>
+                    <p class="text-body-secondary">You can add / remove teacher.</p>
                   </div>
-                  <?php
-                }
-              }
-              ?>
+                </div>
+              </div>
             </div>
             <?php
           }

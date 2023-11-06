@@ -290,7 +290,7 @@ if (isset($_POST['archive'])) {
             </div>
             <div class="col">
               <h2>
-                Created Courses
+                Ongoing Courses
               </h2>
               <p class="text-body-secondary">
                 (Teacher)
@@ -321,90 +321,103 @@ if (isset($_POST['archive'])) {
             $result = $stmt->get_result();
             ?>
             <?php
-            while ($row = mysqli_fetch_assoc($result)) {
-              $_SESSION['class_name'] = $row['class_name'];
-              $_SESSION['section'] = $row['section'];
-              $firstName = ucfirst(strtolower($_SESSION['first_name']));
-              $lastName = ucfirst(strtolower($_SESSION['last_name']));
-              $_SESSION['teacher_name'] = $firstName . " " . $lastName;
+            if ($result->num_rows > 0) {
+              while ($row = mysqli_fetch_assoc($result)) {
+                $_SESSION['class_name'] = $row['class_name'];
+                $_SESSION['section'] = $row['section'];
+                $firstName = ucfirst(strtolower($_SESSION['first_name']));
+                $lastName = ucfirst(strtolower($_SESSION['last_name']));
+                $_SESSION['teacher_name'] = $firstName . " " . $lastName;
 
-              $class_id = $row['class_id']; // Assuming you have a class_id column
-              $sql = "SELECT theme FROM class_theme WHERE teacher_id = :teacher_id AND class_id = :class_id AND theme_status = 'recent'";
-              $stmt = $db->prepare($sql);
-              $stmt->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
-              $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
-              $stmt->execute();
-              $themeData = $stmt->fetch(PDO::FETCH_ASSOC);
-              $stmt->closeCursor();
+                $class_id = $row['class_id'];
+                $sql = "SELECT theme FROM class_theme WHERE teacher_id = :teacher_id AND class_id = :class_id AND theme_status = 'recent'";
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
+                $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $themeData = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt->closeCursor();
 
-              if ($themeData) {
-                $theme = $themeData['theme'];
-              } else {
-                $theme = 'background-color: green';
-              }
-              ?>
-              <div class="col-md-4 grid-margin transparent">
-                <div class="card card-tale text-center"
-                  style="height: 50vh; flex-direction: column; justify-content: space-between;">
-                  <a href="class_course.php?class_id=<?php echo $row['class_id']; ?>&class_name=<?php echo $row['class_name'] ?>"
-                    class="course">
-                    <div class="card-header"
-                      style="text-align: left; background-image: url(assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">
-                      <div class="course-top">
-                        <p class="course-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $row['class_name'] ?>
-                        </p>
-                        <p class="course-section" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $row['section'] ?>
-                        </p>
+                if ($themeData) {
+                  $theme = $themeData['theme'];
+                } else {
+                  $theme = 'background-color: green';
+                }
+                ?>
+                <div class="col-md-4 grid-margin transparent">
+                  <div class="card card-tale text-center"
+                    style="height: 50vh; flex-direction: column; justify-content: space-between;">
+                    <a href="class_course.php?class_id=<?php echo $row['class_id']; ?>&class_name=<?php echo $row['class_name'] ?>"
+                      class="course">
+                      <div class="card-header"
+                        style="text-align: left; background-image: url(assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">
+                        <div class="course-top">
+                          <p class="course-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $row['class_name'] ?>
+                          </p>
+                          <p class="course-section" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $row['section'] ?>
+                          </p>
+                        </div>
+                        <?php
+                        $firstName = ucfirst(strtolower($_SESSION['first_name']));
+                        $lastName = ucfirst(strtolower($_SESSION['last_name']));
+                        $_SESSION['teacher_name'] = $firstName . " " . $lastName;
+                        echo "<p class='course-teacher'>" . $firstName . " " . $lastName . "</p>";
+                        ?>
+
+                        <div class="circle-image" id="circle-image">
+                          <img src="assets/image/<?php echo $profile ?>" alt="profile"
+                            onerror="this.src='images/profile.png'">
+                        </div>
                       </div>
-                      <?php
-                      $firstName = ucfirst(strtolower($_SESSION['first_name']));
-                      $lastName = ucfirst(strtolower($_SESSION['last_name']));
-                      $_SESSION['teacher_name'] = $firstName . " " . $lastName;
-                      echo "<p class='course-teacher'>" . $firstName . " " . $lastName . "</p>";
-                      ?>
+                    </a>
+                    <form action="" method="post">
+                      <div class="card-footer d-flex justify-content-end">
+                        <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
+                          <h5>Archive <i class="bi bi-archive" style="font-size: 20px;"></i></i></h5>
+                        </button>
+                        <div class="modal fade" id="staticBackdrop<?php echo $row['class_id']; ?>" data-bs-backdrop="static"
+                          data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                          <div class="modal-dialog" style="width: 50vh; margin-top: 25vh;">
+                            <div class="modal-content">
+                              <div class="modal-body">
+                                <div class="text-start">
+                                  <h3>Archive
+                                    <?php echo $row['class_name'] ?>?
+                                  </h3>
+                                  <p class="text-body-secondary mt-3">Class will be moved to the archived courses.</p>
+                                  <p class="text-body-secondary mt-3">Do you want to archive this class?</p>
+                                  <p class="text-body-secondary mt-3">Press click archive button if yes.</p>
+                                </div>
+                                <input type="hidden" name="class_id" value="<?php echo $row['class_id']; ?>">
 
-                      <div class="circle-image" id="circle-image">
-                        <img src="assets/image/<?php echo $profile ?>" alt="profile"
-                          onerror="this.src='images/profile.png'">
-                      </div>
-                    </div>
-                  </a>
-                  <form action="" method="post">
-                    <div class="card-footer d-flex justify-content-end">
-                      <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
-                        <h5>Archive <i class="bi bi-archive" style="font-size: 20px;"></i></i></h5>
-                      </button>
-                      <div class="modal fade" id="staticBackdrop<?php echo $row['class_id']; ?>" data-bs-backdrop="static"
-                        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog" style="width: 50vh; margin-top: 25vh;">
-                          <div class="modal-content">
-                            <div class="modal-body">
-                              <div class="text-start">
-                                <h3>Archive
-                                  <?php echo $row['class_name'] ?>?
-                                </h3>
-                                <p class="text-body-secondary mt-3">Class will be moved to the archived courses.</p>
-                                <p class="text-body-secondary mt-3">Do you want to archive this class?</p>
-                                <p class="text-body-secondary mt-3">Press click archive button if yes.</p>
-                              </div>
-                              <input type="hidden" name="class_id" value="<?php echo $row['class_id']; ?>">
-
-                              <div class="modal-button mt-3 d-flex justify-content-end align-items-end">
-                                <button type="button" class="btn" data-bs-dismiss="modal"
-                                  style="margin-right: 2vh; padding: 0;">Cancel</button>
-                                <button type="submit" class="btn"
-                                  name="archive"
-                                  style="color: green; margin-top: 2vh; padding: 0;">Archive</button>
+                                <div class="modal-button mt-3 d-flex justify-content-end align-items-end">
+                                  <button type="button" class="btn" data-bs-dismiss="modal"
+                                    style="margin-right: 2vh; padding: 0;">Cancel</button>
+                                  <button type="submit" class="btn" name="archive"
+                                    style="color: green; margin-top: 2vh; padding: 0;">Archive</button>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </form>
+                    </form>
+                  </div>
+                </div>
+                <?php
+              }
+            } else {
+              ?>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>No Created Courses.</h3>
+                    <p class="text-body-secondary">Create your course subject to interact with your students.</p>
+                    <p style="color: green;">Click the + button from the right-header to input and create course subject.</p>
+                  </div>
                 </div>
               </div>
               <?php

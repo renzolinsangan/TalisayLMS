@@ -252,7 +252,7 @@ $stmt->closeCursor();
         <div class="content-wrapper">
           <div class="row">
             <div class="col mb-2">
-              <h2>Enrolled Courses</h2>
+              <h2>Enrolled Ongoing Courses</h2>
               <p class="text-body-secondary">(Student)</p>
             </div>
           </div>
@@ -324,96 +324,110 @@ $stmt->closeCursor();
             $result = $stmt_enrolled->get_result();
             ?>
             <?php
-            while ($row = mysqli_fetch_assoc($result)) {
-              $_SESSION['class_id'] = $row['class_id'];
-              $_SESSION['class_name'] = $row['class_name'];
-              $_SESSION['section'] = $row['section'];
-              $_SESSION['first_name'] = $row['first_name'];
-              $_SESSION['last_name'] = $row['last_name'];
-              $_SESSION['teacher_id'] = $row['teacher_id'];
+            if ($result->num_rows > 0) {
+              while ($row = mysqli_fetch_assoc($result)) {
+                $_SESSION['class_id'] = $row['class_id'];
+                $_SESSION['class_name'] = $row['class_name'];
+                $_SESSION['section'] = $row['section'];
+                $_SESSION['first_name'] = $row['first_name'];
+                $_SESSION['last_name'] = $row['last_name'];
+                $_SESSION['teacher_id'] = $row['teacher_id'];
 
-              $sql_teacher_profile = "SELECT profile FROM user_profile WHERE user_id = :teacher_id AND profile_status = 'recent'";
-              $stmt_teacher_profile = $db->prepare($sql_teacher_profile);
-              $stmt_teacher_profile->bindParam(':teacher_id', $_SESSION['teacher_id'], PDO::PARAM_INT);
-              $stmt_teacher_profile->execute();
-              $teacher_profile_data = $stmt_teacher_profile->fetch(PDO::FETCH_ASSOC);
-              $stmt_teacher_profile->closeCursor();
+                $sql_teacher_profile = "SELECT profile FROM user_profile WHERE user_id = :teacher_id AND profile_status = 'recent'";
+                $stmt_teacher_profile = $db->prepare($sql_teacher_profile);
+                $stmt_teacher_profile->bindParam(':teacher_id', $_SESSION['teacher_id'], PDO::PARAM_INT);
+                $stmt_teacher_profile->execute();
+                $teacher_profile_data = $stmt_teacher_profile->fetch(PDO::FETCH_ASSOC);
+                $stmt_teacher_profile->closeCursor();
 
-              if ($teacher_profile_data) {
-                $teacher_profile = $teacher_profile_data['profile'];
-              }
+                if ($teacher_profile_data) {
+                  $teacher_profile = $teacher_profile_data['profile'];
+                }
 
-              $sql = "SELECT theme FROM class_theme WHERE teacher_id = :teacher_id AND class_name = :class_name AND theme_status = 'recent'";
-              $stmt = $db->prepare($sql);
-              $stmt->bindParam(':teacher_id', $_SESSION['teacher_id'], PDO::PARAM_INT);
-              $stmt->bindParam(':class_name', $_SESSION['class_name'], PDO::PARAM_STR);
-              $stmt->execute();
-              $themeData = $stmt->fetch(PDO::FETCH_ASSOC);
-              $stmt->closeCursor();
+                $sql = "SELECT theme FROM class_theme WHERE teacher_id = :teacher_id AND class_name = :class_name AND theme_status = 'recent'";
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(':teacher_id', $_SESSION['teacher_id'], PDO::PARAM_INT);
+                $stmt->bindParam(':class_name', $_SESSION['class_name'], PDO::PARAM_STR);
+                $stmt->execute();
+                $themeData = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt->closeCursor();
 
-              if ($themeData) {
-                $theme = $themeData['theme'];
-              } else {
-                $theme = 'background-color: green';
-              }
-              ?>
-              <div class="col-md-4 grid-margin transparent">
-                <div class="card card-tale text-center"
-                  style="height: 50vh; flex-direction: column; justify-content: space-between;">
-                  <a href="class_course.php?class_id=<?php echo $row['class_id']; ?>" class="course">
-                    <div class="card-header"
-                      style="text-align: left; background-image: url(../teacher/assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">
-                      <div class="course-top">
-                        <p class="course-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $row['class_name'] ?>
-                        </p>
-                        <p class="course-section" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $row['section'] ?>
-                        </p>
+                if ($themeData) {
+                  $theme = $themeData['theme'];
+                } else {
+                  $theme = 'background-color: green';
+                }
+                ?>
+                <div class="col-md-4 grid-margin transparent">
+                  <div class="card card-tale text-center"
+                    style="height: 50vh; flex-direction: column; justify-content: space-between;">
+                    <a href="class_course.php?class_id=<?php echo $row['class_id']; ?>" class="course">
+                      <div class="card-header"
+                        style="text-align: left; background-image: url(../teacher/assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">
+                        <div class="course-top">
+                          <p class="course-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $row['class_name'] ?>
+                          </p>
+                          <p class="course-section" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $row['section'] ?>
+                          </p>
+                        </div>
+                        <?php
+                        $firstName = ucfirst(strtolower($_SESSION['first_name']));
+                        $lastName = ucfirst(strtolower($_SESSION['last_name']));
+                        $_SESSION['teacher_name'] = $firstName . " " . $lastName;
+                        echo "<p class='course-teacher'>" . $firstName . " " . $lastName . "</p>";
+                        ?>
+                        <div class="circle-image" id="circle-image">
+                          <img src="../teacher/assets/image/<?php echo $teacher_profile ?>" alt="profile"
+                            onerror="this.src='images/profile.png'">
+                        </div>
                       </div>
-                      <?php
-                      $firstName = ucfirst(strtolower($_SESSION['first_name']));
-                      $lastName = ucfirst(strtolower($_SESSION['last_name']));
-                      $_SESSION['teacher_name'] = $firstName . " " . $lastName;
-                      echo "<p class='course-teacher'>" . $firstName . " " . $lastName . "</p>";
-                      ?>
-                      <div class="circle-image" id="circle-image">
-                        <img src="../teacher/assets/image/<?php echo $teacher_profile ?>" alt="profile"
-                          onerror="this.src='images/profile.png'">
-                      </div>
-                    </div>
-                  </a>
-                  <div class="card-footer d-flex justify-content-end">
-                    <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
-                      data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
-                      <h5>Unenroll <i class="bi bi-journal-x" style="font-size: 20px;"></i></h5>
-                    </button>
-                    <div class="modal fade" id="staticBackdrop<?php echo $row['class_id']; ?>" data-bs-backdrop="static"
-                      data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                      <div class="modal-dialog" style="width: 50vh; margin-top: 25vh;">
-                        <div class="modal-content">
-                          <div class="modal-body">
-                            <div class="text-start">
-                              <h3>Unenroll from
-                                <?php echo $row['class_name'] ?>?
-                              </h3>
-                              <p class="text-body-secondary mt-3">You will be removed from this class.</p>
-                              <p class="text-body-secondary mt-3">Do you want to leave from this class?</p>
-                              <p class="text-body-secondary mt-3">Press unenroll button if yes.</p>
-                            </div>
+                    </a>
+                    <div class="card-footer d-flex justify-content-end">
+                      <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
+                        <h5>Unenroll <i class="bi bi-journal-x" style="font-size: 20px;"></i></h5>
+                      </button>
+                      <div class="modal fade" id="staticBackdrop<?php echo $row['class_id']; ?>" data-bs-backdrop="static"
+                        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog" style="width: 50vh; margin-top: 25vh;">
+                          <div class="modal-content">
+                            <div class="modal-body">
+                              <div class="text-start">
+                                <h3>Unenroll from
+                                  <?php echo $row['class_name'] ?>?
+                                </h3>
+                                <p class="text-body-secondary mt-3">You will be removed from this class.</p>
+                                <p class="text-body-secondary mt-3">Do you want to leave from this class?</p>
+                                <p class="text-body-secondary mt-3">Press unenroll button if yes.</p>
+                              </div>
 
-                            <div class="modal-button mt-3 d-flex justify-content-end align-items-end">
-                              <button type="button" class="btn" data-bs-dismiss="modal"
-                                style="margin-right: 2vh; padding: 0;">Cancel</button>
-                              <a href="delete_course.php?deleteid=<?php echo $row['class_id'] ?>">
-                                <button type="button" class="btn"
-                                  style="color: green; margin-top: 2vh; padding: 0;">Unenroll</button>
-                              </a>
+                              <div class="modal-button mt-3 d-flex justify-content-end align-items-end">
+                                <button type="button" class="btn" data-bs-dismiss="modal"
+                                  style="margin-right: 2vh; padding: 0;">Cancel</button>
+                                <a href="delete_course.php?deleteid=<?php echo $row['class_id'] ?>">
+                                  <button type="button" class="btn"
+                                    style="color: green; margin-top: 2vh; padding: 0;">Unenroll</button>
+                                </a>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+                <?php
+              }
+            } else {
+              ?>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>No Enrolled Courses.</h3>
+                    <p class="text-body-secondary">Join from the course subject using the class code provided by your teachers.</p>
+                    <p style="color: green;">Click the + button from the header to encode the class code.</p>
                   </div>
                 </div>
               </div>

@@ -140,7 +140,7 @@ if (!isset($_SESSION['id'])) {
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link" href="student_report.php">Student Reports</a></li>
                 <li class="nav-item"> <a class="nav-link" href="teacher_report.php">Teacher Reports</a></li>
-                <li class="nav-item"> <a class="nav-link" href="grade_report.php">Report of Grades</a></li>
+                <li class="nav-item"> <a class="nav-link" href="parent_report.php">Parent Reports</a></li>
               </ul>
             </div>
           </li>

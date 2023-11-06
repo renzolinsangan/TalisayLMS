@@ -190,44 +190,62 @@ $stmt->close();
           $sql_selectStudent = "SELECT * FROM student WHERE user_id = ?";
           $stmt_selectStudent = $db->prepare($sql_selectStudent);
           $result = $stmt_selectStudent->execute([$user_id]);
+          $studentsExist = false;
 
           if ($result) {
+            $studentsExist = $stmt_selectStudent->rowCount() > 0;
+            if($studentsExist) {
+              ?>
+              <div class="row">
+                <?php
+                while ($row = $stmt_selectStudent->fetch(PDO::FETCH_ASSOC)) {
+                  $student_id = $row['student_id'];
+                  $student_name = $row['name'];
+  
+                  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                  $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                  $profile_result = $stmt_selectProfile->execute([$student_id]);
+  
+                  $defaultProfile = "images/profile.png";
+  
+                  if ($profile_result) {
+                    $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                    $otherProfile = $profile_row['profile'];
+                    $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
+                    ?>
+                    <div class="col-md-3 mb-4">
+                      <a href="studentView_profile.php?user_id=<?php echo $student_id ?>" class="course">
+                        <div class="card card-tale justify-content-center align-items-center"
+                          style="background-image: url(assets/image/user.png);">
+                          <div class="circle-image mt-4 mb-3">
+                            <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
+                            onerror="this.src='images/profile.png'">
+                          </div>
+                          <p class="text-body-secondary mb-4" style="font-size: 20px;">
+                            <?php echo $student_name ?>
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                    <?php
+                  }
+                }
+                ?>
+              </div>
+              <?php
+            }
+          }
+          if (!$studentsExist) {
             ?>
             <div class="row">
-              <?php
-              while ($row = $stmt_selectStudent->fetch(PDO::FETCH_ASSOC)) {
-                $student_id = $row['student_id'];
-                $student_name = $row['name'];
-
-                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                $profile_result = $stmt_selectProfile->execute([$student_id]);
-
-                $defaultProfile = "images/profile.png";
-
-                if ($profile_result) {
-                  $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                  $otherProfile = $profile_row['profile'];
-                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
-                  ?>
-                  <div class="col-md-3 mb-4">
-                    <a href="studentView_profile.php?user_id=<?php echo $student_id ?>" class="course">
-                      <div class="card card-tale justify-content-center align-items-center"
-                        style="background-image: url(assets/image/user.png);">
-                        <div class="circle-image mt-4 mb-3">
-                          <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
-                          onerror="this.src='images/profile.png'">
-                        </div>
-                        <p class="text-body-secondary mb-4" style="font-size: 20px;">
-                          <?php echo $student_name ?>
-                        </p>
-                      </div>
-                    </a>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>You have no student.</h3>
+                    <p class="text-body-secondary">You can add / remove student from your class.</p>
                   </div>
-                  <?php
-                }
-              }
-              ?>
+                </div>
+              </div>
             </div>
             <?php
           }

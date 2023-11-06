@@ -28,6 +28,8 @@ $stmt->close();
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/add_friend.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -172,43 +174,61 @@ $stmt->close();
           $sql_selectFriend = "SELECT * FROM friend WHERE user_id = ?";
           $stmt_selectFriend = $db->prepare($sql_selectFriend);
           $result = $stmt_selectFriend->execute([$user_id]);
+          $friendsExist = false;
 
           if ($result) {
+            $friendsExist = $stmt_selectFriend->rowCount() > 0;
+            if ($friendsExist) {
+              ?>
+              <div class="row">
+                <?php
+                while ($row = $stmt_selectFriend->fetch(PDO::FETCH_ASSOC)) {
+                  $friend_id = $row['friend_id'];
+                  $friend_name = $row['name'];
+
+                  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                  $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                  $profile_result = $stmt_selectProfile->execute([$friend_id]);
+
+                  $defaultProfile = "images/profile.png";
+
+                  if ($profile_result) {
+                    $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                    $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
+                    ?>
+                    <div class="col-md-4 mb-4">
+                      <a href="studentView_profile.php?user_id=<?php echo $friend_id ?>" class="course">
+                        <div class="card card-tale justify-content-center align-items-center"
+                          style="background-image: url(assets/image/user.png);">
+                          <div class="circle-image mt-4 mb-3">
+                            <img src="assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
+                              onerror="this.src='images/profile.png'">
+                          </div>
+                          <p class="text-body-secondary mb-4" style="font-size: 20px;">
+                            <?php echo $friend_name ?>
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                    <?php
+                  }
+                }
+                ?>
+              </div>
+              <?php
+            }
+          }
+          if (!$friendsExist) {
             ?>
             <div class="row">
-              <?php
-              while ($row = $stmt_selectFriend->fetch(PDO::FETCH_ASSOC)) {
-                $friend_id = $row['friend_id'];
-                $friend_name = $row['name'];
-
-                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                $profile_result = $stmt_selectProfile->execute([$friend_id]);
-
-                $defaultProfile = "images/profile.png";
-
-                if ($profile_result) {
-                  $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
-                  ?>
-                  <div class="col-md-4 mb-4">
-                    <a href="studentView_profile.php?user_id=<?php echo $friend_id ?>" class="course">
-                      <div class="card card-tale justify-content-center align-items-center"
-                        style="background-image: url(assets/image/user.png);">
-                        <div class="circle-image mt-4 mb-3">
-                          <img src="assets/image/<?php echo $otherProfile; ?>" alt="Circular Image" 
-                          onerror="this.src='images/profile.png'">
-                        </div>
-                        <p class="text-body-secondary mb-4" style="font-size: 20px;">
-                          <?php echo $friend_name ?>
-                        </p>
-                      </div>
-                    </a>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>You have no friends.</h3>
+                    <p class="text-body-secondary">You can add / remove friends.</p>
                   </div>
-                  <?php
-                }
-              }
-              ?>
+                </div>
+              </div>
             </div>
             <?php
           }
@@ -216,18 +236,18 @@ $stmt->close();
         </div>
       </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-      crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-      crossorigin="anonymous"></script>
-    <script src="../../vendors/js/vendor.bundle.base.js"></script>
-    <script src="../../js/off-canvas.js"></script>
-    <script src="../../js/hoverable-collapse.js"></script>
-    <script src="../../js/template.js"></script>
-    <script src="../../js/settings.js"></script>
-    <script src="../../js/todolist.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+        crossorigin="anonymous"></script>
+      <script src="../../vendors/js/vendor.bundle.base.js"></script>
+      <script src="../../js/off-canvas.js"></script>
+      <script src="../../js/hoverable-collapse.js"></script>
+      <script src="../../js/template.js"></script>
+      <script src="../../js/settings.js"></script>
+      <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

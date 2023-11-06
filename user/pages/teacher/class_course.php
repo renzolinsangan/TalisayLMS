@@ -303,15 +303,11 @@ if ($themeData) {
                     style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
                     <h4>Assign</h4>
                     <p class="text-body-secondary mt-3">Provide to-do list for your students.</p>
-                    <a href="toreview.php?class_id=<?php echo $class_id ?>" class="create mt-2" style="margin-left: auto; color: green;">Manage to-review</a>
+                    <a href="toreview.php?class_id=<?php echo $class_id ?>" class="create mt-2"
+                      style="margin-left: auto; color: green;">Manage to-review</a>
                   </div>
                 </div>
                 <div class="col">
-                  <div class="d-grid gap-2 col-13 mx-auto mb-4">
-                    <a class="announce" type="button" href="#" style="text-decoration: none;">
-                      Announce something to your class.
-                    </a>
-                  </div>
                   <?php
                   $material_results = [];
                   $question_results = [];
@@ -331,114 +327,122 @@ if ($themeData) {
                   $stmt_titles_assignment = $db->prepare($sql_assignment);
                   $stmt_titles_assignment->execute([$teacher_id, $class_id]);
                   $assignment_results = $stmt_titles_assignment->fetchAll();
-                  
+
                   $combined_results = array_merge($material_results, $question_results, $assignment_results);
                   usort($combined_results, function ($a, $b) {
-                      return strtotime($a['date']) - strtotime($b['date']);
+                    return strtotime($a['date']) - strtotime($b['date']);
                   });
 
-                  foreach($combined_results as $row) {
-                    if(isset($row['material_id'])) {
-                      $material_id = $row['material_id'];
-                      $title = $row['title'];
-                      $words = explode(' ', $title);
-                      $maxWords = 6;
-                      $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
-                      $date = $row['date'];
-                      $formatted_date = date("F j", strtotime($date));
-  
-                      if (count($words) > $maxWords) {
-                        $truncatedTitle .= '...';
-                      }
-  
-                      ?>
-                      <div class="d-grid gap-2 col-13 mx-auto mb-4">
-                        <a class="announce" type="button"
-                          href="#?class_id=<?php echo $class_id ?>&material_id=<?php echo $material_id ?>"
-                          style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <div
-                            style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
-                            <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
-                          </div>
-                          <p
-                            style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            Material:
-                            <?php echo $truncatedTitle ?>
-                          </p>
-                          <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
-                            <?php echo $formatted_date ?>
-                          </div>
-                        </a>
-                      </div>
-                      <?php
-                    }
-                    elseif(isset($row['question_id'])) {
-                      $question_id = $row['question_id'];
-                      $title = $row['title'];
-                      $words = explode(' ', $title);
-                      $maxWords = 6;
-                      $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
-                      $date = $row['date'];
-                      $formatted_date = date("F j", strtotime($date));
-  
-                      if (count($words) > $maxWords) {
-                        $truncatedTitle .= '...';
-                      }
+                  if (empty($combined_results)) {
+                    ?>
+                    <div class="d-grid gap-2 col-13 mx-auto mb-4">
+                      <span class="announce" type="button" href="#" style="text-decoration: none;">
+                        Create your materials in the classwork section.
+                      </span>
+                    </div>
+                    <?php
+                  } else {
+                    foreach ($combined_results as $row) {
+                      if (isset($row['material_id'])) {
+                        $material_id = $row['material_id'];
+                        $title = $row['title'];
+                        $words = explode(' ', $title);
+                        $maxWords = 6;
+                        $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                        $date = $row['date'];
+                        $formatted_date = date("F j", strtotime($date));
 
-                      ?>
-                      <div class="d-grid gap-2 col-13 mx-auto mb-4">
-                        <a class="announce" type="button"
-                          href="question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>"
-                          style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <div
-                            style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
-                            <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
-                          </div>
-                          <p
-                            style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            Question:
-                            <?php echo $truncatedTitle ?>
-                          </p>
-                          <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
-                            <?php echo $formatted_date ?>
-                          </div>
-                        </a>
-                      </div>
-                      <?php
-                    }
-                    elseif(isset($row['assignment_id'])) {
-                      $assignment_id = $row['assignment_id'];
-                      $title = $row['title'];
-                      $words = explode(' ', $title);
-                      $maxWords = 6;
-                      $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
-                      $date = $row['date'];
-                      $formatted_date = date("F j", strtotime($date));
-  
-                      if (count($words) > $maxWords) {
-                        $truncatedTitle .= '...';
-                      }
+                        if (count($words) > $maxWords) {
+                          $truncatedTitle .= '...';
+                        }
 
-                      ?>
-                      <div class="d-grid gap-2 col-13 mx-auto mb-4">
-                        <a class="announce" type="button"
-                          href="assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>"
-                          style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <div
-                            style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
-                            <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
-                          </div>
-                          <p
-                            style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            Assignment:
-                            <?php echo $truncatedTitle ?>
-                          </p>
-                          <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
-                            <?php echo $formatted_date ?>
-                          </div>
-                        </a>
-                      </div>
-                      <?php
+                        ?>
+                        <div class="d-grid gap-2 col-13 mx-auto mb-4">
+                          <a class="announce" type="button"
+                            href="#?class_id=<?php echo $class_id ?>&material_id=<?php echo $material_id ?>"
+                            style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <div
+                              style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                              <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                            </div>
+                            <p
+                              style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                              Material:
+                              <?php echo $truncatedTitle ?>
+                            </p>
+                            <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                              <?php echo $formatted_date ?>
+                            </div>
+                          </a>
+                        </div>
+                        <?php
+                      } elseif (isset($row['question_id'])) {
+                        $question_id = $row['question_id'];
+                        $title = $row['title'];
+                        $words = explode(' ', $title);
+                        $maxWords = 6;
+                        $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                        $date = $row['date'];
+                        $formatted_date = date("F j", strtotime($date));
+
+                        if (count($words) > $maxWords) {
+                          $truncatedTitle .= '...';
+                        }
+
+                        ?>
+                        <div class="d-grid gap-2 col-13 mx-auto mb-4">
+                          <a class="announce" type="button"
+                            href="question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>"
+                            style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <div
+                              style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                              <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                            </div>
+                            <p
+                              style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                              Question:
+                              <?php echo $truncatedTitle ?>
+                            </p>
+                            <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                              <?php echo $formatted_date ?>
+                            </div>
+                          </a>
+                        </div>
+                        <?php
+                      } elseif (isset($row['assignment_id'])) {
+                        $assignment_id = $row['assignment_id'];
+                        $title = $row['title'];
+                        $words = explode(' ', $title);
+                        $maxWords = 6;
+                        $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                        $date = $row['date'];
+                        $formatted_date = date("F j", strtotime($date));
+
+                        if (count($words) > $maxWords) {
+                          $truncatedTitle .= '...';
+                        }
+
+                        ?>
+                        <div class="d-grid gap-2 col-13 mx-auto mb-4">
+                          <a class="announce" type="button"
+                            href="assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>"
+                            style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <div
+                              style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                              <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                            </div>
+                            <p
+                              style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                              Assignment:
+                              <?php echo $truncatedTitle ?>
+                            </p>
+                            <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                              <?php echo $formatted_date ?>
+                            </div>
+                          </a>
+                        </div>
+                        <?php
+                      }
                     }
                   }
                   ?>

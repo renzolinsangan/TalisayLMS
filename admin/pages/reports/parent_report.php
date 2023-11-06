@@ -17,7 +17,7 @@ if (!isset($_SESSION['id'])) {
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="assets/css/grade_report.css">
+  <link rel="stylesheet" href="assets/css/report_teacher.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
 </head>
 
@@ -140,7 +140,7 @@ if (!isset($_SESSION['id'])) {
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link" href="student_report.php">Student Reports</a></li>
                 <li class="nav-item"> <a class="nav-link" href="teacher_report.php">Teacher Reports</a></li>
-                <li class="nav-item"> <a class="nav-link" href="grade_report.php">Report of Grades</a></li>
+                <li class="nav-item"> <a class="nav-link" href="parent_report.php">Parent Reports</a></li>
               </ul>
             </div>
           </li>
@@ -154,90 +154,117 @@ if (!isset($_SESSION['id'])) {
       </nav>
       <div class="main-panel">
         <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
-          <a href="grade_report.php" class="nav-link active" style="margin-left: 5vh;">All</a>
-          <a href="grade_reportstem.php" class="stem">STEM</a>
-          <a href="grade_reporthumss.php" class="humss">HUMSS</a>
-          <a href="grade_reportabm.php" class="abm">ABM</a>
-          <a href="grade_reporttvl.php" class="mechanic">TVL</a>
+          <a href="parent_report.php" class="nav-link active" style="margin-left: 5vh;">All</a>
         </div>
         <div class="content-wrapper">
-          <div class="row">
-            <div class="col-12 grid-margin stretch-card" style="margin-left: -20px;">
-              <div class="card">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="card-body">
-                      <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">All Report of Grades</h1>
-                      <a href="#" class="btn btn-success" style="margin-left: 10px;">Download Data</a>
-                    </div>
-                  </div>
-                </div>
-
+          <button id="print" class="btn btn-success mb-2">Download Data</button>
+          <div id="print-content">
+            <div class="row">
+              <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                       <div class="card-body">
-                        <div class="table-responsive">
-                          <table class="table text-center">
-                            <thead class="table" style="background-color: #4BB543; color: white;">
-                              <tr>
-                                <th scope="col">Student's Name</th>
-                                <th scope="col">Grade Level</th>
-                                <th scope="col">Department</th>
-                                <th scope="col">Section</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <?php
-                              include("db_conn.php");
-                              $sql = "SELECT * FROM user_account WHERE usertype = 'student'";
-                              $result = mysqli_query($conn, $sql);
-
-                              while ($row = mysqli_fetch_assoc($result)) {
-                                ?>
+                        <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">All
+                          Parent Reports</h1>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="card-body">
+                          <div class="table-responsive">
+                            <table class="table text-center">
+                              <thead class="table" style="background-color: #4BB543; color: white;">
                                 <tr>
-                                  <td>
-                                    <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
-                                  </td>
-                                  <td>
-                                    <?php echo $row['grade_level'] ?>
-                                  </td>
-                                  <td>
-                                    <?php echo strtoupper($row['department']) ?>
-                                  </td>
-                                  <td>
-                                    <?php echo $row['section'] ?>
-                                  </td>
+                                  <th scope="col">Parent's Name</th>
+                                  <th scope="col">House Address</th>
+                                  <th scope="col">Contact Number</th>
+                                  <th scope="col">Email Address</th>
+                                  <th scope="col">Children</th>
                                 </tr>
+                              </thead>
+                              <tbody>
                                 <?php
-                              }
-                              ?>
-                            </tbody>
-                          </table>
+                                include("db_conn.php");
+                                $sql = "SELECT * FROM user_account WHERE usertype = 'parent'";
+                                $result = mysqli_query($conn, $sql);
+
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                  ?>
+                                  <tr>
+                                    <td>
+                                      <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
+                                    </td>
+                                    <td>
+                                      <?php echo $row['address']; ?>
+                                    </td>
+                                    <td>
+                                      <?php echo $row['contact']; ?>
+                                    </td>
+                                    <td>
+                                      <?php echo $row['email']; ?>
+                                    </td>
+                                    <td>
+                                      <?php echo $row['children'] ?>
+                                    </td>
+                                  </tr>
+                                  <?php
+                                }
+                                ?>
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
+
+    <script>
+      const printBtn = document.getElementById('print');
+
+      function preparePrintContent() {
+        const content = document.createElement('div');
+        content.innerHTML = '<html><head><title>Print</title></head><body>';
+        content.innerHTML += document.getElementById('print-content').innerHTML;
+        content.innerHTML += '</body></html>';
+        return content;
+      }
+
+      printBtn.addEventListener('click', function () {
+        // Prepare the content to be printed
+        const printContent = preparePrintContent();
+
+        // Create a new window
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(printContent.innerHTML);
+
+        // Close the document and trigger printing
+        printWindow.document.close();
+        printWindow.print();
+        printWindow.close();
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

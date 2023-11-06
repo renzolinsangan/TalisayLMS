@@ -190,10 +190,10 @@ $stmt_department->close();
       </nav>
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row">
+          <div class="row" style="margin-bottom: -20px;">
             <div class="col-md-12 grid-margin">
               <div class="row">
-                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                <div class="col-12 col-xl-8 mb-xl-0">
                   <h2 class="font-weight-bold">
                     Welcome Teacher
                   </h2>
@@ -205,82 +205,67 @@ $stmt_department->close();
             </div>
           </div>
           <div class="row">
-            <div class="col-md-3 grid-margin transparent">
-              <div class="card card-tale text-center">
-                <div class="card-body">
-                  <h5>STEM Department</h5>
-                  <p class="mb-3">Users</p>
-                  <?php
-                  $dash_category_query = "SELECT * FROM user_account WHERE department='stem'";
-                  $dash_category_query_run = mysqli_query($conn, $dash_category_query);
+            <div class="col">
+              <h3 class="mb-3">Ongoing Courses</h3>
+            </div>
+          </div>
+          <div class="row">
+            <?php
+            include("db_conn.php");
 
-                  if ($category_total = mysqli_num_rows($dash_category_query_run)) {
-                    echo '<h3> ' . $category_total . ' </h3>';
-                  } else {
-                    echo '<h3>0</h3>';
-                  }
-                  ?>
-                  <img src="assets/image/stem.png" style="width: 20vh; height: 20vh;">
+            $sqlCourses = "SELECT * FROM section WHERE teacher_id = ? AND archive_status = ''";
+            $stmtCourses = $conn->prepare($sqlCourses);
+            $stmtCourses->bind_param("i", $teacher_id);
+            $stmtCourses->execute();
+            $coursesResult = $stmtCourses->get_result();
+
+            // Check if there are enrolled courses
+            if ($coursesResult->num_rows > 0) {
+              while ($row = mysqli_fetch_assoc($coursesResult)) {
+                $class_id = $row['class_id'];
+                $class_name = $row['class_name'];
+                $section = $row['section'];
+                $teacherFirstName = $row['first_name'];
+                $teacherLastName = $row['last_name'];
+                $teacherFullName = $teacherFirstName . ' ' . $teacherLastName;
+                ?>
+                <div class="col-md-3 mb-4">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5>
+                        <?php echo $class_name ?>
+                      </h5>
+                      <p class="text-body-secondary">Section
+                        <?php echo $section ?>
+                      </p>
+                      <p>by
+                        <?php echo $teacherFullName ?>
+                      </p>
+                      <a href="class_course.php?class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>"
+                        style="color: green;">
+                        View Course Subject
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <?php
+              }
+            } else {
+              ?>
+              <div class="col-md-4 mb-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>No Enrolled Courses</h3>
+                    <p class="text-body-secondary">
+                      You have not enrolled in any courses yet, click the link below to enroll.
+                    </p>
+                    <a href="course.php">Go to course section.</a>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="col-md-3 grid-margin transparent">
-              <div class="card card-dark-blue text-center">
-                <div class="card-body">
-                  <h5>HUMSS Department</h5>
-                  <p class="mb-3">Users</p>
-                  <?php
-                  $dash_category_query = "SELECT * FROM user_account WHERE department='humss'";
-                  $dash_category_query_run = mysqli_query($conn, $dash_category_query);
-
-                  if ($category_total = mysqli_num_rows($dash_category_query_run)) {
-                    echo '<h3> ' . $category_total . ' </h3>';
-                  } else {
-                    echo '<h3>0</h3>';
-                  }
-                  ?>
-                  <img src="assets/image/humss.png" style="width: 20vh; height: 20vh;">
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 grid-margin transparent">
-              <div class="card card-light-blue text-center">
-                <div class="card-body">
-                  <h5>ABM Department</h5>
-                  <p class="mb-3">Users</p>
-                  <?php
-                  $dash_category_query = "SELECT * FROM user_account WHERE department='abm'";
-                  $dash_category_query_run = mysqli_query($conn, $dash_category_query);
-
-                  if ($category_total = mysqli_num_rows($dash_category_query_run)) {
-                    echo '<h3> ' . $category_total . ' </h3>';
-                  } else {
-                    echo '<h3>0</h3>';
-                  }
-                  ?>
-                  <img src="assets/image/abm.png" style="width: 20vh; height: 20vh;">
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 grid-margin transparent">
-              <div class="card card-light-danger text-center">
-                <div class="card-body">
-                  <h5>TVL Department</h5>
-                  <p class="mb-3">Users</p>
-                  <?php
-                  $dash_category_query = "SELECT * FROM user_account WHERE department='tvl'";
-                  $dash_category_query_run = mysqli_query($conn, $dash_category_query);
-
-                  if ($category_total = mysqli_num_rows($dash_category_query_run)) {
-                    echo '<h3> ' . $category_total . ' </h3>';
-                  } else {
-                    echo '<h3>0</h3>';
-                  }
-                  ?>
-                  <img src="assets/image/mechanic.png" style="width: 20vh; height: 20vh;">
-                </div>
-              </div>
-            </div>
+              <?php
+            }
+            ?>
           </div>
           <div class="row">
             <div class="col-md-4 stretch-card grid-margin">
@@ -302,20 +287,26 @@ $stmt_department->close();
                       <?php echo $totalNews ?> )
                     </span></p>
                   <?php
-                  while ($row = mysqli_fetch_assoc($result)) {
+                  if ($totalNews == 0) {
                     ?>
-                    <a href="view_announcement.php?news_id=<?php $row['news_id'] ?>">
-                      <h3 style="margin-top: 2vh;">
-                        <?php echo $row['title'] ?>
-                      </h3>
-                      <p class="text-body-secondary">
-                        <?php echo $row['date'] ?>
-                      </p>
-                      <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                        <?php echo $row['detail'] ?>
-                      </p>
-                    </a>
+                    <p class="text-body-secondary mt-3">There are no announcement posted or available at the moment.</p>
                     <?php
+                  } else {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                      ?>
+                      <a href="view_announcement.php?news_id=<?php $row['news_id'] ?>">
+                        <h3 style="margin-top: 2vh;">
+                          <?php echo $row['title'] ?>
+                        </h3>
+                        <p class="text-body-secondary">
+                          <?php echo $row['date'] ?>
+                        </p>
+                        <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                          <?php echo $row['detail'] ?>
+                        </p>
+                      </a>
+                      <?php
+                    }
                   }
                   ?>
                 </div>
@@ -340,22 +331,43 @@ $stmt_department->close();
                       <?php echo $totalNews ?> )
                     </span></p>
                   <?php
-                  while ($row = mysqli_fetch_assoc($result)) {
+                  if ($totalNews == 0) {
                     ?>
-                    <a href="view_news.php?news_id=<?php $row['news_id'] ?>">
-                      <h3 style="margin-top: 2vh;">
-                        <?php echo $row['title'] ?>
-                      </h3>
-                      <p class="text-body-secondary">
-                        <?php echo $row['date'] ?>
-                      </p>
-                      <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                        <?php echo $row['detail'] ?>
-                      </p>
-                    </a>
+                    <p class="text-body-secondary">There are no news posted or available at the moment.</p>
                     <?php
+                  } else {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                      ?>
+                      <a href="view_news.php?news_id=<?php $row['news_id'] ?>">
+                        <h3 style="margin-top: 2vh;">
+                          <?php echo $row['title'] ?>
+                        </h3>
+                        <p class="text-body-secondary">
+                          <?php echo $row['date'] ?>
+                        </p>
+                        <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                          <?php echo $row['detail'] ?>
+                        </p>
+                      </a>
+                      <?php
+                    }
                   }
                   ?>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 stretch-card grid-margin">
+              <div class="card">
+                <div class="card-body">
+                  <div>
+                    <p class="card-title mb-3">Reports</p>
+                    <p class="card-title mb-1">Student Reports</p>
+                    <a href="student_report.php?user_id=<?php echo $teacher_id ?>">View Student Reports</a>
+                  </div>
+                  <div>
+                    <p class="card-title mt-4 mb-1">Report of Grades</p>
+                    <a href="grade_report.php?user_id=<?php echo $teacher_id ?>">View Report of Grades</a>
+                  </div>
                 </div>
               </div>
             </div>

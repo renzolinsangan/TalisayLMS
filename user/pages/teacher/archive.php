@@ -184,7 +184,6 @@ if (isset($_POST['unarchive'])) {
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="friend.php">My Friends</a></li>
                 <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
               </ul>
             </div>
@@ -237,90 +236,106 @@ if (isset($_POST['unarchive'])) {
             $result = $stmt->get_result();
             ?>
             <?php
-            while ($row = mysqli_fetch_assoc($result)) {
-              $_SESSION['class_name'] = $row['class_name'];
-              $_SESSION['section'] = $row['section'];
-              $firstName = ucfirst(strtolower($_SESSION['first_name']));
-              $lastName = ucfirst(strtolower($_SESSION['last_name']));
-              $_SESSION['teacher_name'] = $firstName . " " . $lastName;
-
-              $class_id = $row['class_id'];
-              $sql = "SELECT theme FROM class_theme WHERE teacher_id = :teacher_id AND class_id = :class_id AND theme_status = 'recent'";
-              $stmt = $db->prepare($sql);
-              $stmt->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
-              $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
-              $stmt->execute();
-              $themeData = $stmt->fetch(PDO::FETCH_ASSOC);
-              $stmt->closeCursor();
-
-              if ($themeData) {
-                $theme = $themeData['theme'];
-              } else {
-                $theme = 'background-color: green';
-              }
-              ?>
-              <div class="col-md-4 grid-margin transparent">
-                <div class="card card-tale text-center"
-                  style="height: 50vh; flex-direction: column; justify-content: space-between;">
-                  <a href="archive_classCourse.php?class_id=<?php echo $row['class_id']; ?>&class_name=<?php echo $row['class_name'] ?>"
-                    class="course">
-                    <div class="card-header"
-                      style="text-align: left; background-image: url(assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">
-                      <div class="course-top">
-                        <p class="course-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $row['class_name'] ?>
-                        </p>
-                        <p class="course-section" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                          <?php echo $row['section'] ?>
-                        </p>
+            if($result->num_rows > 0) {
+              while ($row = mysqli_fetch_assoc($result)) {
+                $_SESSION['class_name'] = $row['class_name'];
+                $_SESSION['section'] = $row['section'];
+                $firstName = ucfirst(strtolower($_SESSION['first_name']));
+                $lastName = ucfirst(strtolower($_SESSION['last_name']));
+                $_SESSION['teacher_name'] = $firstName . " " . $lastName;
+  
+                $class_id = $row['class_id'];
+                $sql = "SELECT theme FROM class_theme WHERE teacher_id = :teacher_id AND class_id = :class_id AND theme_status = 'recent'";
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(':teacher_id', $teacher_id, PDO::PARAM_INT);
+                $stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
+                $stmt->execute();
+                $themeData = $stmt->fetch(PDO::FETCH_ASSOC);
+                $stmt->closeCursor();
+  
+                if ($themeData) {
+                  $theme = $themeData['theme'];
+                } else {
+                  $theme = 'background-color: green';
+                }
+                ?>
+                <div class="col-md-4 grid-margin transparent">
+                  <div class="card card-tale text-center"
+                    style="height: 50vh; flex-direction: column; justify-content: space-between;">
+                    <a href="archive_classCourse.php?class_id=<?php echo $row['class_id']; ?>&class_name=<?php echo $row['class_name'] ?>"
+                      class="course">
+                      <div class="card-header"
+                        style="text-align: left; background-image: url(assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">
+                        <div class="course-top">
+                          <p class="course-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $row['class_name'] ?>
+                          </p>
+                          <p class="course-section" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <?php echo $row['section'] ?>
+                          </p>
+                        </div>
+                        <?php
+                        $firstName = ucfirst(strtolower($_SESSION['first_name']));
+                        $lastName = ucfirst(strtolower($_SESSION['last_name']));
+                        $_SESSION['teacher_name'] = $firstName . " " . $lastName;
+                        echo "<p class='course-teacher'>" . $firstName . " " . $lastName . "</p>";
+                        ?>
+  
+                        <div class="circle-image" id="circle-image">
+                          <img src="assets/image/<?php echo $profile ?>" alt="profile"
+                            onerror="this.src='images/profile.png'">
+                        </div>
                       </div>
-                      <?php
-                      $firstName = ucfirst(strtolower($_SESSION['first_name']));
-                      $lastName = ucfirst(strtolower($_SESSION['last_name']));
-                      $_SESSION['teacher_name'] = $firstName . " " . $lastName;
-                      echo "<p class='course-teacher'>" . $firstName . " " . $lastName . "</p>";
-                      ?>
-
-                      <div class="circle-image" id="circle-image">
-                        <img src="assets/image/<?php echo $profile ?>" alt="profile"
-                          onerror="this.src='images/profile.png'">
-                      </div>
-                    </div>
-                  </a>
-                  <form action="" method="post">
-                    <div class="card-footer d-flex justify-content-end">
-                      <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
-                        <h5>Unarchive <i class="bi bi-archive" style="font-size: 20px;"></i></i></h5>
-                      </button>
-                      <div class="modal fade" id="staticBackdrop<?php echo $row['class_id']; ?>" data-bs-backdrop="static"
-                        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog" style="width: 50vh; margin-top: 25vh;">
-                          <div class="modal-content">
-                            <div class="modal-body">
-                              <div class="text-start">
-                                <h3>Unarchive
-                                  <?php echo $row['class_name'] ?>?
-                                </h3>
-                                <p class="text-body-secondary mt-3">Class will be moved to the courses.</p>
-                                <p class="text-body-secondary mt-3">Do you want to unarchive this class?</p>
-                                <p class="text-body-secondary mt-3">Press click unarchive button if yes.</p>
-                              </div>
-                              <input type="hidden" name="class_id" value="<?php echo $row['class_id']; ?>">
-
-                              <div class="modal-button mt-3 d-flex justify-content-end align-items-end">
-                                <button type="button" class="btn" data-bs-dismiss="modal"
-                                  style="margin-right: 2vh; padding: 0;">Cancel</button>
-                                <button type="submit" class="btn"
-                                  name="unarchive"
-                                  style="color: green; margin-top: 2vh; padding: 0;">Unarchive</button>
+                    </a>
+                    <form action="" method="post">
+                      <div class="card-footer d-flex justify-content-end">
+                        <button class="unenroll" id="unenroll" type="button" data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop<?php echo $row['class_id']; ?>">
+                          <h5>Unarchive <i class="bi bi-archive" style="font-size: 20px;"></i></i></h5>
+                        </button>
+                        <div class="modal fade" id="staticBackdrop<?php echo $row['class_id']; ?>" data-bs-backdrop="static"
+                          data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                          <div class="modal-dialog" style="width: 50vh; margin-top: 25vh;">
+                            <div class="modal-content">
+                              <div class="modal-body">
+                                <div class="text-start">
+                                  <h3>Unarchive
+                                    <?php echo $row['class_name'] ?>?
+                                  </h3>
+                                  <p class="text-body-secondary mt-3">Class will be moved to the courses.</p>
+                                  <p class="text-body-secondary mt-3">Do you want to unarchive this class?</p>
+                                  <p class="text-body-secondary mt-3">Press click unarchive button if yes.</p>
+                                </div>
+                                <input type="hidden" name="class_id" value="<?php echo $row['class_id']; ?>">
+  
+                                <div class="modal-button mt-3 d-flex justify-content-end align-items-end">
+                                  <button type="button" class="btn" data-bs-dismiss="modal"
+                                    style="margin-right: 2vh; padding: 0;">Cancel</button>
+                                  <button type="submit" class="btn"
+                                    name="unarchive"
+                                    style="color: green; margin-top: 2vh; padding: 0;">Unarchive</button>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </form>
+                    </form>
+                  </div>
+                </div>
+                <?php
+              }
+            } else {
+              ?>
+              <div class="col-md-4 mb-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>No Archived Courses</h3>
+                    <p class="text-body-secondary">
+                      There are no course subject available in archive section.
+                    </p>
+                    <a href="course.php">Go to course section.</a>
+                  </div>
                 </div>
               </div>
               <?php

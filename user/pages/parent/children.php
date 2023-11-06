@@ -195,41 +195,59 @@ if ($row) {
           $sql_selectChild = "SELECT * FROM user_account WHERE user_id = ?";
           $stmt_selectChild = $db->prepare($sql_selectChild);
           $result = $stmt_selectChild->execute([$childrenID]);
+          $childrenExist = false;
 
           if ($result) {
+            $childrenExist = $stmt_selectChild->rowCount() > 0;
+            if($childrenExist) {
+              ?>
+              <div class="row">
+                <?php
+                while ($row = $stmt_selectChild->fetch(PDO::FETCH_ASSOC)) {
+  
+                  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                  $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                  $profile_result = $stmt_selectProfile->execute([$childrenID]);
+  
+                  $defaultProfile = "images/profile.png";
+  
+                  if ($profile_result) {
+                    $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                    $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
+                    ?>
+                    <div class="col-md-4 mb-4">
+                      <a href="grade_report.php?user_id=<?php echo $childrenID ?>" class="course">
+                        <div class="card card-tale justify-content-center align-items-center"
+                          style="background-image: url(../student/assets/image/user.png);">
+                          <div class="circle-image mt-4 mb-3">
+                            <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
+                              onerror="this.src='images/profile.png'">
+                          </div>
+                          <p class="text-body-secondary mb-4" style="font-size: 20px;">
+                            <?php echo $childrenFullName ?>
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                    <?php
+                  }
+                }
+                ?>
+              </div>
+              <?php
+            }
+          }
+          if (!$childrenExist) {
             ?>
             <div class="row">
-              <?php
-              while ($row = $stmt_selectChild->fetch(PDO::FETCH_ASSOC)) {
-
-                $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                $profile_result = $stmt_selectProfile->execute([$childrenID]);
-
-                $defaultProfile = "images/profile.png";
-
-                if ($profile_result) {
-                  $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                  $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
-                  ?>
-                  <div class="col-md-4 mb-4">
-                    <a href="grade_report.php?user_id=<?php echo $childrenID ?>" class="course">
-                      <div class="card card-tale justify-content-center align-items-center"
-                        style="background-image: url(../student/assets/image/user.png);">
-                        <div class="circle-image mt-4 mb-3">
-                          <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
-                            onerror="this.src='images/profile.png'">
-                        </div>
-                        <p class="text-body-secondary mb-4" style="font-size: 20px;">
-                          <?php echo $childrenFullName ?>
-                        </p>
-                      </div>
-                    </a>
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>You have no children.</h3>
+                    <p class="text-body-secondary">There is no registered account for your children, please proceed to feedback section to fix it.</p>
                   </div>
-                  <?php
-                }
-              }
-              ?>
+                </div>
+              </div>
             </div>
             <?php
           }

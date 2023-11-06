@@ -41,6 +41,8 @@ if ($studentNameRow) {
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/add_friend.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -164,7 +166,7 @@ if ($studentNameRow) {
             </a>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" href="feedbacks.php">
+            <a class="nav-link" href="feedback.php">
               <i class="menu-icon"><i class="bi bi-chat-right-quote"></i></i>
               <span class="menu-title">Feedbacks</span>
             </a>
@@ -184,6 +186,8 @@ if ($studentNameRow) {
           $sqlSelectChildren = "SELECT * FROM user_account WHERE children = ?";
           $stmtSelectChildren = $db->prepare($sqlSelectChildren);
           $selectChildrenResult = $stmtSelectChildren->execute([$fullname]);
+
+          $parentsExist = false;
 
           if ($selectChildrenResult) {
             ?>
@@ -211,7 +215,7 @@ if ($studentNameRow) {
                         style="background-image: url(assets/image/user.png);">
                         <div class="circle-image mt-4 mb-3">
                           <img src="../parent/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
-                          onerror="this.src='images/profile.png'">
+                            onerror="this.src='images/profile.png'">
                         </div>
                         <p class="text-body-secondary mb-4" style="font-size: 20px;">
                           <?php echo $parentFullname ?>
@@ -220,9 +224,25 @@ if ($studentNameRow) {
                     </a>
                   </div>
                   <?php
+                  $parentsExist = true;
                 }
               }
               ?>
+            </div>
+            <?php
+          }
+
+          if (!$parentsExist) {
+            ?>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card">
+                  <div class="card-body">
+                    <h3>You have no parent.</h3>
+                    <p class="text-body-secondary">Your parent must have an account to appear in here.</p>
+                  </div>
+                </div>
+              </div>
             </div>
             <?php
           }

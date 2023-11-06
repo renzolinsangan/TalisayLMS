@@ -227,73 +227,84 @@ if ($teacher_id) {
                 return strtotime($a['due_date']) - strtotime($b['due_date']);
               });
 
-              foreach ($combined_results as $row) {
-                if (isset($row['assignment_id'])) {
-                  $assignment_id = $row['assignment_id'];
-                  $title = $row['title'];
-                  $class_name = $row['class_name'];
-                  $due_date = $row['due_date'];
-                  $timestamp = strtotime($due_date);
-                  $formatted_date = date("F d", $timestamp);
-                  ?>
-                  <div class="d-grid gap-2 col-10 mx-auto mb-4">
-                    <a class="announce" type="button"
-                      href="assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>"
-                      style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                      <div
-                        style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
-                        <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
-                      </div>
-                      <p
-                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; 
-                        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                        <?php echo $title ?>
-                      </p>
-                      <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
-                        <p class="text-body-secondary"
-                        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                          <?php echo $class_name ?> -
-                          <span>
-                            Due <?php echo $formatted_date ?>
-                        </span>
+              if (empty($combined_results)) {
+                ?>
+                <div class="d-grid gap-2 col-10 mx-auto">
+                  <a class="announce" type="button" href="class_classwork.php?class_id=<?php echo $class_id ?>"
+                  style="text-decoration: none;">
+                    There are no assessments created to review, click this to go to classwork to create course assessment.
+                  </a>
+                </div>
+                <?php
+              } else {
+                foreach ($combined_results as $row) {
+                  if (isset($row['assignment_id'])) {
+                    $assignment_id = $row['assignment_id'];
+                    $title = $row['title'];
+                    $class_name = $row['class_name'];
+                    $due_date = $row['due_date'];
+                    $timestamp = strtotime($due_date);
+                    $formatted_date = date("F d", $timestamp);
+                    ?>
+                    <div class="d-grid gap-2 col-10 mx-auto mb-4">
+                      <a class="announce" type="button"
+                        href="assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>"
+                        style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <div
+                          style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                          <i class="bi bi-journal-text" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                        </div>
+                        <p style="font-size: 17px; margin-top: -36px; margin-left: 7vh; 
+                          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                          <?php echo $title ?>
                         </p>
-                      </div>
-                    </a>
-                  </div>
-                  <?php
-                } elseif (isset($row['question_id'])) {
-                  $question_id = $row['question_id'];
-                  $title = $row['title'];
-                  $class_name = $row['class_name'];
-                  $due_date = $row['due_date'];
-                  $timestamp = strtotime($due_date);
-                  $formatted_date = date("F d", $timestamp);
-                  ?>
-                  <div class="d-grid gap-2 col-10 mx-auto mb-4">
-                    <a class="announce" type="button"
-                      href="question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>"
-                      style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                      <div
-                        style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
-                        <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
-                      </div>
-                      <p
-                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; 
-                        overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                        <?php echo $title ?>
-                      </p>
-                      <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
-                        <p class="text-body-secondary"
-                        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                          <?php echo $class_name ?> -
-                          <span>
-                            Due <?php echo $formatted_date ?>
-                          </span>
+                        <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                          <p class="text-body-secondary"
+                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                            <?php echo $class_name ?> -
+                            <span>
+                              Due
+                              <?php echo $formatted_date ?>
+                            </span>
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                    <?php
+                  } elseif (isset($row['question_id'])) {
+                    $question_id = $row['question_id'];
+                    $title = $row['title'];
+                    $class_name = $row['class_name'];
+                    $due_date = $row['due_date'];
+                    $timestamp = strtotime($due_date);
+                    $formatted_date = date("F d", $timestamp);
+                    ?>
+                    <div class="d-grid gap-2 col-10 mx-auto mb-4">
+                      <a class="announce" type="button"
+                        href="question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>"
+                        style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <div
+                          style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                          <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                        </div>
+                        <p style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; 
+                          overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                          <?php echo $title ?>
                         </p>
-                      </div>
-                    </a>
-                  </div>
-                  <?php
+                        <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                          <p class="text-body-secondary"
+                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                            <?php echo $class_name ?> -
+                            <span>
+                              Due
+                              <?php echo $formatted_date ?>
+                            </span>
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                    <?php
+                  }
                 }
               }
               ?>
