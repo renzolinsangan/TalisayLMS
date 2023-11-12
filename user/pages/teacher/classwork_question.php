@@ -27,11 +27,10 @@ if (isset($_POST['ask_button'])) {
   $youtube = isset($_SESSION['temp_youtube']) ? $_SESSION['temp_youtube'] : '';
   $question_status = "assigned";
 
-  // Check if there's a temporary file ID in the session
   if (isset($_SESSION['temp_file_id'])) {
     $file_id = $_SESSION['temp_file_id'];
     $link = $_SESSION['temp_link'];
-    $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
+    $file_name = $_SESSION['temp_file_name'];
 
     $sql = "INSERT INTO classwork_question (title, question, instruction, class_name, student, point, date, due_date, time, 
     class_topic, class_id, teacher_id, link, file, youtube, question_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

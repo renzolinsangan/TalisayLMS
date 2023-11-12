@@ -7,8 +7,9 @@
 }
 
 .navbar {
-  height: 10vh;
-  border-bottom: 1px solid #ccc;
+  height: 8vh;
+  border-bottom: 1px solid greenyellow;
+  background-color: green;
 }
 
 .go-back {
@@ -22,17 +23,25 @@
 
 .wrapper {
   display: flex;
-  min-height: 100%;
+  flex-direction: column;
+  min-height: 77vh;
+  position: relative;
 }
+
+.footer {
+    border-top: 2px solid darkgreen;
+    color: green;
+    text-align: center;
+    width: 100%;
+    bottom: 0;
+  }
 
 
 @media (max-width: 768px) {
 
-  p.name,
-  h3.greater {
-    display: none;
-  }
-
+ .navbar {
+    height: 10vh;
+ }
   p.classname {
     margin-left: -20px;
     white-space: nowrap;

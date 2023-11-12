@@ -237,36 +237,51 @@ $stmt->close();
                                 include("config.php");
                                 $class_id = $_GET['class_id'];
 
-                                $sqlQuestion = "SELECT title, date, point FROM classwork_question WHERE class_id = ? AND teacher_id = ?";
+                                $sqlQuestion = "SELECT title, date, point, 'Question' as type FROM classwork_question 
+                                WHERE class_id = ? AND teacher_id = ?";
                                 $stmtQuestion = $db->prepare($sqlQuestion);
                                 $stmtQuestion->execute([$class_id, $teacher_id]);
                                 $questionTitles = $stmtQuestion->fetchAll(PDO::FETCH_ASSOC);
 
-                                $sqlAssignment = "SELECT title, date, point FROM classwork_assignment WHERE class_id = ? AND teacher_id = ?";
+                                $sqlAssignment = "SELECT title, date, point, 'Assignment' as type FROM classwork_assignment 
+                                WHERE class_id = ? AND teacher_id = ?";
                                 $stmtAssignment = $db->prepare($sqlAssignment);
                                 $stmtAssignment->execute([$class_id, $teacher_id]);
                                 $assignmentTitles = $stmtAssignment->fetchAll(PDO::FETCH_ASSOC);
 
-                                $allTitles = array_merge($questionTitles, $assignmentTitles);
-                                usort($allTitles, function ($a, $b) {
-                                  return strtotime($a['date']) - strtotime($b['date']);
-                                });
+                                $sqlQuiz = "SELECT quizTitle as title, date, quizPoint as point, 'Quiz' as type FROM classwork_quiz 
+                                WHERE class_id = ? AND teacher_id = ?";
+                                $stmtQuiz = $db->prepare($sqlQuiz);
+                                $stmtQuiz->execute([$class_id, $teacher_id]);
+                                $quizTitles = $stmtQuiz->fetchAll(PDO::FETCH_ASSOC);
 
+                                $sqlExam = "SELECT examTitle as title, date, examPoint as point, 'Exam' as type FROM classwork_exam 
+                                WHERE class_id = ? AND teacher_id = ?";
+                                $stmtExam = $db->prepare($sqlExam);
+                                $stmtExam->execute([$class_id, $teacher_id]);
+                                $examTitles = $stmtExam->fetchAll(PDO::FETCH_ASSOC);
+
+                                $allTitles = array_merge($questionTitles, $assignmentTitles, $quizTitles, $examTitles);
+
+                                usort($allTitles, function ($a, $b) {
+                                    return strtotime($a['date']) - strtotime($b['date']);
+                                });
+                                
                                 foreach ($allTitles as $title) {
-                                  $formattedDate = date("F j", strtotime($title['date']));
-                                  ?>
-                                  <th scope="col" style="text-align: left;">
-                                    <p style="color: white; margin-bottom: -3px;">
-                                      <?php echo $formattedDate; ?>
-                                    </p>
-                                    <p style="border-bottom: 1px solid white; color: black;">
-                                      <?php echo $title['title']; ?>
-                                    </p>
-                                    <p style="color: white;">out of
-                                      <?php echo $title['point']; ?>
-                                    </p>
-                                  </th>
-                                  <?php
+                                    $formattedDate = date("F j", strtotime($title['date']));
+                                    ?>
+                                    <th scope="col" style="text-align: left;">
+                                        <p style="color: white; margin-bottom: -3px;">
+                                            <?php echo $formattedDate; ?>
+                                        </p>
+                                        <p style="border-bottom: 1px solid white; color: black;">
+                                            <?php echo $title['type'] . ': ' . $title['title']; ?>
+                                        </p>
+                                        <p style="color: white;">out of
+                                            <?php echo $title['point']; ?>
+                                        </p>
+                                    </th>
+                                    <?php
                                 }
                                 ?>
                               </thead>
@@ -293,22 +308,53 @@ $stmt->close();
                                     <?php
                                     foreach ($allTitles as $title) {
                                       $student_id = $student['student_id'];
-                                      $title = $title['title'];
+                                      $questionTitle = $title['title'];
+                                      $assignmentTitle = $title['title'];
+                                      $quizTitle = $title['title'];
+                                      $examTitle = $title['title'];
 
                                       $sqlQuestionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND questionTitle = ?";
                                       $stmtQuestionScore = $db->prepare($sqlQuestionScore);
-                                      $stmtQuestionScore->execute([$student_id, $title]);
+                                      $stmtQuestionScore->execute([$student_id, $questionTitle]);
                                       $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
 
                                       $sqlAssignmentScore = "SELECT score FROM assignmentgrade WHERE student_id = ? AND assignmentTitle = ?";
                                       $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
-                                      $stmtAssignmentScore->execute([$student_id, $title]);
+                                      $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
                                       $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
 
-                                      if ($questionScore && $assignmentScore) {
+                                      $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quizTitle = ?";
+                                      $stmtQuizScore = $db->prepare($sqlQuizScore);
+                                      $stmtQuizScore->execute([$student_id, $quizTitle]);
+                                      $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+
+                                      $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND examTitle = ?";
+                                      $stmtExamScore = $db->prepare($sqlExamScore);
+                                      $stmtExamScore->execute([$student_id, $examTitle]);
+                                      $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+
+                                      if ($questionScore && $assignmentScore && $quizScore) {
+                                        ?>
+                                        <td>
+                                          <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] . "<br> " . $quizScore['score'] ?>
+                                        </td>
+                                        <?php
+                                      } elseif ($questionScore && $assignmentScore) {
                                         ?>
                                         <td>
                                           <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] ?>
+                                        </td>
+                                        <?php
+                                      } elseif ($questionScore && $quizScore) {
+                                        ?>
+                                        <td>
+                                          <?php echo $questionScore['score'] . "<br> " . $quizScore['score'] ?>
+                                        </td>
+                                        <?php
+                                      } elseif ($assignmentScore && $quizScore) {
+                                        ?>
+                                        <td>
+                                          <?php echo $assignmentScore['score'] . "<br> " . $quizScore['score'] ?>
                                         </td>
                                         <?php
                                       } elseif ($questionScore) {
@@ -321,6 +367,12 @@ $stmt->close();
                                         ?>
                                         <td>
                                           <?php echo $assignmentScore['score'] ?>
+                                        </td>
+                                        <?php
+                                      } elseif ($quizScore) {
+                                        ?>
+                                        <td>
+                                          <?php echo $quizScore['score'] ?>
                                         </td>
                                         <?php
                                       } else {

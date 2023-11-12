@@ -17,6 +17,7 @@ if (!isset($_SESSION['id'])) {
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet" href="../../css/styles.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
 </head>
@@ -189,19 +190,20 @@ if (!isset($_SESSION['id'])) {
                   <div class="col-md-12">
                     <div class="card-body">
                       <div class="table-responsive">
-                        <table class="table text-center">
+                        <table id="example" class="table text-center"
+                        style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                           <thead class="table" style="background-color: #4BB543; color: white;">
                             <tr>
-                              <th scope="col">Title</th>
-                              <th scope="col">Type</th>
-                              <th scope="col">Name</th>
-                              <th scope="col">Date</th>
-                              <th scope="col">Division/Track</th>
-                              <th scope="col">Start Date</th>
-                              <th scope="col">End Date</th>
-                              <th scope="col">Detail</th>
-                              <th scope="col">Attachment</th>
-                              <th scope="col">Action</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Title</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Type</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Name</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Date</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Division/Track</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Start Date</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">End Date</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Detail</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Attachment</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Action</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -214,28 +216,28 @@ if (!isset($_SESSION['id'])) {
                             while ($row = mysqli_fetch_assoc($result)) {
                               ?>
                               <tr>
-                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['title'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['type'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['name'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['date'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['track'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['start_date'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['end_date'] ?>
                                 </td>
-                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
+                                <td style="padding: 3vh !imporant; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                   <?php echo $row['detail'] ?>
                                 </td>
                                 <td>
@@ -281,13 +283,23 @@ if (!isset($_SESSION['id'])) {
       </div>
     </div>
 
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <!-- Include DataTables JavaScript and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Initialize DataTables after including the necessary files -->
+    <script>
+      $(document).ready(function () {
+        $('#example').DataTable();
+      });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
       crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
       integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
       crossorigin="anonymous"></script>
-    <script src="../../vendors/js/vendor.bundle.base.js"></script>
     <script src="../../js/off-canvas.js"></script>
     <script src="../../js/hoverable-collapse.js"></script>
     <script src="../../js/template.js"></script>

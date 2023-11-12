@@ -214,36 +214,70 @@ if ($teacher_id) {
               $stmt_update_status_question = $db->prepare($sql_update_status_question);
               $stmt_update_status_question->execute([$teacher_id, $class_name]);
 
+              $sql_update_status_exam = "UPDATE classwork_exam SET examStatus = 'missing' WHERE 
+                teacher_id = ? and class_name = ? AND examStatus = 'assigned' AND dueDate < DATE(NOW())";
+              $stmt_update_status_exam = $db->prepare($sql_update_status_exam);
+              $stmt_update_status_exam->execute([$teacher_id, $class_name]);
+
+              $sql_update_status_quiz = "UPDATE classwork_quiz SET quizStatus = 'missing' WHERE 
+                teacher_id = ? and class_name = ? AND quizStatus = 'assigned' AND dueDate < DATE(NOW())";
+              $stmt_update_status_quiz = $db->prepare($sql_update_status_quiz);
+              $stmt_update_status_quiz->execute([$teacher_id, $class_name]);
+
               $assignment_results = [];
               $question_results = [];
+              $quiz_results = [];
+              $exam_results = [];
 
               $sql_assignment = "SELECT a.assignment_id, a.title, a.due_date 
-                   FROM classwork_assignment a
-                   LEFT JOIN student_assignment_course_answer sa
-                   ON a.assignment_id = sa.assignment_id AND sa.user_id = ?
-                   WHERE a.teacher_id = ? AND a.class_name = ? 
-                   AND a.assignment_status = 'missing'
-                   AND sa.assignment_id IS NULL";
+                FROM classwork_assignment a
+                LEFT JOIN student_assignment_course_answer sa
+                ON a.assignment_id = sa.assignment_id AND sa.user_id = ?
+                WHERE a.teacher_id = ? AND a.class_name = ? 
+                AND a.assignment_status = 'missing'
+                AND sa.assignment_id IS NULL";
               $stmt_assignment = $db->prepare($sql_assignment);
               $stmt_assignment->execute([$user_id, $teacher_id, $class_name]);
               $assignment_results = $stmt_assignment->fetchAll();
 
               $sql_question = "SELECT q.question_id, q.title, q.due_date 
-                 FROM classwork_question q
-                 LEFT JOIN student_question_course_answer sq
-                 ON q.question_id = sq.question_id AND sq.user_id = ?
-                 WHERE q.teacher_id = ? AND q.class_name = ? 
-                 AND q.question_status = 'missing'
-                 AND sq.question_id IS NULL";
+                FROM classwork_question q
+                LEFT JOIN student_question_course_answer sq
+                ON q.question_id = sq.question_id AND sq.user_id = ?
+                WHERE q.teacher_id = ? AND q.class_name = ? 
+                AND q.question_status = 'missing'
+                AND sq.question_id IS NULL";
               $stmt_question = $db->prepare($sql_question);
               $stmt_question->execute([$user_id, $teacher_id, $class_name]);
               $question_results = $stmt_question->fetchAll();
 
-              $combined_results = array_merge($assignment_results, $question_results);
-              usort($combined_results, function ($a, $b) {
-                return strtotime($a['due_date']) - strtotime($b['due_date']);
-              });
+              $sql_quiz = "SELECT q.quiz_id, q.quizTitle AS title, q.dueDate 
+                FROM classwork_quiz q
+                LEFT JOIN student_quiz_course_answer sq
+                ON q.quiz_id = sq.quiz_id AND sq.user_id = ?
+                WHERE q.teacher_id = ? AND q.class_name = ? 
+                AND q.quizStatus = 'missing'
+                AND sq.quiz_id IS NULL";
+              $stmt_quiz = $db->prepare($sql_quiz);
+              $stmt_quiz->execute([$user_id, $teacher_id, $class_name]);
+              $quiz_results = $stmt_quiz->fetchAll();
 
+              $sql_exam = "SELECT e.exam_id, e.examTitle AS title, e.dueDate 
+                FROM classwork_exam e
+                LEFT JOIN student_exam_course_answer se
+                ON e.exam_id = se.exam_id AND se.user_id = ?
+                WHERE e.teacher_id = ? AND e.class_name = ? 
+                AND e.examStatus = 'missing'
+                AND se.exam_id IS NULL";
+              $stmt_exam = $db->prepare($sql_exam);
+              $stmt_exam->execute([$user_id, $teacher_id, $class_name]);
+              $exam_results = $stmt_exam->fetchAll();
+
+              $combined_results = array_merge($assignment_results, $question_results, $quiz_results, $exam_results);
+              usort($combined_results, function ($a, $b) {
+                $dueDateA = isset($a['dueDate']) ? $a['dueDate'] : $a['due_date'];
+                $dueDateB = isset($b['dueDate']) ? $b['dueDate'] : $b['due_date'];
+              });
               foreach ($combined_results as $row) {
                 if (isset($row['assignment_id'])) {
                   $assignment_id = $row['assignment_id'];
@@ -293,6 +327,66 @@ if ($teacher_id) {
                       <p
                         style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         <?php echo $title ?>
+                      </p>
+                      <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                        <?php echo $class_name ?>
+                      </div>
+                      <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                        <span style="color: red;"> Missing on
+                          <?php echo $formatted_date ?>
+                        </span>
+                      </div>
+                    </a>
+                  </div>
+                  <?php
+                } elseif (isset($row['quiz_id'])) {
+                  $quiz_id = $row['quiz_id'];
+                  $quizTitle = $row['title'];
+                  $dueDate = $row['due_date'];
+                  $timestamp = strtotime($dueDate);
+                  $formatted_date = date("F d", $timestamp);
+                  ?>
+                  <div class="d-grid gap-2 col-10 mx-auto mb-3">
+                    <a class="announce" type="button"
+                      href="quiz_course.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $quiz_id ?>&user_id=<?php echo $user_id ?>"
+                      style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      <div
+                        style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                        <i class="bi bi-card-list" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                      </div>
+                      <p
+                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <?php echo $quizTitle ?>
+                      </p>
+                      <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                        <?php echo $class_name ?>
+                      </div>
+                      <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                        <span style="color: red;"> Missing on
+                          <?php echo $formatted_date ?>
+                        </span>
+                      </div>
+                    </a>
+                  </div>
+                  <?php
+                } elseif (isset($row['exam_id'])) {
+                  $exam_id = $row['exam_id'];
+                  $examTitle = $row['title'];
+                  $dueDate = $row['dueDate'];
+                  $timestamp = strtotime($dueDate);
+                  $formatted_date = date('F d', $timestamp);
+                  ?>
+                  <div class="d-grid gap-2 col-10 mx-auto mb-3">
+                    <a class="announce" type="button"
+                      href="exam_course.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $exam_id ?>&user_id=<?php echo $user_id ?>"
+                      style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      <div
+                        style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                        <i class="bi bi-card-list" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                      </div>
+                      <p
+                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <?php echo $examTitle ?>
                       </p>
                       <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
                         <?php echo $class_name ?>

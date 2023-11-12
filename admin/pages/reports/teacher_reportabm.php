@@ -17,6 +17,8 @@ if (!isset($_SESSION['id'])) {
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="assets/css/table.css">
   <link rel="stylesheet" href="assets/css/report_teacher.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
 </head>
@@ -169,7 +171,7 @@ if (!isset($_SESSION['id'])) {
                     <div class="row">
                       <div class="col-md-6">
                         <div class="card-body">
-                          <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">ABM teachers</h1>
+                          <h1 class="card-title" style="font-size: 30px; margin-left: 10px; margin-bottom: -20px;">ABM teachers</h1>
                         </div>
                       </div>
                     </div>
@@ -178,14 +180,15 @@ if (!isset($_SESSION['id'])) {
                         <div class="col-md-12">
                           <div class="card-body">
                             <div class="table-responsive">
-                              <table class="table text-center">
+                              <table id="example" class="table text-center"
+                              style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                                 <thead class="table" style="background-color: #4BB543; color: white;">
                                   <tr>
-                                    <th scope="col">Teacher's Name</th>
-                                    <th scope="col">House Address</th>
-                                    <th scope="col">Contact Number</th>
-                                    <th scope="col">Email Address</th>
-                                    <th scope="col">Department</th>
+                                    <th scope="col" style="text-align: center; overflow: hidden;">Teacher's Name</th>
+                                    <th scope="col" style="text-align: center; overflow: hidden;">House Address</th>
+                                    <th scope="col" style="text-align: center; overflow: hidden;">Contact Number</th>
+                                    <th scope="col" style="text-align: center; overflow: hidden;">Email Address</th>
+                                    <th scope="col" style="text-align: center; overflow: hidden;">Department</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -197,19 +200,19 @@ if (!isset($_SESSION['id'])) {
                                   while ($row = mysqli_fetch_assoc($result)) {
                                     ?>
                                     <tr>
-                                      <td>
+                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                         <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
                                       </td>
-                                      <td>
+                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                         <?php echo $row['address']; ?>
                                       </td>
-                                      <td>
+                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                         <?php echo $row['contact']; ?>
                                       </td>
-                                      <td>
+                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                         <?php echo $row['email']; ?>
                                       </td>
-                                      <td>
+                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                         <?php echo $row['department'] ?>
                                       </td>
                                     </tr>
@@ -231,6 +234,17 @@ if (!isset($_SESSION['id'])) {
       </div>
     </div>
 
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <!-- Include DataTables JavaScript and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Initialize DataTables after including the necessary files -->
+    <script>
+      $(document).ready(function () {
+        $('#example').DataTable();
+      });
+    </script>
     <script>
       const printBtn = document.getElementById('print');
 
@@ -263,7 +277,6 @@ if (!isset($_SESSION['id'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
       integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
       crossorigin="anonymous"></script>
-    <script src="../../vendors/js/vendor.bundle.base.js"></script>
     <script src="../../js/off-canvas.js"></script>
     <script src="../../js/hoverable-collapse.js"></script>
     <script src="../../js/template.js"></script>

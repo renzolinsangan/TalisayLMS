@@ -251,6 +251,16 @@ $stmt->closeCursor();
                         $stmt_titles_question = $db->prepare($sql_question);
                         $stmt_titles_question->execute([$_SESSION['class_topic'], $teacher_id, $class_name]);
 
+                        $sql_quiz = "SELECT quiz_id, quizTitle, quizInstruction, quizLink, date, dueDate 
+                        FROM classwork_quiz WHERE classTopic=? AND teacher_id=? AND class_name=?";
+                        $stmt_titles_quiz = $db->prepare($sql_quiz);
+                        $stmt_titles_quiz->execute([$_SESSION['class_topic'], $teacher_id, $class_name]);
+
+                        $sql_exam = "SELECT exam_id, examTitle, examInstruction, examLink, date, dueDate
+                        FROM classwork_exam WHERE classTopic = ? AND teacher_id=? AND class_name=?";
+                        $stmt_titles_exam = $db->prepare($sql_exam);
+                        $stmt_titles_exam->execute([$_SESSION['class_topic'], $teacher_id, $class_name]);
+
                         foreach ($stmt_titles_material as $title_row) {
                           $material_id = $title_row['material_id'];
                           $title = $title_row['title'];
@@ -325,8 +335,7 @@ $stmt->closeCursor();
                                       ?>
                                       <div class="col-md-4">
                                         <div class="link card" style="background-color: white; border: 1px solid #ccc;">
-                                          <a href="<?php echo $link ?>" target="_blank"
-                                            style="text-decoration: none;">
+                                          <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none;">
                                             <div class="row mt-3 ml-2">
                                               <div class="col-md-11">
                                                 <p style="color: green; white-space: nowrap; overflow: hidden; 
@@ -374,8 +383,7 @@ $stmt->closeCursor();
                                       ?>
                                       <div class="col-md-4">
                                         <div class="youtube card" style="background-color: white; border: 1px solid #ccc;">
-                                          <a href="<?php echo $youtube ?>" target="_blank"
-                                            style="text-decoration: none;">
+                                          <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none;">
                                             <div class="row mt-3 ml-2">
                                               <div class="col-md-11">
                                                 <p style="color: green; white-space: nowrap; overflow: hidden; 
@@ -487,8 +495,7 @@ $stmt->closeCursor();
                                       ?>
                                       <div class="col-md-4">
                                         <div class="link card" style="background-color: white; border: 1px solid #ccc;">
-                                          <a href="<?php echo $link ?>" target="_blank"
-                                            style="text-decoration: none;">
+                                          <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none;">
                                             <div class="row mt-3 ml-2">
                                               <div class="col-md-11">
                                                 <p style="color: green; white-space: nowrap; overflow: hidden; 
@@ -536,8 +543,7 @@ $stmt->closeCursor();
                                       ?>
                                       <div class="col-md-4">
                                         <div class="youtube card" style="background-color: white; border: 1px solid #ccc;">
-                                          <a href="<?php echo $youtube ?>" target="_blank"
-                                            style="text-decoration: none;">
+                                          <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none;">
                                             <div class="row mt-3 ml-2">
                                               <div class="col-md-11">
                                                 <p style="color: green; white-space: nowrap; overflow: hidden; 
@@ -648,8 +654,7 @@ $stmt->closeCursor();
                                       ?>
                                       <div class="col-md-4">
                                         <div class="link card" style="background-color: white; border: 1px solid #ccc;">
-                                          <a href="<?php echo $link ?>" target="_blank"
-                                            style="text-decoration: none;">
+                                          <a href="<?php echo $link ?>" target="_blank" style="text-decoration: none;">
                                             <div class="row mt-3 ml-2">
                                               <div class="col-md-11">
                                                 <p style="color: green; white-space: nowrap; overflow: hidden; 
@@ -697,8 +702,7 @@ $stmt->closeCursor();
                                       ?>
                                       <div class="col-md-4">
                                         <div class="youtube card" style="background-color: white; border: 1px solid #ccc;">
-                                          <a href="<?php echo $youtube ?>" target="_blank"
-                                            style="text-decoration: none;">
+                                          <a href="<?php echo $youtube ?>" target="_blank" style="text-decoration: none;">
                                             <div class="row mt-3 ml-2">
                                               <div class="col-md-11">
                                                 <p style="color: green; white-space: nowrap; overflow: hidden; 
@@ -731,13 +735,181 @@ $stmt->closeCursor();
                             </div>
                           </div>
                           <?php
+                          $counter++;
+                        }
+                        foreach ($stmt_titles_quiz as $rowQuiz) {
+                          $quiz_id = $rowQuiz['quiz_id'];
+                          $quizTitle = $rowQuiz['quizTitle'];
+                          $quizInstruction = $rowQuiz['quizInstruction'];
+                          $date = $rowQuiz['date'];
+                          $formattedDate = date('F j', strtotime($date));
+                          $dueDate = $rowQuiz['dueDate'];
+                          $formattedDueDate = date("F j", strtotime($dueDate));
+                          $words = explode(' ', $quizTitle);
+                          $maxWords = 4;
+                          $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                          $collapseID = "collapseQuestion" . $counter;
+
+                          if (count($words) > $maxWords) {
+                            $truncatedTitle .= '...';
+                          }
+                          ?>
+                          <div class="topic-question">
+                            <div class="col-12 grid-margin strech-card">
+                              <div class="body-card"
+                                style="display: flex; justify-content: space-between; align-items: center; height: 10vh;">
+                                <button class="d-flex justify-content-between align-items-center" data-toggle="collapse"
+                                  data-target="#<?php echo $collapseID ?>"
+                                  style="width: 100%; height: 100%; border: none; background-color: transparent;">
+                                  <div style="display: flex; align-items: center;" id="accordionHeading">
+                                    <div
+                                      style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: 20px;">
+                                      <i class="bi bi-card-list"
+                                        style="color: white; line-height: 41px; font-size: 26px;"></i>
+                                    </div>
+                                    <p style="margin-top: 15px; margin-left: 30px; font-size: 17px; color: black;">
+                                      <?php echo $truncatedTitle ?>
+                                    </p>
+                                  </div>
+                                  <div class="ml-auto">
+                                    <p class="text-body-secondary" style="margin-top: 12px;">Due
+                                      <?php echo $formattedDueDate ?>
+                                    </p>
+                                  </div>
+                                </button>
+                                <div class="dropdown">
+                                  <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="font-size: 20px; color: green; margin-right: 10px;">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                  </a>
+
+                                  <ul class="dropdown-menu">
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="edit_quiz.php?updateid=<?php echo $quiz_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                    </li>
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="delete_quiz.php?deleteid=<?php echo $quiz_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                              <div id="<?php echo $collapseID ?>" class="collapse" aria-labelledby="accordionHeading">
+                                <div class="card-body" style="border: 1px solid #ccc;">
+                                  <div class="row mb-2">
+                                    <div class="col-md-8">
+                                      <p class="text-body-secondary">Posted
+                                        <?php echo $formattedDate ?>
+                                      </p>
+                                      <p>
+                                        <?php echo $quizInstruction ?>
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="card-footer" style="border: 1px solid #ccc; 
+                                background-color: transparent; border-radius: 0%;">
+                                  <a href="quiz_course.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $quiz_id ?>&user_id=<?php echo $user_id ?>"
+                                    style="color: green; margin-left: 8px; text-decoration: none;">
+                                    View Quiz
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <?php
+                          $counter++;
+                        }
+                        foreach ($stmt_titles_exam as $rowExam) {
+                          $exam_id = $rowExam['exam_id'];
+                          $examTitle = $rowExam['examTitle'];
+                          $examInstruction = $rowExam['examInstruction'];
+                          $date = $rowExam['date'];
+                          $formattedDate = date('F j', strtotime($date));
+                          $dueDate = $rowExam['dueDate'];
+                          $formattedDueDate = date("F j", strtotime($dueDate));
+                          $words = explode(' ', $examTitle);
+                          $maxWords = 4;
+                          $truncatedTitle = implode(' ', array_slice($words, 0, $maxWords));
+                          $collapseID = "collapseQuestion" . $counter;
+
+                          if (count($words) > $maxWords) {
+                            $truncatedTitle .= '...';
+                          }
+                          ?>
+                          <div class="topic-question">
+                            <div class="col-12 grid-margin strech-card">
+                              <div class="body-card"
+                                style="display: flex; justify-content: space-between; align-items: center; height: 10vh;">
+                                <button class="d-flex justify-content-between align-items-center" data-toggle="collapse"
+                                  data-target="#<?php echo $collapseID ?>"
+                                  style="width: 100%; height: 100%; border: none; background-color: transparent;">
+                                  <div style="display: flex; align-items: center;" id="accordionHeading">
+                                    <div
+                                      style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: 20px;">
+                                      <i class="bi bi-card-list"
+                                        style="color: white; line-height: 41px; font-size: 26px;"></i>
+                                    </div>
+                                    <p style="margin-top: 15px; margin-left: 30px; font-size: 17px; color: black;">
+                                      <?php echo $truncatedTitle ?>
+                                    </p>
+                                  </div>
+                                  <div class="ml-auto">
+                                    <p class="text-body-secondary" style="margin-top: 12px;">Due
+                                      <?php echo $formattedDueDate ?>
+                                    </p>
+                                  </div>
+                                </button>
+                                <div class="dropdown">
+                                  <a href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+                                    style="font-size: 20px; color: green; margin-right: 10px;">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                  </a>
+
+                                  <ul class="dropdown-menu">
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="edit_exam.php?updateid=<?php echo $exam_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
+                                    </li>
+                                    <li>
+                                      <a class="dropdown-item"
+                                        href="delete_exam.php?deleteid=<?php echo $exam_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                              <div id="<?php echo $collapseID ?>" class="collapse" aria-labelledby="accordionHeading">
+                                <div class="card-body" style="border: 1px solid #ccc;">
+                                  <div class="row mb-2">
+                                    <div class="col-md-8">
+                                      <p class="text-body-secondary">Posted
+                                        <?php echo $formattedDate ?>
+                                      </p>
+                                      <p>
+                                        <?php echo $examInstruction ?>
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="card-footer" style="border: 1px solid #ccc; 
+                                background-color: transparent; border-radius: 0%;">
+                                  <a href="exam_course.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $exam_id ?>&user_id=<?php echo $user_id ?>"
+                                    style="color: green; margin-left: 8px; text-decoration: none;">
+                                    View Exam
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <?php
+                          $counter++;
                         }
                         ?>
                       </div>
                     </div>
                   </div>
                   <?php
-                  $counter++;
                 }
                 ?>
               </div>

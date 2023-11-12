@@ -10,10 +10,31 @@ if (isset($_GET['class_id'])) {
   $class_id = $_GET['class_id'];
 }
 
-include("config.php");
+include("db_conn.php");
 $teacher_id = $_SESSION['user_id'];
 
+$_SESSION['id'] = $_GET['updateid'];
+$id = $_SESSION['id'];
+
+$sql = "SELECT * FROM classwork_quiz WHERE quiz_id = ? AND class_id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "ii", $id, $class_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$row = mysqli_fetch_assoc($result);
+
+$quizTitle = $row['quizTitle'];
+$quizInstruction = $row['quizInstruction'];
+$quizLink = $row['quizLink'];
+$quizPoint = $row['quizPoint'];
+$dueDate = $row['dueDate'];
+$time = $row['time'];
+$classTopic = $row['classTopic'];
+
 if (isset($_POST['setQuiz'])) {
+  $class_id = $_GET['class_id'];
+  $teacher_id = $_SESSION['user_id'];
+  $quiz_id = $_SESSION['id'];
   $quizTitle = $_POST['title'];
   $quizInstruction = $_POST['instruction'];
   $quizLink = $_POST['link'];
@@ -24,16 +45,48 @@ if (isset($_POST['setQuiz'])) {
   $dueDate = $_POST['due_date'];
   $time = $_POST['time'];
   $classTopic = $_POST['class_topic'];
-  $quizStatus = "assigned";
 
-  $sqlSetQuiz = "INSERT INTO classwork_quiz (quizTitle, quizInstruction, quizLink, class_name, student, quizPoint, 
-  date, dueDate, time, classTopic, class_id, teacher_id, quizStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  $stmtSetQuiz = $db->prepare($sqlSetQuiz);
-  $stmtSetQuiz->execute([$quizTitle, $quizInstruction, $quizLink, $class_name, $student, $quizPoint, $date, $dueDate, 
-  $time, $classTopic, $class_id, $teacher_id, $quizStatus]);
-  header("Location: class_classwork.php?class_id=$class_id");
-  exit;
+  $sql = "UPDATE classwork_quiz 
+        SET quizTitle = ?,
+            quizInstruction = ?,
+            quizLink = ?,
+            class_name = ?,
+            student = ?,
+            quizPoint = ?,
+            date = ?,
+            dueDate = ?,
+            time = ?,
+            classTopic = ?
+        WHERE teacher_id = ? 
+        AND class_id = ? 
+        AND quiz_id = ?";
+  $stmtupdate = $conn->prepare($sql);
+
+  if ($stmtupdate) {
+    $stmtupdate->bind_param(
+      "sssssissssiii",
+      $quizTitle,
+      $quizInstruction,
+      $quizLink,
+      $class_name,
+      $student,
+      $quizPoint,
+      $date,
+      $dueDate,
+      $time,
+      $classTopic,
+      $teacher_id,
+      $class_id,
+      $quiz_id
+    );
+
+    if ($stmtupdate->execute()) {
+      header("Location: class_classwork.php?class_id=$class_id");
+      exit();
+    }
+  }
 }
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -63,7 +116,7 @@ if (isset($_POST['setQuiz'])) {
         <div>
           <div class="btn-group">
             <button type="submit" id="setQuiz" name="setQuiz" class="btn btn-success"
-              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Set Quiz</button>
+              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Update</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
               style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
@@ -93,7 +146,7 @@ if (isset($_POST['setQuiz'])) {
               <div class="col-md-7 mb-4" style="margin-left: 3px;">
                 <div class="form-floating">
                   <textarea name="title" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Quiz Title"></textarea>
+                    placeholder="Quiz Title"><?php echo $quizTitle ?></textarea>
                   <label for="floatingInput">Quiz Title</label>
                 </div>
               </div>
@@ -105,7 +158,7 @@ if (isset($_POST['setQuiz'])) {
               <div class="col-md-10">
                 <div class="form-floating">
                   <textarea name="instruction" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Instructions" style="height: 200px;"></textarea>
+                    placeholder="Instructions" style="height: 200px;"><?php echo $quizInstruction ?></textarea>
                   <label for="floatingInput">Instructions</label>
                 </div>
               </div>
@@ -117,7 +170,7 @@ if (isset($_POST['setQuiz'])) {
               <div class="col-md-10">
                 <div class="form-floating">
                   <textarea name="link" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Quiz Link"></textarea>
+                    placeholder="Quiz Link"><?php echo $quizLink ?></textarea>
                   <label for="floatingInput">Quiz Link</label>
                 </div>
               </div>
@@ -175,20 +228,21 @@ if (isset($_POST['setQuiz'])) {
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Points</label>
               <div class="col-md-6 mb-4">
-                <input type="text" name="point" class="form-control" style="padding: 10px;">
+                <input type="text" name="point" class="form-control" style="padding: 10px;"
+                  value="<?php echo $quizPoint ?>">
               </div>
             </div>
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Due-date</label>
               <div class="col-md-14 mb-4">
-                <input type="date" name="due_date" id="due_date" class="form-control"
-                  min="<?php echo date('Y-m-d'); ?>">
+                <input type="date" name="due_date" id="due_date" class="form-control" min="<?php echo date('Y-m-d'); ?>"
+                  value="<?php echo $dueDate ?>">
               </div>
             </div>
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Time (AM/PM)</label>
               <div class="col-md-6 mb-4">
-                <input type="text" name="time" class="form-control" style="padding: 10px;" value="11:59 PM">
+                <input type="text" name="time" class="form-control" style="padding: 10px;" value="<?php echo $time ?>">
               </div>
             </div>
             <div class="row">
@@ -203,10 +257,27 @@ if (isset($_POST['setQuiz'])) {
 
                   $sql = "SELECT class_topic FROM topic WHERE teacher_id=$teacher_id AND class_id=$class_id";
                   $result = mysqli_query($conn, $sql);
+                  $matchingOptionFound = false;
 
                   while ($row = mysqli_fetch_assoc($result)) {
                     $class_topic = $row['class_topic'];
-                    echo '<option value="' . $class_topic . '">' . $class_topic . '</option>';
+
+                    $sql_quizTopic = "SELECT classTopic FROM classwork_quiz WHERE quiz_id = $id AND class_id = $class_id";
+                    $stmt_result_quizTopic = mysqli_query($conn, $sql_quizTopic);
+
+                    while ($row_quizTopic = mysqli_fetch_assoc($stmt_result_quizTopic)) {
+                      $class_topicQuiz = $row_quizTopic['classTopic'];
+                      $selected = ($class_topicQuiz == $class_topic) ? 'selected' : '';
+
+                      if ($selected) {
+                        $matchingOptionFound = true;
+                      }
+                      echo '<option value="' . $class_topic . '" ' . $selected . '>' . $class_topic . '</option>';
+                    }
+                  }
+
+                  if (!$matchingOptionFound) {
+                    echo '<option value="" selected>No Topic</option>';
                   }
                   ?>
                 </select>

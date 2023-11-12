@@ -7,8 +7,9 @@
 }
 
 .navbar {
-  height: 10vh;
-  border-bottom: 1px solid #ccc;
+  height: 8vh;
+  border-bottom: 1px solid greenyellow;
+  background-color: green;
 }
 
 .go-back {
@@ -24,6 +25,22 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  position: relative;
+}
+
+.footer {
+    border-top: 2px solid darkgreen;
+    color: green;
+    text-align: center;
+    width: 100%;
+    bottom: 0;
+  }
+
+#divider {
+    border-top: 2px solid #ccc;
+    width: 90%;
+    margin-top: 10px;
+    margin-left: 15px;
 }
 
 .card.answer-box {
@@ -44,17 +61,19 @@
 }
 
 @media (max-width: 768px) {
-
-  p.name,
-  h3.greater {
-    display: none;
+  .navbar {
+    height: 10vh;
   }
-
+  
   p.classname {
     margin-left: -20px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 90%;
+  }
+
+  #divider {
+    width: 94%;
   }
 }

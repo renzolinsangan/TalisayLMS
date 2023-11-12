@@ -1,0 +1,360 @@
+<?php
+session_start();
+include("config.php");
+$teacher_id = $_SESSION['user_id'];
+
+if (!isset($_SESSION['user_id'])) {
+  header("Location: ../../user_login.php");
+  exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+$stmt = $db->prepare($sql);
+$stmt->execute([$user_id]);
+$profile = $stmt->fetchColumn();
+
+if (isset($_GET['class_id'])) {
+  $class_id = $_GET['class_id'];
+}
+
+if (isset($_GET['exam_id'])) {
+  $exam_id = $_GET['exam_id'];
+}
+
+$sql_selectExam = "SELECT * FROM classwork_exam WHERE exam_id = ? AND class_id = ? AND teacher_id = ?";
+$stmt_selectExam = $db->prepare($sql_selectExam);
+$stmt_selectExam->execute([$exam_id, $class_id, $teacher_id]);
+$result = $stmt_selectExam->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($result as $examRow) {
+  $examTitle = $examRow['examTitle'];
+  $examInstruction = $examRow['examInstruction'];
+  $examLink = $examRow['examLink'];
+  $examPoint = $examRow['examPoint'];
+  $date = $examRow['date'];
+  $examStatus = $examRow['examStatus'];
+}
+
+$sql_getStudents = "SELECT * FROM class_enrolled WHERE tc_id = ? AND teacher_id = ? ORDER BY student_firstname ASC";
+$stmt_getStudents = $db->prepare($sql_getStudents);
+$stmt_getStudents->execute([$class_id, $teacher_id]);
+$result = $stmt_getStudents->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($result as $studentRow) {
+  $student_id = $studentRow['student_id'];
+  $student_firstname = $studentRow['student_firstname'];
+  $student_lastname = $studentRow['student_lastname'];
+  $class_name = $studentRow['class_name'];
+
+  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+  $stmt_selectProfile = $db->prepare($sql_selectProfile);
+  $stmt_selectProfile->execute([$student_id]);
+  $otherProfile = $stmt_selectProfile->fetchColumn();
+}
+
+if (isset($_POST['assignmentGrade'])) {
+  $assignmentTitle = $_POST['assignmentTitle'];
+  $studentFirstName = $_POST['studentFirstName'];
+  $studentLastName = $_POST['studentLastName'];
+  $score = $_POST['score'];
+  $assignmentPoint = $_POST['assignmentPoint'];
+  $student_id = $_POST['student_id'];
+
+  $sql_assignmentGrade = "INSERT INTO assignmentgrade (assignmentTitle, studentFirstName, studentLastname, date, score, 
+  assignmentPoint, student_id, teacher_id, class_id, assignment_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
+  $assignmentGradeResult = $stmt_assignmentGrade->execute([
+    $assignmentTitle,
+    $studentFirstName,
+    $studentLastName,
+    $date,
+    $score,
+    $assignmentPoint,
+    $student_id,
+    $teacher_id,
+    $class_id,
+    $assignment_id
+  ]);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Talisay Senior High School LMS User</title>
+  <link rel="stylesheet" href="../../vendors/feather/feather.css">
+  <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
+  <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/my_student.css">
+  <link rel="shortcut icon" href="assets/image/trace.svg" />
+</head>
+
+<body>
+  <div class="container-scroller">
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+      <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+        <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
+            alt="logo" />Talisay LMS</a>
+        <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/trace.svg" alt="logo" /></a>
+      </div>
+      <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+        <ul class="navbar-nav navbar-nav-right">
+          <li class="nav-item dropdown">
+            <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
+              data-toggle="dropdown">
+              <i class="icon-bell mx-0"></i>
+              <span class="count"></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
+              aria-labelledby="notificationDropdown">
+              <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-success">
+                    <i class="ti-info-alt mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
+                  <p class="font-weight-light small-text mb-0 text-muted">
+                    Just now
+                  </p>
+                </div>
+              </a>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-warning">
+                    <i class="ti-settings mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <h6 class="preview-subject font-weight-normal">Settings</h6>
+                  <p class="font-weight-light small-text mb-0 text-muted">
+                    Private message
+                  </p>
+                </div>
+              </a>
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <div class="preview-icon bg-info">
+                    <i class="ti-user mx-0"></i>
+                  </div>
+                </div>
+                <div class="preview-item-content">
+                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
+                  <p class="font-weight-light small-text mb-0 text-muted">
+                    2 days ago
+                  </p>
+                </div>
+              </a>
+            </div>
+          </li>
+          <li class="nav-item nav-profile dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+              <img src="assets/image/<?php echo $profile ?>" alt="profile" onerror="this.src='images/profile.png'" />
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+              <a href="profile.php" class="dropdown-item">
+                <i class="bi bi-person-circle text-success"></i>
+                Profile
+              </a>
+              <a href="user_logout.php" class="dropdown-item">
+                <i class="ti-power-off text-success"></i>
+                Logout
+              </a>
+            </div>
+          </li>
+        </ul>
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+          data-toggle="offcanvas">
+          <span class="icon-menu"></span>
+        </button>
+      </div>
+    </nav>
+    <div class="container-fluid page-body-wrapper">
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <ul class="nav">
+          <li class="nav-item mb-3">
+            <a class="nav-link" href="index.php">
+              <i class="icon-grid menu-icon"></i>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item mb-3">
+            <a class="nav-link" href="course.php">
+              <i class="menu-icon"><i class="bi bi-journals"></i></i>
+              <span class="menu-title">Courses</span>
+            </a>
+          </li>
+          <li class="nav-item mb-3">
+            <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false"
+              aria-controls="form-elements">
+              <i class="menu-icon"><i class="bi bi-people"></i></i>
+              <span class="menu-title">Users</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="form-elements">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"><a class="nav-link" href="friend.php">My Friends</a></li>
+                <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item mb-3">
+            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+              <i class="menu-icon"><i class="bi bi-exclamation-triangle"></i></i>
+              <span class="menu-title">Reports</span>
+              <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="charts">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link"
+                    href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a>
+                </li>
+                <li class="nav-item"> <a class="nav-link"
+                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="nav-item mb-3">
+            <a class="nav-link" href="feedback.php">
+              <i class="menu-icon"><i class="bi bi-chat-right-quote"></i></i>
+              <span class="menu-title">Feedbacks</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <div class="row mb-4">
+            <div class="col">
+              <h2>
+                <?php echo $class_name ?>
+              </h2>
+              <p class="text-body-secondary">(Exam Review)</p>
+              <a href="toreview.php?class_id=<?php echo $class_id ?>" style="text-decoration: none; color: green;">
+                Go back to to-review page.
+              </a>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-md-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="ml-4 mt-3 mb-3" s>
+                  <h2>
+                    <?php echo $examTitle ?>
+                  </h2>
+                  <p class="text-body-secondary">Instructions:
+                    <?php echo $examInstruction ?>
+                  </p>
+                </div>
+                <div class="row">
+                  <?php
+                  foreach ($result as $studentRow) {
+                    $student_id = $studentRow['student_id'];
+                    $student_firstname = $studentRow['student_firstname'];
+                    $student_lastname = $studentRow['student_lastname'];
+                    $class_name = $studentRow['class_name'];
+
+                    $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                    $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                    $stmt_selectProfile->execute([$student_id]);
+                    $profileResult = $stmt_selectProfile->fetchAll(PDO::FETCH_ASSOC);
+
+                    foreach ($profileResult as $profileRow) {
+                      $otherProfile = $profileRow['profile'];
+                      ?>
+                      <div class="col-md-3 mb-4">
+                        <div class="card card-tale justify-content-center align-items-center" data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop_<?php echo $student_id; ?>" style="cursor: pointer;">
+                          <div class="circle-image mt-4 mb-3">
+                            <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
+                          </div>
+                          <p class="text-body-secondary">
+                            <?php echo $student_firstname . ' ' . $student_lastname ?>
+                          </p>
+                        </div>
+                      </div>
+                      <div class="modal fade" id="staticBackdrop_<?php echo $student_id; ?>" data-bs-backdrop="static"
+                        data-bs-keyboard="false" tabindex="-1"
+                        aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <form action="" method="post">
+                            <div class="modal-content">
+                              <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                  <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                  <?php echo $examTitle ?> (
+                                  <?php echo $date ?>)
+                                  <input type="hidden" name="assignmentTitle" value="<?php echo $title ?>">
+                                  <p class="text-body-secondary">by
+                                    <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                    <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                                    <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
+                                  </p>
+                                  <p style="color: green;"><?php echo ucfirst($examStatus) ?></p>
+                                  <p>
+                                  <input type="text" name="score" style=" height: 4vh; width: 4vh; font-size: 13px; border: none;
+                                    border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
+                                  / <?php echo $examPoint ?>
+                                </p>
+                                </h1>
+                              </div>
+                              <div class="modal-body">
+                                <p>Exam are taken through Google Form. Please check the Google Form to review the exam and determine the score of the student.</p>
+                                <span>Link: <a href="https://docs.google.com/forms/" target="_blank">https://docs.google.com/forms/</a></span>
+                                <p class="text-body-secondary">(make sure to open the link with your account)</p>
+                              </div>
+                              <div class="modal-footer" style="border: none;">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <?php
+                                if (empty($assignmentScoreResult)) {
+                                  ?>
+                                  <button type="submit" name="assignmentGrade" class="btn btn-success">Submit</button>
+                                  <?php
+                                } else {
+                                  ?>
+                                  <button type="button" name="editGrade" class="btn btn-success">Edit</button>
+                                  <?php
+                                }
+                                ?>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                      <?php
+                    }
+                  }
+                  ?>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
+</body>
+
+</html>

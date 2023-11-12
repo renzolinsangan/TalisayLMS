@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 06, 2023 at 08:31 AM
+-- Generation Time: Nov 12, 2023 at 01:16 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -86,7 +86,7 @@ CREATE TABLE `classwork_assignment` (
   `title` varchar(100) NOT NULL,
   `instruction` varchar(1000) NOT NULL,
   `class_name` varchar(100) NOT NULL,
-  `student` varchar(100) NOT NULL,
+  `student` varchar(1000) NOT NULL,
   `point` int(11) NOT NULL,
   `date` date NOT NULL,
   `due_date` date NOT NULL,
@@ -125,6 +125,36 @@ CREATE TABLE `classwork_assignment_upload` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `classwork_exam`
+--
+
+CREATE TABLE `classwork_exam` (
+  `exam_id` int(11) NOT NULL,
+  `examTitle` varchar(64) NOT NULL,
+  `examInstruction` varchar(1000) NOT NULL,
+  `examLink` varchar(1000) NOT NULL,
+  `class_name` varchar(64) NOT NULL,
+  `student` varchar(1000) NOT NULL,
+  `examPoint` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `dueDate` date NOT NULL,
+  `time` varchar(64) NOT NULL,
+  `classTopic` varchar(64) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `examStatus` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `classwork_exam`
+--
+
+INSERT INTO `classwork_exam` (`exam_id`, `examTitle`, `examInstruction`, `examLink`, `class_name`, `student`, `examPoint`, `date`, `dueDate`, `time`, `classTopic`, `class_id`, `teacher_id`, `examStatus`) VALUES
+(1, 'Final Exam in General Biology', 'No cheating, please answer honestly. Good Luck on your exam class!', 'https://docs.google.com/forms/d/e/1FAIpQLSc0jl5ypYrj5NU8E05cAnb5QFZv3IxCd6nMyIg-s850bTbSVA/viewform?usp=sf_link', 'STEM-Einstein - General Biology', 'R.J Liwag,Marco Luis Hernandez,Carl Justine Aala,Martin Clarence Guantes,John Renzo Linsangan', 50, '2023-11-10', '2023-11-10', '11:59 PM', 'Exams', 39, 33, 'missing');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `classwork_material`
 --
 
@@ -133,7 +163,7 @@ CREATE TABLE `classwork_material` (
   `title` varchar(500) NOT NULL,
   `description` varchar(2000) NOT NULL,
   `class_name` varchar(64) NOT NULL,
-  `student` varchar(64) NOT NULL,
+  `student` varchar(1000) NOT NULL,
   `class_topic` varchar(64) NOT NULL,
   `class_id` int(11) NOT NULL,
   `teacher_id` int(11) NOT NULL,
@@ -184,7 +214,7 @@ CREATE TABLE `classwork_question` (
   `question` varchar(500) NOT NULL,
   `instruction` varchar(500) NOT NULL,
   `class_name` varchar(100) NOT NULL,
-  `student` varchar(100) NOT NULL,
+  `student` varchar(1000) NOT NULL,
   `point` int(11) NOT NULL,
   `point_received` int(11) NOT NULL,
   `date` date NOT NULL,
@@ -229,20 +259,27 @@ CREATE TABLE `classwork_question_upload` (
 
 CREATE TABLE `classwork_quiz` (
   `quiz_id` int(11) NOT NULL,
-  `quiz_title` varchar(64) NOT NULL,
-  `form_description` varchar(64) NOT NULL,
-  `question_title` varchar(64) NOT NULL,
-  `question_type` varchar(64) NOT NULL,
-  `question_details` varchar(1000) NOT NULL
+  `quizTitle` varchar(64) NOT NULL,
+  `quizInstruction` varchar(1000) NOT NULL,
+  `quizLink` varchar(1000) NOT NULL,
+  `class_name` varchar(64) NOT NULL,
+  `student` varchar(1000) NOT NULL,
+  `quizPoint` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `dueDate` date NOT NULL,
+  `time` varchar(50) NOT NULL,
+  `classTopic` varchar(64) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `quizStatus` varchar(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `classwork_quiz`
 --
 
-INSERT INTO `classwork_quiz` (`quiz_id`, `quiz_title`, `form_description`, `question_title`, `question_type`, `question_details`) VALUES
-(13, 'Quiz Title', 'Form Description', 'Untitled Question', 'multiple', '[]'),
-(14, 'Quiz Title', 'Form Description', 'Untitled Question', 'multiple', '[]');
+INSERT INTO `classwork_quiz` (`quiz_id`, `quizTitle`, `quizInstruction`, `quizLink`, `class_name`, `student`, `quizPoint`, `date`, `dueDate`, `time`, `classTopic`, `class_id`, `teacher_id`, `quizStatus`) VALUES
+(15, 'Cell Biology Quiz', 'Answer this quiz which is a true or false question. Goodluck on the quiz and make sure to answer it on time.', 'https://forms.gle/Ln2Mf75r5EU62BDM6', 'STEM-Einstein - General Biology', 'R.J Liwag,Marco Luis Hernandez,Carl Justine Aala,Martin Clarence Guantes,John Renzo Linsangan', 10, '2023-11-10', '2023-11-15', '11:59 PM', 'Cell Biology', 39, 33, 'assigned');
 
 -- --------------------------------------------------------
 
@@ -312,6 +349,26 @@ INSERT INTO `class_theme` (`theme_id`, `theme`, `class_id`, `teacher_id`, `class
 (25, 'theme9.jpg', 40, 33, 'STEM-Einstein - Basic Calculus', 'recent'),
 (26, 'theme8.jpg', 45, 33, 'STEM-D - Oral Communication', 'old'),
 (27, 'theme8.jpg', 45, 33, 'STEM-Einstein - Oral Communication', 'recent');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `examgrade`
+--
+
+CREATE TABLE `examgrade` (
+  `examGrade_id` int(11) NOT NULL,
+  `examTitle` varchar(64) NOT NULL,
+  `studentFirstName` varchar(64) NOT NULL,
+  `studentLastName` varchar(64) NOT NULL,
+  `date` date NOT NULL,
+  `score` int(11) NOT NULL,
+  `quizPoint` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `exam_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -417,6 +474,26 @@ INSERT INTO `questiongrade` (`questionGrade_id`, `questionTitle`, `studentFirstN
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `quizgrade`
+--
+
+CREATE TABLE `quizgrade` (
+  `quizGrade_id` int(11) NOT NULL,
+  `quizTitle` varchar(64) NOT NULL,
+  `studentFirstName` varchar(64) NOT NULL,
+  `studentLastName` varchar(64) NOT NULL,
+  `date` date NOT NULL,
+  `score` int(11) NOT NULL,
+  `quizPoint` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `quiz_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `section`
 --
 
@@ -497,6 +574,32 @@ INSERT INTO `student_assignment_course_answer` (`answer_assignment_id`, `assignm
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `student_exam_course_answer`
+--
+
+CREATE TABLE `student_exam_course_answer` (
+  `answer_exam_id` int(11) NOT NULL,
+  `exam_id` int(11) NOT NULL,
+  `examTitle` varchar(100) NOT NULL,
+  `examLink` varchar(100) NOT NULL,
+  `examPoint` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `exam_course_status` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `student_exam_course_answer`
+--
+
+INSERT INTO `student_exam_course_answer` (`answer_exam_id`, `exam_id`, `examTitle`, `examLink`, `examPoint`, `date`, `user_id`, `class_id`, `teacher_id`, `exam_course_status`) VALUES
+(3, 1, 'Final Exam in General Biology', 'https://docs.google.com/forms/d/e/1FAIpQLSc0jl5ypYrj5NU8E05cAnb5QFZv3IxCd6nMyIg-s850bTbSVA/viewform?', 50, '2023-11-10', 28, 52, 33, 'turned-in late');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `student_question_course_answer`
 --
 
@@ -521,6 +624,32 @@ INSERT INTO `student_question_course_answer` (`answer_question_id`, `question_id
 (25, 21, 30, 'Cell Biology', '2023-10-15', 'Cell biology is the scientific discipline that investigates the structure, function, and behavior of cells, which are the fundamental units of life. It encompasses the study of various cellular processes, interactions, and the molecular mechanisms that underlie the functions of cells within living organisms. Cell biology is integral to understanding how life is organized and how organisms function at the cellular level.', 28, 52, 33, 'turned-in late'),
 (27, 21, 40, 'Cell Biology', '2023-10-15', 'Cell biology is a branch of biology that focuses on the study of cells, which are the basic structural and functional units of living organisms. It encompasses a wide range of topics related to cells, including their structure, function, physiology, and interactions. Cell biology explores how cells are organized, how they communicate with each other, and how they carry out various biological processes.', 38, 49, 33, 'turned-in late'),
 (29, 23, 20, 'Cell Evolution', '2023-10-24', 'What happens from cell evolution is that, cell evolution traces the development and diversification of cells, the fundamental units of life, over billions of years. All life shares a common ancestry, and cells have evolved from simple, early forms to more complex prokaryotic and eukaryotic structures. Genetic variation, driven by mutations, has played a central role, with natural selection favoring advantageous traits that enhance an organism\'s fitness and adaptation to its environment. This ongoing process has led to the emergence of new species and the diverse cellular structures and functions seen today. Molecular biology has shed light on the genetic and molecular changes that underlie cell evolution, and the endosymbiotic theory explains the origins of some cellular structures. Cell evolution is an integral part of the broader theory of biological evolution, illustrating the interconnectedness of all life on Earth.', 28, 52, 33, 'turned in');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_quiz_course_answer`
+--
+
+CREATE TABLE `student_quiz_course_answer` (
+  `answer_quiz_id` int(11) NOT NULL,
+  `quiz_id` int(11) NOT NULL,
+  `quizTitle` varchar(64) NOT NULL,
+  `quizLink` varchar(100) NOT NULL,
+  `quizPoint` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `quiz_course_status` varchar(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `student_quiz_course_answer`
+--
+
+INSERT INTO `student_quiz_course_answer` (`answer_quiz_id`, `quiz_id`, `quizTitle`, `quizLink`, `quizPoint`, `date`, `user_id`, `class_id`, `teacher_id`, `quiz_course_status`) VALUES
+(1, 15, 'Cell Biology Quiz', 'https://forms.gle/Ln2Mf75r5EU62BDM6', 10, '2023-11-10', 28, 52, 33, 'turned in');
 
 -- --------------------------------------------------------
 
@@ -564,23 +693,8 @@ CREATE TABLE `topic` (
 --
 
 INSERT INTO `topic` (`topic_id`, `class_topic`, `class_id`, `teacher_id`, `section`, `subject`, `strand`, `class_name`) VALUES
-(64, 'Derivative', 35, 33, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
-(65, 'Functions', 35, 33, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
-(66, 'Integral', 35, 33, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
-(67, 'Free Fall', 36, 33, 'STEM-A', 'General Physics', 'STEM', 'STEM-A - General Physics'),
-(68, 'Velocity', 36, 33, 'STEM-A', 'General Physics', 'STEM', 'STEM-A - General Physics'),
-(69, 'Law of Motion', 36, 33, 'STEM-A', 'General Physics', 'STEM', 'STEM-A - General Physics'),
-(70, 'Ecology', 37, 33, 'STEM-F', 'General Biology', 'STEM', 'STEM-F - General Biology'),
-(71, 'Biology', 37, 33, 'STEM-F', 'General Biology', 'STEM', 'STEM-F - General Biology'),
-(72, 'Cell Biology', 37, 33, 'STEM-F', 'General Biology', 'STEM', 'STEM-F - General Biology'),
-(73, 'Architecture', 34, 32, 'STEM-C', 'Art Appreciation', 'STEM', 'STEM-C - Art Appreciation'),
-(74, 'Painting', 34, 32, 'STEM-C', 'Art Appreciation', 'STEM', 'STEM-C - Art Appreciation'),
-(75, 'Sculpture', 34, 32, 'STEM-C', 'Art Appreciation', 'STEM', 'STEM-C - Art Appreciation'),
-(76, 'Derivative', 38, 32, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
-(77, 'Functions', 38, 32, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
-(78, 'Integral', 38, 32, 'STEM-B', 'Basic Calculus', 'STEM', 'STEM-B - Basic Calculus'),
 (79, 'Cell Biology', 39, 33, 'Einstein', 'General Biology', 'STEM', 'STEM-Einstein - General Biology'),
-(80, 'Cytoskeleton', 39, 33, 'Einstein', 'General Biology', 'STEM', 'STEM-Einstein - General Biology');
+(82, 'Exams', 39, 33, 'Einstein', 'General Biology', 'STEM', 'STEM-Einstein - General Biology');
 
 -- --------------------------------------------------------
 
@@ -705,6 +819,12 @@ ALTER TABLE `classwork_assignment_upload`
   ADD PRIMARY KEY (`assignment_upload_id`);
 
 --
+-- Indexes for table `classwork_exam`
+--
+ALTER TABLE `classwork_exam`
+  ADD PRIMARY KEY (`exam_id`);
+
+--
 -- Indexes for table `classwork_material`
 --
 ALTER TABLE `classwork_material`
@@ -747,6 +867,12 @@ ALTER TABLE `class_theme`
   ADD PRIMARY KEY (`theme_id`);
 
 --
+-- Indexes for table `examgrade`
+--
+ALTER TABLE `examgrade`
+  ADD PRIMARY KEY (`examGrade_id`);
+
+--
 -- Indexes for table `feedback`
 --
 ALTER TABLE `feedback`
@@ -771,6 +897,12 @@ ALTER TABLE `questiongrade`
   ADD PRIMARY KEY (`questionGrade_id`);
 
 --
+-- Indexes for table `quizgrade`
+--
+ALTER TABLE `quizgrade`
+  ADD PRIMARY KEY (`quizGrade_id`);
+
+--
 -- Indexes for table `section`
 --
 ALTER TABLE `section`
@@ -789,10 +921,22 @@ ALTER TABLE `student_assignment_course_answer`
   ADD PRIMARY KEY (`answer_assignment_id`);
 
 --
+-- Indexes for table `student_exam_course_answer`
+--
+ALTER TABLE `student_exam_course_answer`
+  ADD PRIMARY KEY (`answer_exam_id`);
+
+--
 -- Indexes for table `student_question_course_answer`
 --
 ALTER TABLE `student_question_course_answer`
   ADD PRIMARY KEY (`answer_question_id`);
+
+--
+-- Indexes for table `student_quiz_course_answer`
+--
+ALTER TABLE `student_quiz_course_answer`
+  ADD PRIMARY KEY (`answer_quiz_id`);
 
 --
 -- Indexes for table `teacher`
@@ -839,7 +983,7 @@ ALTER TABLE `assignmentgrade`
 -- AUTO_INCREMENT for table `assignment_course_upload`
 --
 ALTER TABLE `assignment_course_upload`
-  MODIFY `assignment_course_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=102;
+  MODIFY `assignment_course_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT for table `classwork_assignment`
@@ -852,6 +996,12 @@ ALTER TABLE `classwork_assignment`
 --
 ALTER TABLE `classwork_assignment_upload`
   MODIFY `assignment_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `classwork_exam`
+--
+ALTER TABLE `classwork_exam`
+  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `classwork_material`
@@ -881,7 +1031,7 @@ ALTER TABLE `classwork_question_upload`
 -- AUTO_INCREMENT for table `classwork_quiz`
 --
 ALTER TABLE `classwork_quiz`
-  MODIFY `quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `class_enrolled`
@@ -894,6 +1044,12 @@ ALTER TABLE `class_enrolled`
 --
 ALTER TABLE `class_theme`
   MODIFY `theme_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT for table `examgrade`
+--
+ALTER TABLE `examgrade`
+  MODIFY `examGrade_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `feedback`
@@ -920,6 +1076,12 @@ ALTER TABLE `questiongrade`
   MODIFY `questionGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
+-- AUTO_INCREMENT for table `quizgrade`
+--
+ALTER TABLE `quizgrade`
+  MODIFY `quizGrade_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `section`
 --
 ALTER TABLE `section`
@@ -938,10 +1100,22 @@ ALTER TABLE `student_assignment_course_answer`
   MODIFY `answer_assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
 
 --
+-- AUTO_INCREMENT for table `student_exam_course_answer`
+--
+ALTER TABLE `student_exam_course_answer`
+  MODIFY `answer_exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `student_question_course_answer`
 --
 ALTER TABLE `student_question_course_answer`
   MODIFY `answer_question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
+-- AUTO_INCREMENT for table `student_quiz_course_answer`
+--
+ALTER TABLE `student_quiz_course_answer`
+  MODIFY `answer_quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `teacher`
@@ -953,7 +1127,7 @@ ALTER TABLE `teacher`
 -- AUTO_INCREMENT for table `topic`
 --
 ALTER TABLE `topic`
-  MODIFY `topic_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `topic_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
 
 --
 -- AUTO_INCREMENT for table `users`

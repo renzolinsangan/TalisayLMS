@@ -180,12 +180,15 @@ if ($teacher_id) {
       <div class="main-panel">
         <div class="header-sticky">
           <div class="header-links">
-            <a class="btn-success" href="class_course.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"><i
+            <a class="btn-success"
+              href="class_course.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"><i
                 class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-            <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="people"
-              style="margin-left: 2vh;">Assigned</a>
-            <a href="todolist_missing.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="people">Missing</a>
-            <a href="todolist_done.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>" class="nav-link active">Done</a>
+            <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+              class="people" style="margin-left: 2vh;">Assigned</a>
+            <a href="todolist_missing.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+              class="people">Missing</a>
+            <a href="todolist_done.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+              class="nav-link active">Done</a>
           </div>
         </div>
         <div class="content-wrapper align-items-center justify-content-center" style="margin-top: 10vh;">
@@ -204,6 +207,8 @@ if ($teacher_id) {
               <?php
               $assignment_results = [];
               $question_results = [];
+              $quiz_results = [];
+              $exam_results = [];
 
               $sql_assignment = "SELECT assignment_id, title, date, assignment_course_status FROM student_assignment_course_answer WHERE 
               teacher_id = ? AND class_id = ? AND (assignment_course_status = 'turned in' OR assignment_course_status = 'turned-in late')";
@@ -217,7 +222,19 @@ if ($teacher_id) {
               $stmt_question->execute([$teacher_id, $class_id]);
               $question_results = $stmt_question->fetchall();
 
-              $combined_results = array_merge($assignment_results, $question_results);
+              $sql_quiz = "SELECT quiz_id, quizTitle, date, quiz_course_status FROM student_quiz_course_answer WHERE
+              teacher_id = ? AND class_id = ? AND (quiz_course_status = 'turned in' OR quiz_course_status = 'turned-in late')";
+              $stmt_quiz = $db->prepare($sql_quiz);
+              $stmt_quiz->execute([$teacher_id, $class_id]);
+              $quiz_results = $stmt_quiz->fetchAll();
+
+              $sql_exam = "SELECT exam_id, examTitle, date, exam_course_status FROM student_exam_course_answer WHERE
+              teacher_id = ? AND class_id =? AND (exam_course_status = 'turned in' OR exam_course_status = 'turned-in late')";
+              $stmt_exam = $db->prepare($sql_exam);
+              $stmt_exam->execute([$teacher_id, $class_id]);
+              $exam_results = $stmt_exam->fetchAll();
+
+              $combined_results = array_merge($assignment_results, $question_results, $quiz_results, $exam_results);
               usort($combined_results, function ($a, $b) {
                 return strtotime($a['date']) - strtotime($b['date']);
               });
@@ -279,7 +296,69 @@ if ($teacher_id) {
                       </div>
                       <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                         <span>
-                        <?php echo ucfirst($question_course_status) ?>
+                          <?php echo ucfirst($question_course_status) ?>
+                        </span>
+                      </div>
+                    </a>
+                  </div>
+                  <?php
+                } elseif (isset($row['quiz_id'])) {
+                  $quiz_id = $row['quiz_id'];
+                  $quizTitle = $row['quizTitle'];
+                  $date = $row['date'];
+                  $timestamp = strtotime($date);
+                  $formatted_date = date("F d", $timestamp);
+                  $quiz_course_status = $row['quiz_course_status'];
+                  ?>
+                  <div class="d-grid gap-2 col-10 mx-auto mb-4">
+                    <a class="announce" type="button"
+                      href="quiz_course.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $quiz_id ?>&user_id=<?php echo $user_id ?>"
+                      style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      <div
+                        style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                        <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                      </div>
+                      <p
+                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <?php echo $quizTitle ?>
+                      </p>
+                      <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                        <?php echo $class_name ?>
+                      </div>
+                      <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                        <span>
+                          <?php echo ucfirst($quiz_course_status) ?>
+                        </span>
+                      </div>
+                    </a>
+                  </div>
+                  <?php
+                } elseif (isset($row['exam_id'])) {
+                  $exam_id = $row['exam_id'];
+                  $examTitle = $row['examTitle'];
+                  $date = $row['date'];
+                  $timestamp = strtotime($date);
+                  $formatted_date = date("F d", $timestamp);
+                  $exam_course_status = $row['exam_course_status'];
+                  ?>
+                  <div class="d-grid gap-2 col-10 mx-auto mb-4">
+                    <a class="announce" type="button"
+                      href="exam_course.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $exam_id ?>&user_id=<?php echo $user_id ?>"
+                      style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      <div
+                        style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                        <i class="bi bi-question-square" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                      </div>
+                      <p
+                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <?php echo $examTitle ?>
+                      </p>
+                      <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                        <?php echo $class_name ?>
+                      </div>
+                      <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                        <span>
+                          <?php echo ucfirst($exam_course_status) ?>
                         </span>
                       </div>
                     </a>

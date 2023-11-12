@@ -115,7 +115,7 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Talisay Senior High School LMS</title>
   <link rel="stylesheet" type="text/css" href="assets/css/virtual-select.min.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/assignment_course.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/ass_course.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -126,15 +126,11 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
 
   <nav class="navbar navbar-light fs-3 mb-5">
     <div class="d-flex align-items-center justify-content-between w-100">
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center" style="margin-top: -3px;">
         <button type="button" class="go-back" onclick="goToClasswork('<?php echo $class_id; ?>')"><i
-            class="bi bi-arrow-bar-left"></i></button>
-        <p class="name text-body-secondary" style="margin-top: 10px; font-size: 22px; pointer-events: none;">
-          <?php echo $first_name . " " . $last_name ?>
-        </p>
-        <h3 class="greater" style="margin-left: 10px; margin-top: 5px; margin-right: 10px; pointer-events: none;">></h3>
-        <p class="classname text-body-secondary" style="margin-top: 10px; font-size: 22px; pointer-events: none;">
-          <?php echo $class_name ?>
+            class="bi bi-arrow-bar-left" style="color: white;"></i></button>
+        <p class="name" style="margin-top: 6px; font-size: 22px; pointer-events: none; color: white;">
+          Assignment
         </p>
       </div>
     </div>
@@ -569,6 +565,17 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
           <?php
         }
         ?>
+      </div>
+    </div>
+  </div>
+  <div class="footer mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col mt-2 text-center">
+          <p>
+            <?php echo $class_name ?>
+          </p>
+        </div>
       </div>
     </div>
   </div>

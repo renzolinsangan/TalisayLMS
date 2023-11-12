@@ -7,8 +7,8 @@
 }
 
 .navbar {
-    height: 10vh;
-    border-bottom: 1px solid #ccc;
+    height: 8vh;
+    border-bottom: 2px solid greenyellow;
 }
 
 .go-back {
@@ -23,24 +23,35 @@
 .wrapper {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
+    min-height: 77vh;
+    position: relative;
 }
 
-@media (min-width: 768px) {
-    .card-top-right {
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
+.footer {
+    border-top: 2px solid darkgreen;
+    color: green;
+    text-align: center;
+    width: 100%;
+    bottom: 0;
   }
 
+#divider{
+    border-top: 2px solid #ccc;
+    width: 65%;
+    margin-top: 10px;
+    margin-left: 15px;
+}
+
+#submit-card {
+    margin-top: -38vh;
+    margin-right: -10vh;
+}
+
 @media (max-width: 768px) {
-
-    p.name,
-    h3.greater {
-        display: none;
+    .navbar {
+        height: 10vh;
     }
-
+    
     p.classname {
         margin-left: -20px;
         white-space: nowrap;
@@ -49,7 +60,12 @@
         max-width: 90%;
     }
 
-    hr.divider {
-        width: 70%;
+    #divider {
+        width: 94%;
+    }
+
+    #submit-card {
+        margin-right: 0vh;
+        margin-top: 0vh;
     }
 }

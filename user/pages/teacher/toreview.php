@@ -184,7 +184,6 @@ if ($teacher_id) {
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
         <div class="header-sticky">
           <div class="header-links">
@@ -211,6 +210,8 @@ if ($teacher_id) {
               <?php
               $assignment_results = [];
               $question_results = [];
+              $quiz_results = [];
+              $exam_results = [];
 
               $sql_assignment = "SELECT assignment_id, title, class_name, due_date FROM classwork_assignment WHERE class_id = ?";
               $stmt_assignment = $db->prepare($sql_assignment);
@@ -222,9 +223,22 @@ if ($teacher_id) {
               $stmt_question->execute([$class_id]);
               $question_results = $stmt_question->fetchall();
 
-              $combined_results = array_merge($assignment_results, $question_results);
+              $sql_quiz = "SELECT quiz_id, quizTitle, class_name, dueDate FROM classwork_quiz WHERE class_id = ?";
+              $stmt_quiz = $db->prepare($sql_quiz);
+              $stmt_quiz->execute([$class_id]);
+              $quiz_results = $stmt_quiz->fetchAll();
+
+              $sql_exam = "SELECT exam_id, examTitle, class_name, dueDate FROM classwork_exam WHERE class_id = ?";
+              $stmt_exam = $db->prepare($sql_exam);
+              $stmt_exam->execute([$class_id]);
+              $exam_results = $stmt_exam->fetchAll();
+
+              $combined_results = array_merge($assignment_results, $question_results, $quiz_results, $exam_results);
               usort($combined_results, function ($a, $b) {
-                return strtotime($a['due_date']) - strtotime($b['due_date']);
+                  $dueDateA = isset($a['dueDate']) ? $a['dueDate'] : $a['due_date'];
+                  $dueDateB = isset($b['dueDate']) ? $b['dueDate'] : $b['due_date'];
+              
+                  return strtotime($dueDateA) - strtotime($dueDateB);
               });
 
               if (empty($combined_results)) {
@@ -256,7 +270,7 @@ if ($teacher_id) {
                         </div>
                         <p style="font-size: 17px; margin-top: -36px; margin-left: 7vh; 
                           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                          <?php echo $title ?>
+                          Assignment: <?php echo $title ?>
                         </p>
                         <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                           <p class="text-body-secondary"
@@ -289,7 +303,73 @@ if ($teacher_id) {
                         </div>
                         <p style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; 
                           overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                          <?php echo $title ?>
+                          Question: <?php echo $title ?>
+                        </p>
+                        <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                          <p class="text-body-secondary"
+                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                            <?php echo $class_name ?> -
+                            <span>
+                              Due
+                              <?php echo $formatted_date ?>
+                            </span>
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                    <?php
+                  } elseif(isset($row['quiz_id'])) {
+                    $quiz_id = $row['quiz_id'];
+                    $quizTitle = $row['quizTitle'];
+                    $class_name = $row['class_name'];
+                    $dueDate = $row['dueDate'];
+                    $timestamp = strtotime($dueDate);
+                    $formatted_date = date("F d", $timestamp);
+                    ?>
+                    <div class="d-grid gap-2 col-10 mx-auto mb-4">
+                      <a class="announce" type="button"
+                        href="quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $quiz_id ?>"
+                        style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <div
+                          style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                          <i class="bi bi-card-list" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                        </div>
+                        <p style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; 
+                          overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                          Quiz: <?php echo $quizTitle ?>
+                        </p>
+                        <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                          <p class="text-body-secondary"
+                            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                            <?php echo $class_name ?> -
+                            <span>
+                              Due
+                              <?php echo $formatted_date ?>
+                            </span>
+                          </p>
+                        </div>
+                      </a>
+                    </div>
+                    <?php
+                  } elseif(isset($row['exam_id'])) {
+                    $exam_id = $row['exam_id'];
+                    $examTitle = $row['examTitle'];
+                    $class_name = $row['class_name'];
+                    $dueDate = $row['dueDate'];
+                    $timestamp = strtotime($dueDate);
+                    $formatted_date = date("F d", $timestamp);
+                    ?>
+                    <div class="d-grid gap-2 col-10 mx-auto mb-4">
+                      <a class="announce" type="button"
+                        href="exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $exam_id ?>"
+                        style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <div
+                          style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                          <i class="bi bi-card-list" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                        </div>
+                        <p style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; 
+                          overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
+                          Exam: <?php echo $examTitle ?>
                         </p>
                         <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                           <p class="text-body-secondary"

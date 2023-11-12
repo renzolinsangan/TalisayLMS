@@ -17,6 +17,7 @@ if (!isset($_SESSION['id'])) {
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet" href="../../css/styles.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
 </head>
@@ -189,20 +190,19 @@ if (!isset($_SESSION['id'])) {
                   <div class="col-md-12">
                     <div class="card-body">
                       <div class="table-responsive">
-                        <table class="table text-center">
+                        <table id="example" class="table text-center"
+                          style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                           <thead class="table" style="background-color: #4BB543; color: white;">
                             <tr>
-                              <th scope="col">Username</th>
-                              <th scope="col">Password</th>
-                              <th scope="col">Email</th>
-                              <th scope="col">House Address</th>
-                              <th scope="col">Contact Number</th>
-                              <th scope="col">First Name</th>
-                              <th scope="col">Middle Name</th>
-                              <th scope="col">Last Name</th>
-                              <th scope="col">Department</th>
-                              <th scope="col">User Type</th>
-                              <th scope="col">Action</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">First Name</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Middle Name</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Last Name</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">House Address</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Email</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Contact Number</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Department</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">User Type</th>
+                              <th scope="col" style="text-align: center; overflow: hidden;">Action</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -215,37 +215,31 @@ if (!isset($_SESSION['id'])) {
                             while ($row = mysqli_fetch_assoc($result)) {
                               ?>
                               <tr>
-                                <td>
-                                  <?php echo $row['username'] ?>
-                                </td>
-                                <td>
-                                  <?php echo $row['password'] ?>
-                                </td>
-                                <td>
-                                  <?php echo $row['email'] ?>
-                                </td>
-                                <td>
-                                  <?php echo $row['address'] ?>
-                                </td>
-                                <td>
-                                  <?php echo $row['contact'] ?>
-                                </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['firstname'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['middlename'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['lastname'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                  <?php echo $row['address'] ?>
+                                </td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                  <?php echo $row['email'] ?>
+                                </td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                  <?php echo $row['contact'] ?>
+                                </td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['department'] ?>
                                 </td>
-                                <td>
+                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                   <?php echo $row['usertype'] ?>
                                 </td>
-                                <td style="font-size: 18px;">
+                                <td style="font-size: 18px; overflow: hidden;">
                                   <a href="edit_teacher.php?updateid=<?php echo $row['user_id'] ?>" class="link-dark"
                                     style="margin-right: 5px;"><i class="bi bi-pencil-square"></i></a>
                                   <a href="delete_teacher.php?deleteid=<?php echo $row['user_id'] ?>" class="link-dark"><i
@@ -268,18 +262,28 @@ if (!isset($_SESSION['id'])) {
       </div>
     </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <!-- Include DataTables JavaScript and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Initialize DataTables after including the necessary files -->
+    <script>
+      $(document).ready(function () {
+        $('#example').DataTable();
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

@@ -13,24 +13,37 @@ if (isset($_GET['class_id'])) {
 include("config.php");
 $teacher_id = $_SESSION['user_id'];
 
-if (isset($_POST['setQuiz'])) {
-  $quizTitle = $_POST['title'];
-  $quizInstruction = $_POST['instruction'];
-  $quizLink = $_POST['link'];
+if (isset($_POST['setExam'])) {
+  $examTitle = $_POST['title'];
+  $examInstruction = $_POST['instruction'];
+  $examLink = $_POST['link'];
   $class_name = $_POST['class_name'];
   $student = $_POST['student'];
-  $quizPoint = $_POST['point'];
+  $examPoint = $_POST['point'];
   $date = date('Y-m-d');
   $dueDate = $_POST['due_date'];
   $time = $_POST['time'];
   $classTopic = $_POST['class_topic'];
-  $quizStatus = "assigned";
+  $examStatus = "assigned";
 
-  $sqlSetQuiz = "INSERT INTO classwork_quiz (quizTitle, quizInstruction, quizLink, class_name, student, quizPoint, 
-  date, dueDate, time, classTopic, class_id, teacher_id, quizStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  $sqlSetQuiz = "INSERT INTO classwork_exam (examTitle, examInstruction, examLink, class_name, student, examPoint, 
+  date, dueDate, time, classTopic, class_id, teacher_id, examStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   $stmtSetQuiz = $db->prepare($sqlSetQuiz);
-  $stmtSetQuiz->execute([$quizTitle, $quizInstruction, $quizLink, $class_name, $student, $quizPoint, $date, $dueDate, 
-  $time, $classTopic, $class_id, $teacher_id, $quizStatus]);
+  $stmtSetQuiz->execute([
+    $examTitle,
+    $examInstruction,
+    $examLink,
+    $class_name,
+    $student,
+    $examPoint,
+    $date,
+    $dueDate,
+    $time,
+    $classTopic,
+    $class_id,
+    $teacher_id,
+    $examStatus
+  ]);
   header("Location: class_classwork.php?class_id=$class_id");
   exit;
 }
@@ -58,12 +71,12 @@ if (isset($_POST['setQuiz'])) {
         <div class="d-flex align-items-center">
           <button type="button" class="go-back" onclick="goToClasswork('<?php echo $class_id; ?>')"><i
               class="bi bi-x-lg custom-icon"></i></button>
-          <p class="text-body-secondary" style="margin-top: 10px; font-size: 22px;">Quiz</p>
+          <p class="text-body-secondary" style="margin-top: 10px; font-size: 22px;">Exam</p>
         </div>
         <div>
           <div class="btn-group">
-            <button type="submit" id="setQuiz" name="setQuiz" class="btn btn-success"
-              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Set Quiz</button>
+            <button type="submit" id="setExam" name="setExam" class="btn btn-success"
+              style="margin-right: 3px; width: 15vh; margin-bottom: 10px;">Create</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
               style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
@@ -93,8 +106,8 @@ if (isset($_POST['setQuiz'])) {
               <div class="col-md-7 mb-4" style="margin-left: 3px;">
                 <div class="form-floating">
                   <textarea name="title" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Quiz Title"></textarea>
-                  <label for="floatingInput">Quiz Title</label>
+                    placeholder="Exam Title"></textarea>
+                  <label for="floatingInput">Exam Title</label>
                 </div>
               </div>
             </div>
@@ -117,8 +130,8 @@ if (isset($_POST['setQuiz'])) {
               <div class="col-md-10">
                 <div class="form-floating">
                   <textarea name="link" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Quiz Link"></textarea>
-                  <label for="floatingInput">Quiz Link</label>
+                    placeholder="Exam Link"></textarea>
+                  <label for="floatingInput">Exam Link</label>
                 </div>
               </div>
             </div>
@@ -220,23 +233,23 @@ if (isset($_POST['setQuiz'])) {
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      var askButton = document.getElementById("setQuiz");
+      var askButton = document.getElementById("setExam");
       var form = document.querySelector('form');
 
       askButton.addEventListener('click', function (event) {
-        var quizTitleInput = document.querySelector('[name="title"]');
+        var examTitleInput = document.querySelector('[name="title"]');
         var instructionInput = document.querySelector('[name="instruction"]');
-        var quizLinkInput = document.querySelector('[name="link"]');
+        var examLinkInput = document.querySelector('[name="link"]');
         var pointInput = document.querySelector('[name="point"]');
         var duedateInput = document.querySelector('[name="due_date"]');
 
         var isEmpty = false;
 
-        if (quizTitleInput.value.trim() === '') {
+        if (examTitleInput.value.trim() === '') {
           isEmpty = true;
-          quizTitleInput.classList.add('is-invalid');
+          examTitleInput.classList.add('is-invalid');
         } else {
-          quizTitleInput.classList.remove('is-invalid');
+          examTitleInput.classList.remove('is-invalid');
         }
 
         if (instructionInput.value.trim() === '') {
@@ -247,11 +260,11 @@ if (isset($_POST['setQuiz'])) {
         }
 
         var googleFormsUrlPattern = /^https:\/\/(docs\.google\.com\/forms|forms\.gle)\/.*/;
-        if (!googleFormsUrlPattern.test(quizLinkInput.value)) {
+        if (!googleFormsUrlPattern.test(examLinkInput.value)) {
           isEmpty = true;
-          quizLinkInput.classList.add('is-invalid');
+          examLinkInput.classList.add('is-invalid');
         } else {
-          quizLinkInput.classList.remove('is-invalid');
+          examLinkInput.classList.remove('is-invalid');
         }
 
 
