@@ -181,7 +181,7 @@ $stmt->close();
           $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';
 
           // Fetch distinct class_name and tc_id from the database
-          $sql = "SELECT DISTINCT class_name, tc_id FROM class_enrolled WHERE teacher_id = ?";
+          $sql = "SELECT DISTINCT class_name, class_id FROM section WHERE teacher_id = ?";
           $stmt = $conn->prepare($sql);
           $stmt->bind_param("i", $user_id);
           $stmt->execute();
@@ -190,19 +190,19 @@ $stmt->close();
           $class_names_and_tc_ids = array();
 
           while ($row = $result->fetch_assoc()) {
-            $class_names_and_tc_ids[] = $row;
+            $class_names_and_class_ids[] = $row;
           }
 
-          foreach ($class_names_and_tc_ids as $class_data) {
+          foreach ($class_names_and_class_ids as $class_data) {
             $class_name = $class_data['class_name'];
-            $tc_id = $class_data['tc_id'];
+            $class_id = $class_data['class_id'];
 
             $safeClass = str_replace(' ', '_', $class_name);
             $cssClass = ($classFromUrl === $class_name) ? 'active' : '';
 
             $encodedClass = urlencode($class_name);
 
-            echo '<a href="grade_report_subject.php?user_id=' . $teacher_id . '&class_name=' . $encodedClass . '&class_id=' . $tc_id . '" class="' . $cssClass . '">' . $class_name . '</a>';
+            echo '<a href="grade_report_subject.php?user_id=' . $teacher_id . '&class_name=' . $encodedClass . '&class_id=' . $class_id . '" class="' . $cssClass . '">' . $class_name . '</a>';
           }
           ?>
         </div>

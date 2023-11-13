@@ -208,6 +208,7 @@ $stmt->close();
                 style="margin-left: 2vh;">Stream</a>
               <a href="class_classwork.php?class_id=<?php echo $class_id ?>" class="people">Classwork</a>
               <a href="class_people.php?class_id=<?php echo $class_id ?>" class="nav-link active">People</a>
+              <a href="class_grade.php?class_id=<?php echo $class_id ?>" class="people">Grade</a>
               <?php
             }
             ?>

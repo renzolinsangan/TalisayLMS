@@ -18,11 +18,8 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
-// Create an array to store class names
 $class_names = array();
 
-// Fetch class names and store them in the array
 while ($row = $result->fetch_assoc()) {
   $class_names[] = $row['class_name'];
 }
@@ -50,11 +47,12 @@ $stmt->close();
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
   <!-- endinject -->
   <!-- Plugin css for this page -->
   <!-- End plugin css for this page -->
   <!-- inject:css -->
-  <link rel="stylesheet" href="assets/css/student_report.css">
+  <link rel="stylesheet" href="assets/css/report_student.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="images/trace.svg" />
 </head>
@@ -196,22 +194,56 @@ $stmt->close();
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
-          <a href="student_report.php?user_id=<?php echo $teacher_id ?>" class="nav-link active"
-            style="margin-left: 5vh;">All</a>
-          <?php
-          $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';
+        <div class="card d-flex align-items-left justify-content-between"
+          style="position: relative; background-color: none; height: 8vh;">
+          <div class="row">
+            <div class="col-1" style="margin-left: 35px; margin-top: 9px;">
+              <a href="student_report.php?user_id=<?= $teacher_id ?>" class="nav-link active"
+              style="color: green; text-decoration: none; font-size: 14px;">All</a>
+            </div>
+            <div class="row">
+              <?php
+              $sqlSection = "SELECT DISTINCT section FROM section WHERE teacher_id = ?";
+              $stmtSection = $conn->prepare($sqlSection);
+              $stmtSection->bind_param("i", $user_id);
+              $stmtSection->execute();
+              $sectionResult = $stmtSection->get_result();
 
-          foreach ($class_names as $class_name) {
-            $safeClass = str_replace(' ', '_', $class_name);
-            $cssClass = ($classFromUrl === $class_name) ? 'active' : '';
+              while ($sectionrow = $sectionResult->fetch_assoc()):
+                $section = $sectionrow['section'];
+                ?>
+                <div class="col">
+                  <div class="dropdown-container">
+                    <div class="dropdown" style="position: relative;">
+                      <button class="btn dropdown-toggle" type="button" data-toggle="dropdown"
+                        style="background-color: transparent; color: green; margin-top: 10px;">
+                        <?= $section ?>
+                      </button>
+                      <div class="dropdown-menu">
+                        <?php
+                        $sqlSubjects = "SELECT class_id, class_name, subject FROM section WHERE teacher_id = ? AND section = ?";
+                        $stmtSubjects = $conn->prepare($sqlSubjects);
+                        $stmtSubjects->bind_param("is", $user_id, $section);
+                        $stmtSubjects->execute();
+                        $subjectsResult = $stmtSubjects->get_result();
 
-            // Encode the class_name before appending it to the URL
-            $encodedClass = urlencode($class_name);
-
-            echo '<a href="student_report_subject.php?user_id=' . $teacher_id . '&class_name=' . $encodedClass . '" class="' . $cssClass . '">' . $class_name . '</a>';
-          }
-          ?>
+                        while ($subjectRow = $subjectsResult->fetch_assoc()):
+                          $class_id = $subjectRow['class_id'];
+                          $class_name = $subjectRow['class_name'];
+                          $subject = $subjectRow['subject'];
+                          ?>
+                          <a class="dropdown-item" href="student_report_subject.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" 
+                          style="background-color: transparent;">
+                            <?= $subject ?>
+                          </a>
+                        <?php endwhile; ?>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <?php endwhile; ?>
+            </div>
+          </div>
         </div>
         <div class="content-wrapper">
           <button id="print" class="btn btn-success mb-2">Download Data</button>
@@ -222,7 +254,9 @@ $stmt->close();
                   <div class="row">
                     <div class="col-md-6">
                       <div class="card-body">
-                        <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">Reports in All Handled
+                        <h1 class="card-title" style="font-size: 30px; margin-left: 10px; margin-bottom: -20px;">
+                          Reports
+                          in All Handled
                           Students
                         </h1>
                       </div>
@@ -233,15 +267,16 @@ $stmt->close();
                       <div class="col-md-12">
                         <div class="card-body">
                           <div class="table-responsive">
-                            <table class="table table-hover text-center">
+                            <table id="example" class="table table-hover text-center"
+                              style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                               <thead class="table" style="background-color: #4BB543; color: white;">
                                 <tr>
-                                  <th scope="col">Student's Name</th>
-                                  <th scope="col">Class Name</th>
-                                  <th scope="col">Section</th>
-                                  <th scope="col">Subject</th>
-                                  <th scope="col">Grade Level</th>
-                                  <th scope="col">Department</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Student's Name</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Class Name</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Section</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Subject</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Grade Level</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Department</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -253,22 +288,22 @@ $stmt->close();
                                 while ($row = mysqli_fetch_assoc($result)) {
                                   ?>
                                   <tr>
-                                    <td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                       <?php echo $row['student_firstname'] . ' ' . $row['student_lastname']; ?>
                                     </td>
-                                    <td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                       <?php echo $row['class_name'] ?>
                                     </td>
-                                    <td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                       <?php echo $row['section'] ?>
                                     </td>
-                                    <td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                       <?php echo $row['subject'] ?>
                                     </td>
-                                    <td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                       <?php echo $row['grade_level'] ?>
                                     </td>
-                                    <td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
                                       <?php echo $row['strand'] ?>
                                     </td>
                                   </tr>
@@ -290,11 +325,10 @@ $stmt->close();
       </div>
     </div>
 
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-
-    <!-- Initialize DataTables after including the necessary files -->
     <script>
       $(document).ready(function () {
         $('#example').DataTable();
@@ -328,7 +362,6 @@ $stmt->close();
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
       crossorigin="anonymous"></script>
-    <script src="../../vendors/js/vendor.bundle.base.js"></script>
     <script src="../../js/off-canvas.js"></script>
     <script src="../../js/hoverable-collapse.js"></script>
     <script src="../../js/template.js"></script>

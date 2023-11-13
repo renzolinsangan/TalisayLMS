@@ -13,6 +13,16 @@ if (isset($_GET['class_id'])) {
 
 $teacher_id = $_SESSION['user_id'];
 
+$sql = "SELECT class_name FROM section WHERE class_id = :class_id";
+$stmt = $db->prepare($sql);
+$stmt->bindParam(':class_id', $class_id, PDO::PARAM_INT);
+$stmt->execute();
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if ($result) {
+  $class_name = $result['class_name'];
+}
+
 if (isset($_POST['submit_topic'])) {
   $class_topic = $_POST['class_topic'];
 
@@ -219,10 +229,12 @@ $stmt->closeCursor();
               $class_id = $_GET['class_id'];
               ?>
               <a class="btn-success" href="course.php"><i class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-              <a href="class_course.php?class_id=<?php echo $class_id ?>" class="people"
+              <a href="class_course.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" class="people"
                 style="margin-left: 2vh;">Stream</a>
-              <a href="class_classwork.php?class_id=<?php echo $class_id ?>" class="nav-link active">Classwork</a>
-              <a href="class_people.php?class_id=<?php echo $class_id ?>" class="people">People</a>
+              <a href="class_classwork.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" class="nav-link active">Classwork</a>
+              <a href="class_people.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" class="people">People</a>
+              <a href="class_grade.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" 
+              class="people">Grade</a>
               <?php
             }
             ?>
