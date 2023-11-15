@@ -39,7 +39,6 @@ $stmt_department->close();
   <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css">
-  <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css">
   <link rel="stylesheet" href="assets/css/indexStyle.css">
   <link rel="stylesheet" href="assets/css/notification.css">
@@ -234,6 +233,8 @@ $stmt_department->close();
                 <?php endforeach; ?>
               </div>
             </div>
+            <?php
+            ?>
           </li>
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">

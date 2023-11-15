@@ -19,6 +19,7 @@ if (!isset($_SESSION['id'])) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet" href="assets/css/report_teacher.css">
+  <link rel="stylesheet" href="assets/css/notification.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
 </head>
 

@@ -18,6 +18,7 @@ if (isset($_POST['assign_button'])) {
   $instruction = $_POST['instruction'];
   $class_name = $_POST['class_name'];
   $student = $_POST['student'];
+  $type = $_POST['type'];
   $point = $_POST['point'];
   $date = date('Y-m-d');
   $due_date = $_POST['due_date'];
@@ -32,10 +33,10 @@ if (isset($_POST['assign_button'])) {
     $link = $_SESSION['temp_link'];
     $file_name = $_SESSION['temp_file_name']; // Retrieve the filename from the session
 
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, 
-    class_topic, class_id, teacher_id, link, file, youtube, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, type, point, date, due_date, time, 
+    class_topic, class_id, teacher_id, link, file, youtube, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, 
+    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $type, $point, $date, $due_date, $time, 
     $class_topic, $class_id, $teacher_id, $link, $file_name, $youtube, $assignment_status]);
 
     if ($result) {
@@ -55,9 +56,9 @@ if (isset($_POST['assign_button'])) {
       echo "Failed: " . $conn->error;
     }
   } else {
-    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, point, date, due_date, time, class_topic, class_id, teacher_id, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO classwork_assignment (title, instruction, class_name, student, type, point, date, due_date, time, class_topic, class_id, teacher_id, assignment_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmtinsert = $conn->prepare($sql);
-    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $assignment_status]);
+    $result = $stmtinsert->execute([$title, $instruction, $class_name, $student, $type, $point, $date, $due_date, $time, $class_topic, $class_id, $teacher_id, $assignment_status]);
 
     if ($result) {
       header("Location: class_classwork.php?class_id=$class_id");
@@ -127,7 +128,7 @@ if (isset($_POST['youtube_submit'])) {
     $lastInsertId = $conn->insert_id;
     $_SESSION['temp_file_id'] = $lastInsertId;
   } else {
-    echo "Error: " . $stmt->error; // Check for errors in query execution
+    echo "Error: " . $stmt->error;
   }
 }
 ?>
@@ -246,7 +247,7 @@ if (isset($_POST['youtube_submit'])) {
             $result = mysqli_query($conn, $sql);
 
             while ($row = mysqli_fetch_assoc($result)) {
-              if (!empty($row['youtube'])) // Check if it's a YouTube link
+              if (!empty($row['youtube']))
               {
                 $assignment_upload_id = $row['assignment_upload_id'];
                 $youtube = $row['youtube'];
@@ -414,6 +415,12 @@ if (isset($_POST['youtube_submit'])) {
               </div>
             </div>
             <div class="row">
+              <label class="text-body-secondary mb-3" style="font-size: 20px;">Written / Performance</label>
+              <div class="col-md-10 mb-4">
+                <input type="text" class="form-control" name="type" style="padding: 10px;">
+              </div>
+            </div>
+            <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Points</label>
               <div class="col-md-6 mb-4">
                 <input type="text" class="form-control" name="point" style="padding: 10px;">
@@ -524,6 +531,8 @@ if (isset($_POST['youtube_submit'])) {
     form.addEventListener('submit', function (event) {
       var titleInput = document.querySelector('[name="title"]');
       var instructionInput = document.querySelector('[name="instruction"]');
+      var typeInput = form.querySelector('[name="type"]');
+      var selectedType = typeInput.value;
       var pointInput = document.querySelector('[name="point"]');
       var duedateInput = document.querySelector('[name="due_date"]');
 
@@ -540,7 +549,14 @@ if (isset($_POST['youtube_submit'])) {
         isEmpty = true;
         instructionInput.classList.add('is-invalid'); // Add a class to highlight the invalid input
       } else {
-        instructionInput.classList.remove('is-invalid'); // Remove the class if it's valid
+        instructionInput.classList.remove('is-invalid');
+      }
+
+      if ((selectedType !== "written" && selectedType !== "performance") || selectedType === "") {
+        event.preventDefault();
+        typeInput.classList.add('is-invalid');
+      } else {
+        typeInput.classList.remove('is-invalid');
       }
 
       var pointValue = pointInput.value.trim();

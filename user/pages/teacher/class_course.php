@@ -87,7 +87,7 @@ if ($themeData) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/class_course.css">
-  <!-- endinject -->
+  <link rel="stylesheet" href="assets/css/notif.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
@@ -108,48 +108,178 @@ if ($themeData) {
               <i class="icon-bell mx-0"></i>
               <span class="count"></span>
             </a>
+            <?php
+            include("config.php");
+            include("notifications.php");
+
+            $resultNewsNotif = getNewsNotifications($db);
+            $resultStudentNotif = getStudentNotifications($db, $user_id);
+            $resultQuestionNotif = getQuestionNotifications($db, $user_id);
+            $resultAssignmentNotif = getAssignmentNotifications($db, $user_id);
+            $resultQuizNotif = getQuizNotifications($db, $user_id);
+            $resultExamNotif = getExamNotifications($db, $user_id);
+            $resultClassroomNotif = getClassroomNotifications($db, $user_id);
+
+            $allNotifications = array_merge(
+              $resultNewsNotif,
+              $resultStudentNotif,
+              $resultQuestionNotif,
+              $resultAssignmentNotif,
+              $resultQuizNotif,
+              $resultExamNotif,
+              $resultClassroomNotif
+            );
+
+            usort($allNotifications, function ($a, $b) {
+              return strtotime($b['date']) - strtotime($a['date']);
+            });
+            ?>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
-              <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+              <div class="scrollable-notifications">
+                <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+                <?php foreach ($allNotifications as $notification): ?>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <?php if (isset($notification['title']) && isset($notification['type'])): ?>
+                        <div class="preview-icon bg-success">
+                          <i class="ti-info-alt mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['student_id'])): ?>
+                        <div class="preview-icon bg-warning">
+                          <i class="ti-user mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['class_name'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-blackboard mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['question_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['assignment_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['quiz_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['exam_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="preview-item-content">
+                      <?php if (isset($notification['title']) && isset($notification['type'])): ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $notification['title']; ?> (
+                          <?php echo ucfirst($notification['type']); ?>)
+                        </h6>
+                      <?php elseif (isset($notification['student_id'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['student_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          You added
+                          <?php echo $studentName; ?> as student.
+                        </h6>
+                      <?php elseif (isset($notification['class_name'])): ?>
+                        <div class="preview-item-content">
+                          <h6 class="preview-subject font-weight-normal">
+                            <?php echo $notification['student_firstname']; ?> joined from
+                            <?php echo $notification['class_name']; ?>
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </div>
+                      <?php elseif (isset($notification['question_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['question_course_status']; ?>
+                          <?php echo $notification['title']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['assignment_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['assignment_course_status']; ?>
+                          <?php echo $notification['title']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['quiz_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['quiz_course_status']; ?>
+                          <?php echo $notification['quizTitle']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['exam_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['exam_course_status']; ?>
+                          <?php echo $notification['examTitle']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php endif; ?>
+                      <?php if (isset($notification['name'])): ?>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          by
+                          <?php echo $notification['name']; ?> on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php endif; ?>
+                    </div>
+                  </a>
+                <?php endforeach; ?>
+              </div>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -315,6 +445,7 @@ if ($themeData) {
                   $question_results = [];
                   $assignment_results = [];
                   $quiz_results = [];
+                  $exam_results = [];
 
                   $sql_material = "SELECT material_id, title, date FROM classwork_material WHERE teacher_id=? AND class_id=?";
                   $stmt_titles_material = $db->prepare($sql_material);

@@ -32,10 +32,26 @@ if (isset($_POST['submit'])) {
   $subject = $_POST['subject'];
   $strand = $_POST['strand'];
   $class_code = generateClassCode();
+  $written = $_POST['written'];
+  $performance = $_POST['performance'];
+  $exam = $_POST['exam'];
 
-  $sql = "INSERT INTO section (class_name, section, subject, strand, teacher_id, class_code, first_name, last_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  $sql = "INSERT INTO section (class_name, section, subject, strand, teacher_id, class_code, first_name, last_name, written, performance, exam) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   $stmtinsert = $db->prepare($sql);
-  $result = $stmtinsert->execute([$class_name, $section, $subject, $strand, $teacher_id, $class_code, $first_name, $last_name]);
+  $result = $stmtinsert->execute([
+    $class_name,
+    $section,
+    $subject,
+    $strand,
+    $teacher_id,
+    $class_code,
+    $first_name,
+    $last_name,
+    $written,
+    $performance,
+    $exam
+  ]);
 
   if ($result) {
     header("Location: course.php?msg=Class created successfully!");
@@ -89,6 +105,7 @@ if (isset($_POST['archive'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/course.css">
+  <link rel="stylesheet" href="assets/css/notif.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
@@ -113,48 +130,178 @@ if (isset($_POST['archive'])) {
               <i class="icon-bell mx-0"></i>
               <span class="count"></span>
             </a>
+            <?php
+            include("config.php");
+            include("notifications.php");
+
+            $resultNewsNotif = getNewsNotifications($db);
+            $resultStudentNotif = getStudentNotifications($db, $user_id);
+            $resultQuestionNotif = getQuestionNotifications($db, $user_id);
+            $resultAssignmentNotif = getAssignmentNotifications($db, $user_id);
+            $resultQuizNotif = getQuizNotifications($db, $user_id);
+            $resultExamNotif = getExamNotifications($db, $user_id);
+            $resultClassroomNotif = getClassroomNotifications($db, $user_id);
+
+            $allNotifications = array_merge(
+              $resultNewsNotif,
+              $resultStudentNotif,
+              $resultQuestionNotif,
+              $resultAssignmentNotif,
+              $resultQuizNotif,
+              $resultExamNotif,
+              $resultClassroomNotif
+            );
+
+            usort($allNotifications, function ($a, $b) {
+              return strtotime($b['date']) - strtotime($a['date']);
+            });
+            ?>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
-              <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+              <div class="scrollable-notifications">
+                <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+                <?php foreach ($allNotifications as $notification): ?>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <?php if (isset($notification['title']) && isset($notification['type'])): ?>
+                        <div class="preview-icon bg-success">
+                          <i class="ti-info-alt mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['student_id'])): ?>
+                        <div class="preview-icon bg-warning">
+                          <i class="ti-user mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['class_name'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-blackboard mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['question_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['assignment_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['quiz_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['exam_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="preview-item-content">
+                      <?php if (isset($notification['title']) && isset($notification['type'])): ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $notification['title']; ?> (
+                          <?php echo ucfirst($notification['type']); ?>)
+                        </h6>
+                      <?php elseif (isset($notification['student_id'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['student_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          You added
+                          <?php echo $studentName; ?> as student.
+                        </h6>
+                      <?php elseif (isset($notification['class_name'])): ?>
+                        <div class="preview-item-content">
+                          <h6 class="preview-subject font-weight-normal">
+                            <?php echo $notification['student_firstname']; ?> joined from
+                            <?php echo $notification['class_name']; ?>
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </div>
+                      <?php elseif (isset($notification['question_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['question_course_status']; ?>
+                          <?php echo $notification['title']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['assignment_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['assignment_course_status']; ?>
+                          <?php echo $notification['title']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['quiz_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['quiz_course_status']; ?>
+                          <?php echo $notification['quizTitle']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['exam_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['exam_course_status']; ?>
+                          <?php echo $notification['examTitle']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php endif; ?>
+                      <?php if (isset($notification['name'])): ?>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          by
+                          <?php echo $notification['name']; ?> on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php endif; ?>
+                    </div>
+                  </a>
+                <?php endforeach; ?>
+              </div>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -278,6 +425,29 @@ if (isset($_POST['archive'])) {
                       <div class="form-floating mb-4">
                         <input type="text" name="subject" class="form-control" id="floatingInput" placeholder="Subject">
                         <label for="floatingSubject">Subject</label>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-group mb-4">
+                            <label for="floatingWrittenGrade">Written Works %</label>
+                            <input type="text" name="written" class="form-control" id="floatingInput"
+                              placeholder="Grade">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group mb-4">
+                            <label for="floatingPerformanceGrade">Performance Task %</label>
+                            <input type="text" name="performance" class="form-control" id="floatingInput"
+                              placeholder="Grade">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group mb-4">
+                            <label for="floatingExamGrade">Exam %</label>
+                            <input type="text" name="exam" class="form-control" id="floatingInput"
+                              placeholder="Grade">
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div class="modal-footer">
@@ -416,7 +586,8 @@ if (isset($_POST['archive'])) {
                   <div class="card-body">
                     <h3>No Created Courses.</h3>
                     <p class="text-body-secondary">Create your course subject to interact with your students.</p>
-                    <p style="color: green;">Click the + button from the right-header to input and create course subject.</p>
+                    <p style="color: green;">Click the + button from the right-header to input and create course subject.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -427,12 +598,8 @@ if (isset($_POST['archive'])) {
         </div>
       </div>
     </div>
-
-    <!-- content-wrapper ends -->
   </div>
-  <!-- main-panel ends -->
   </div>
-  <!-- page-body-wrapper ends -->
   </div>
 
   <script>
@@ -444,9 +611,14 @@ if (isset($_POST['archive'])) {
       var sectionInput = form.querySelector('input[name="section"]');
       var subjectInput = form.querySelector('input[name="subject"]');
       var strandDropdown = form.querySelector('select[name="strand"]');
+      var writtenInput = form.querySelector('input[name="written"]');
+      var performanceInput = form.querySelector('input[name="performance"]');
+      var examInput = form.querySelector('input[name="exam"]');
 
       if (classnameInput.value === '' || sectionInput.value === '' ||
-        subjectInput.value === '' || strandDropdown.value === '') {
+        subjectInput.value === '' || strandDropdown.value === '' ||
+        writtenInput.value === '' || performanceInput.value === '' ||
+        examInput.value === '') {
         event.preventDefault();
         validationAlert.style.display = 'block';
 
@@ -485,6 +657,27 @@ if (isset($_POST['archive'])) {
       } else {
         strandDropdown.classList.remove('is-invalid'); // Remove the class if it's valid
       }
+
+      if (!/^\d+$/.test(writtenInput.value.trim())) {
+      event.preventDefault();
+      writtenInput.classList.add('is-invalid');
+    } else {
+      writtenInput.classList.remove('is-invalid');
+    }
+
+    if (!/^\d+$/.test(performanceInput.value.trim())) {
+      event.preventDefault();
+      performanceInput.classList.add('is-invalid');
+    } else {
+      performanceInput.classList.remove('is-invalid');
+    }
+
+    if (!/^\d+$/.test(examInput.value.trim())) {
+      event.preventDefault();
+      examInput.classList.add('is-invalid');
+    } else {
+      examInput.classList.remove('is-invalid');
+    }
     });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

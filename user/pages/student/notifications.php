@@ -86,9 +86,9 @@ function getExamNotification($db, $studentFullName)
 
 function getQuestionScoreNotification($db, $user_id)
 {
-    $sql = "SELECT qg.questionTitle, qg.date, u.firstname as studentFirstName, u.lastname as studentLastname, 
+    $sql = "SELECT qg.questionTitle, qg.date, u.firstname as studentFirstName, u.lastname as studentLastName, 
             t.firstname as teacherFirstName, t.lastname as teacherLastname, qg.score as score, 'questionGrade' as scoreNotification_type 
-            FROM questionGrade qg
+            FROM questiongrade qg
             JOIN user_account u ON qg.student_id = u.user_id
             JOIN user_account t ON qg.teacher_id = t.user_id
             WHERE u.user_id = :user_id";
@@ -101,9 +101,9 @@ function getQuestionScoreNotification($db, $user_id)
 
 function getAssignmentScoreNotification($db, $user_id)
 {
-    $sql = "SELECT ag.assignmentTitle, ag.date, u.firstname as studentFirstName, u.lastname as studentLastname, 
+    $sql = "SELECT ag.assignmentTitle, ag.date, u.firstname as studentFirstName, u.lastname as studentLastName, 
             t.firstname as teacherFirstName, t.lastname as teacherLastname, ag.score as score, 'assignmentGrade' as scoreNotification_type 
-            FROM assignmentGrade ag
+            FROM assignmentgrade ag
             JOIN user_account u ON ag.student_id = u.user_id
             JOIN user_account t ON ag.teacher_id = t.user_id
             WHERE u.user_id = :user_id";
@@ -116,9 +116,9 @@ function getAssignmentScoreNotification($db, $user_id)
 
 function getQuizScoreNotification($db, $user_id)
 {
-    $sql = "SELECT qz.quizTitle, qz.date, u.firstname as studentFirstName, u.lastname as studentLastname, 
+    $sql = "SELECT qz.quizTitle, qz.date, u.firstname as studentFirstName, u.lastname as studentLastName, 
             t.firstname as teacherFirstName, t.lastname as teacherLastname, qz.score as score, 'quizGrade' as scoreNotification_type 
-            FROM quizGrade qz
+            FROM quizgrade qz
             JOIN user_account u ON qz.student_id = u.user_id
             JOIN user_account t ON qz.teacher_id = t.user_id
             WHERE u.user_id = :user_id";
@@ -131,9 +131,9 @@ function getQuizScoreNotification($db, $user_id)
 
 function getExamScoreNotification($db, $user_id)
 {
-    $sql = "SELECT eg.examTitle, eg.date, u.firstname as studentFirstName, u.lastname as studentLastname, 
+    $sql = "SELECT eg.examTitle, eg.date, u.firstname as studentFirstName, u.lastname as studentLastName, 
     t.firstname as teacherFirstName, t.lastname as teacherLastname, eg.score as score, 'examGrade' as scoreNotification_type 
-            FROM examGrade eg
+            FROM examgrade eg
             JOIN user_account u ON eg.student_id = u.user_id
             JOIN user_account t ON eg.teacher_id = t.user_id
             WHERE u.user_id = :user_id";

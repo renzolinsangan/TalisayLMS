@@ -34,6 +34,7 @@ foreach ($result as $quizRow) {
   $quizLink = $quizRow['quizLink'];
   $quizPoint = $quizRow['quizPoint'];
   $date = $quizRow['date'];
+  $type = $quizRow['type'];
   $quizStatus = $quizRow['quizStatus'];
 }
 
@@ -62,13 +63,14 @@ if (isset($_POST['quizGrade'])) {
   $quizPoint = $_POST['quizPoint'];
   $student_id = $_POST['student_id'];
 
-  $sql_assignmentGrade = "INSERT INTO quizGrade (quizTitle, studentFirstName, studentLastname, date, score, 
-  quizPoint, student_id, teacher_id, class_id, quiz_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)";
+  $sql_assignmentGrade = "INSERT INTO quizgrade (quizTitle, studentFirstName, studentLastname, date, gradeType, score, 
+  quizPoint, student_id, teacher_id, class_id, quiz_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?)";
   $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
   $assignmentGradeResult = $stmt_assignmentGrade->execute([
     $quizTitle,
     $studentFirstName,
     $studentLastName,
+    $type,
     $score,
     $quizPoint,
     $student_id,
@@ -314,6 +316,7 @@ if (isset($_POST['quizGrade'])) {
                                   <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
                                   <?php echo $quizTitle ?> (
                                   <?php echo $date ?>)
+                                  <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
                                   <p class="text-body-secondary">by
                                     <?php echo $student_firstname . ' ' . $student_lastname ?>
                                     <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
@@ -341,7 +344,7 @@ if (isset($_POST['quizGrade'])) {
                         border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
                                       /
                                       <?php echo $quizPoint; ?>
-                                      <input type="hidden" name="questionPoint" value="<?php echo $quizPoint; ?>">
+                                      <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
                                     </p>
                                     <?php
                                   } else {
@@ -353,7 +356,7 @@ if (isset($_POST['quizGrade'])) {
                                         value="<?php echo $quizScore; ?>" readonly>
                                       /
                                       <?php echo $quizPoint; ?>
-                                      <input type="hidden" name="questionPoint" value="<?php echo $quizPoint; ?>">
+                                      <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
                                     </p>
                                     <?php
                                   }
@@ -374,7 +377,6 @@ if (isset($_POST['quizGrade'])) {
                                   <span>Link: <a href="https://docs.google.com/forms/"
                                       target="_blank">https://docs.google.com/forms/</a></span>
                                   <p class="text-body-secondary">(make sure to open the link with your account)</p>
-                                  <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
                                   <?php
                                   ?>
                                 <?php endforeach; ?>

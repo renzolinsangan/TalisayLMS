@@ -1,0 +1,11 @@
+.dropdown-menu .dropdown-item.preview-item {
+    width: 400px !important; /* Set your desired maximum width */
+    word-wrap: break-word;
+    overflow: hidden;
+    white-space: normal;
+  }
+
+  .scrollable-notifications {
+    max-height: 500px; /* Set the desired maximum height for your notifications */
+    overflow-y: auto;
+  }   

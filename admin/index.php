@@ -25,6 +25,7 @@ include("db_conn.php");
   <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/notification.css">
   <link rel="shortcut icon" href="images/trace.svg" />
 </head>
 
@@ -47,15 +48,11 @@ include("db_conn.php");
             <?php
             include("config.php");
 
-            // Fetch feedback notifications
             $sqlFeedbackNotif = "SELECT firstname, lastname, date FROM feedback ORDER BY date DESC";
             $resultFeedbackNotif = $db->query($sqlFeedbackNotif);
 
-            // Fetch news items
             $sqlNews = "SELECT type, title, end_date FROM news";
             $resultNews = $db->query($sqlNews);
-
-            // Current date
             $currentDate = date('Y-m-d');
             ?>
 

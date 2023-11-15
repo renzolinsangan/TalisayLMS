@@ -47,7 +47,7 @@ if ($result) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet" href="assets/css/class_course.css">
-  <!-- endinject -->
+  <link rel="stylesheet" href="assets/css/notif.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
@@ -68,48 +68,178 @@ if ($result) {
               <i class="icon-bell mx-0"></i>
               <span class="count"></span>
             </a>
+            <?php
+            include("config.php");
+            include("notifications.php");
+
+            $resultNewsNotif = getNewsNotifications($db);
+            $resultStudentNotif = getStudentNotifications($db, $user_id);
+            $resultQuestionNotif = getQuestionNotifications($db, $user_id);
+            $resultAssignmentNotif = getAssignmentNotifications($db, $user_id);
+            $resultQuizNotif = getQuizNotifications($db, $user_id);
+            $resultExamNotif = getExamNotifications($db, $user_id);
+            $resultClassroomNotif = getClassroomNotifications($db, $user_id);
+
+            $allNotifications = array_merge(
+              $resultNewsNotif,
+              $resultStudentNotif,
+              $resultQuestionNotif,
+              $resultAssignmentNotif,
+              $resultQuizNotif,
+              $resultExamNotif,
+              $resultClassroomNotif
+            );
+
+            usort($allNotifications, function ($a, $b) {
+              return strtotime($b['date']) - strtotime($a['date']);
+            });
+            ?>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
-              <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+              <div class="scrollable-notifications">
+                <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+                <?php foreach ($allNotifications as $notification): ?>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <?php if (isset($notification['title']) && isset($notification['type'])): ?>
+                        <div class="preview-icon bg-success">
+                          <i class="ti-info-alt mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['student_id'])): ?>
+                        <div class="preview-icon bg-warning">
+                          <i class="ti-user mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['class_name'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-blackboard mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['question_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['assignment_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['quiz_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['exam_course_status'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="preview-item-content">
+                      <?php if (isset($notification['title']) && isset($notification['type'])): ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $notification['title']; ?> (
+                          <?php echo ucfirst($notification['type']); ?>)
+                        </h6>
+                      <?php elseif (isset($notification['student_id'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['student_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          You added
+                          <?php echo $studentName; ?> as student.
+                        </h6>
+                      <?php elseif (isset($notification['class_name'])): ?>
+                        <div class="preview-item-content">
+                          <h6 class="preview-subject font-weight-normal">
+                            <?php echo $notification['student_firstname']; ?> joined from
+                            <?php echo $notification['class_name']; ?>
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </div>
+                      <?php elseif (isset($notification['question_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['question_course_status']; ?>
+                          <?php echo $notification['title']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['assignment_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['assignment_course_status']; ?>
+                          <?php echo $notification['title']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['quiz_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['quiz_course_status']; ?>
+                          <?php echo $notification['quizTitle']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php elseif (isset($notification['exam_course_status'])): ?>
+                        <?php
+                        $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
+                        $stmtStudentName = $db->prepare($sqlStudentName);
+                        $stmtStudentName->bindParam(':user_id', $notification['user_id']);
+                        $stmtStudentName->execute();
+                        $studentName = $stmtStudentName->fetchColumn();
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $studentName; ?>
+                          <?php echo $notification['exam_course_status']; ?>
+                          <?php echo $notification['examTitle']; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        </h6>
+                      <?php endif; ?>
+                      <?php if (isset($notification['name'])): ?>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          by
+                          <?php echo $notification['name']; ?> on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php endif; ?>
+                    </div>
+                  </a>
+                <?php endforeach; ?>
+              </div>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -211,6 +341,51 @@ if ($result) {
         <div class="content-wrapper" style="margin-top: 10vh;">
           <div id="print-content">
             <div class="row">
+              <div class="col-12 grid-margin stretch-card mb-4">
+                <div class="card">
+                  <div class="card-body">
+                    <?php
+                    include("config.php");
+                    $sqlGradePercentage = "SELECT written, performance, exam FROM section WHERE class_id = ? AND teacher_id = ?";
+                    $stmtGradePercentage = $db->prepare($sqlGradePercentage);
+                    $stmtGradePercentage->execute([$class_id, $user_id]);
+                    $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
+
+                    if ($result) {
+                      $written = $result['written'];
+                      $performance = $result['performance'];
+                      $exam = $result['exam'];
+                      ?>
+                      <div class="row">
+                        <div class="col-12 mb-3">
+                          <h2>Grading System</h2>
+                        </div>
+                        <div class="col-12 mb-3">
+                          <h4>Written Work = <span>
+                              <?php echo $written ?>%
+                            </span></h3>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12 mb-3">
+                          <h4>Performance Task = <span>
+                              <?php echo $performance ?>%
+                            </span></h3>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <h4>Quarterly Assessment = <span>
+                              <?php echo $exam ?>%
+                            </span></h3>
+                        </div>
+                      </div>
+                      <?php
+                    }
+                    ?>
+                  </div>
+                </div>
+              </div>
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="row">
@@ -231,31 +406,31 @@ if ($result) {
                             <table id="example" class="table table-bordered table-hover text-center"
                               style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                               <thead class="table" style="background-color: #4BB543; color: white;">
-                                <th scope="col" style="overflow: hidden;">Student Name</th>
+                                <th scope="col" style="text-align: center; overflow: hidden;">Student Name</th>
                                 <?php
                                 include("config.php");
                                 $class_id = $_GET['class_id'];
 
-                                $sqlQuestion = "SELECT title, date, point, 'Question' as type FROM classwork_question 
-                                WHERE class_id = ? AND teacher_id = ?";
+                                $sqlQuestion = "SELECT title, date, type, point, 'Question' as class_type FROM classwork_question 
+                        WHERE class_id = ? AND teacher_id = ?";
                                 $stmtQuestion = $db->prepare($sqlQuestion);
                                 $stmtQuestion->execute([$class_id, $teacher_id]);
                                 $questionTitles = $stmtQuestion->fetchAll(PDO::FETCH_ASSOC);
 
-                                $sqlAssignment = "SELECT title, date, point, 'Assignment' as type FROM classwork_assignment 
-                                WHERE class_id = ? AND teacher_id = ?";
+                                $sqlAssignment = "SELECT title, date, type, point, 'Assignment' as class_type FROM classwork_assignment 
+                          WHERE class_id = ? AND teacher_id = ?";
                                 $stmtAssignment = $db->prepare($sqlAssignment);
                                 $stmtAssignment->execute([$class_id, $teacher_id]);
                                 $assignmentTitles = $stmtAssignment->fetchAll(PDO::FETCH_ASSOC);
 
-                                $sqlQuiz = "SELECT quizTitle as title, date, quizPoint as point, 'Quiz' as type FROM classwork_quiz 
-                                WHERE class_id = ? AND teacher_id = ?";
+                                $sqlQuiz = "SELECT quizTitle as title, type, date, quizPoint as point, 'Quiz' as class_type FROM classwork_quiz 
+                    WHERE class_id = ? AND teacher_id = ?";
                                 $stmtQuiz = $db->prepare($sqlQuiz);
                                 $stmtQuiz->execute([$class_id, $teacher_id]);
                                 $quizTitles = $stmtQuiz->fetchAll(PDO::FETCH_ASSOC);
 
-                                $sqlExam = "SELECT examTitle as title, date, examPoint as point, 'Exam' as type FROM classwork_exam 
-                                WHERE class_id = ? AND teacher_id = ?";
+                                $sqlExam = "SELECT examTitle as title, date, examPoint as point, 'Exam' as class_type FROM classwork_exam 
+                    WHERE class_id = ? AND teacher_id = ?";
                                 $stmtExam = $db->prepare($sqlExam);
                                 $stmtExam->execute([$class_id, $teacher_id]);
                                 $examTitles = $stmtExam->fetchAll(PDO::FETCH_ASSOC);
@@ -284,6 +459,9 @@ if ($result) {
                                   <?php
                                 }
                                 ?>
+                                <th scope="col" style="text-align: center; overflow: hidden;">
+                                  <p style="color: white; margin-bottom: -3px;">Grade</p>
+                                </th>
                               </thead>
                               <tbody>
                                 <?php
@@ -313,75 +491,98 @@ if ($result) {
                                       $quizTitle = $title['title'];
                                       $examTitle = $title['title'];
 
-                                      $sqlQuestionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND questionTitle = ?";
+                                      $sqlQuestionScore = "SELECT gradeType, score, questionPoint FROM questiongrade 
+                                        WHERE student_id = ? AND questionTitle = ?";
                                       $stmtQuestionScore = $db->prepare($sqlQuestionScore);
                                       $stmtQuestionScore->execute([$student_id, $questionTitle]);
                                       $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
 
-                                      $sqlAssignmentScore = "SELECT score FROM assignmentgrade WHERE student_id = ? AND assignmentTitle = ?";
+                                      $sqlAssignmentScore = "SELECT gradeType, score, assignmentPoint FROM assignmentgrade 
+                                          WHERE student_id = ? AND assignmentTitle = ?";
                                       $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
                                       $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
                                       $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
 
-                                      $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quizTitle = ?";
+                                      $sqlQuizScore = "SELECT gradeType, score, quizPoint FROM quizgrade 
+                                     WHERE student_id = ? AND quizTitle = ?";
                                       $stmtQuizScore = $db->prepare($sqlQuizScore);
                                       $stmtQuizScore->execute([$student_id, $quizTitle]);
                                       $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
 
-                                      $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND examTitle = ?";
+                                      $sqlExamScore = "SELECT score, examPoint FROM examgrade 
+                                    WHERE student_id = ? AND examTitle = ?";
+                                      $stmtExamScore = $db->prepare($sqlExamScore);
+                                      $stmtExamScore->execute([$student_id, $examTitle]);
+                                      $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+                                      ?>
+                                      <td>
+                                        <?php
+                                        echo isset($questionScore['score']) ? $questionScore['score'] . "<br>" : "";
+                                        echo isset($assignmentScore['score']) ? $assignmentScore['score'] . "<br>" : "";
+                                        echo isset($quizScore['score']) ? $quizScore['score'] . "<br>" : "";
+                                        echo isset($examScore['score']) ? $examScore['score'] : "";
+                                        ?>
+                                      </td>
+                                      <?php
+                                    }
+
+                                    $totalScore = 0;
+                                    $totalPoints = 0;
+
+                                    foreach ($allTitles as $title) {
+                                      $questionTitle = $title['title'];
+                                      $assignmentTitle = $title['title'];
+                                      $quizTitle = $title['title'];
+                                      $examTitle = $title['title'];
+
+                                      $sqlQuestionScore = "SELECT gradeType, score, questionPoint FROM questiongrade 
+                                        WHERE student_id = ? AND questionTitle = ?";
+                                      $stmtQuestionScore = $db->prepare($sqlQuestionScore);
+                                      $stmtQuestionScore->execute([$student_id, $questionTitle]);
+                                      $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
+
+                                      $sqlAssignmentScore = "SELECT gradeType, score, assignmentPoint FROM assignmentgrade 
+                                          WHERE student_id = ? AND assignmentTitle = ?";
+                                      $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
+                                      $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
+                                      $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
+
+                                      $sqlQuizScore = "SELECT gradeType, score, quizPoint FROM quizgrade 
+                                      WHERE student_id = ? AND quizTitle = ?";
+                                      $stmtQuizScore = $db->prepare($sqlQuizScore);
+                                      $stmtQuizScore->execute([$student_id, $quizTitle]);
+                                      $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+
+                                      $sqlExamScore = "SELECT score, examPoint FROM examgrade 
+                                      WHERE student_id = ? AND examTitle = ?";
                                       $stmtExamScore = $db->prepare($sqlExamScore);
                                       $stmtExamScore->execute([$student_id, $examTitle]);
                                       $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
 
-                                      if ($questionScore && $assignmentScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore && $assignmentScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($assignmentScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $assignmentScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($assignmentScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $assignmentScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } else {
-                                        ?>
-                                        <td></td>
-                                        <?php
-                                      }
+                                      $sqlGradePercentage = "SELECT written, performance, exam FROM section WHERE class_id = ? AND teacher_id = ?";
+                                      $stmtGradePercentage = $db->prepare($sqlGradePercentage);
+                                      $stmtGradePercentage->execute([$class_id, $user_id]);
+                                      $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
+                                      
+                                      $totalScore += isset($questionScore['score']) ? ($questionScore['score'] / $questionScore['questionPoint']) : 0;
+                                      $totalScore += isset($assignmentScore['score']) ? ($assignmentScore['score'] / $assignmentScore['assignmentPoint']) : 0;
+                                      $totalScore += isset($quizScore['score']) ? ($quizScore['score'] / $quizScore['quizPoint']) : 0;
+                                      $totalScore += isset($examScore['score']) ? ($examScore['score'] / $examScore['examPoint']) : 0;
+
+                                      $totalPoints += isset($questionScore['score']) ? 1 : 0;
+                                      $totalPoints += isset($assignmentScore['score']) ? 1 : 0;
+                                      $totalPoints += isset($quizScore['score']) ? 1 : 0;
+                                      $totalPoints += isset($examScore['score']) ? 1 : 0;
                                     }
+
+                                    $averageGrade = ($totalPoints > 0) ? ($totalScore / $totalPoints) : 0;
+                                    $percentage = $averageGrade * 100;
+                                    $color = ($percentage < 75) ? 'red' : 'green';
+
                                     ?>
+                                    <td style="color: <?php echo $color; ?>">
+                                      <?php echo number_format($percentage, 2) . '%'; ?>
+                                    </td>
                                   </tr>
                                   <?php
                                 }

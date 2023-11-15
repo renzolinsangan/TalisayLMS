@@ -31,6 +31,7 @@ $result = $stmt_selectAssignment->fetchAll(PDO::FETCH_ASSOC);
 foreach ($result as $assignmentRow) {
   $title = $assignmentRow['title'];
   $instruction = $assignmentRow['instruction'];
+  $type = $assignmentRow['type'];
   $point = $assignmentRow['point'];
   $date = $assignmentRow['date'];
   $assignmentStatus = $assignmentRow['assignment_status'];
@@ -61,11 +62,11 @@ if (isset($_POST['assignmentGrade'])) {
   $assignmentPoint = $_POST['assignmentPoint'];
   $student_id = $_POST['student_id'];
 
-  $sql_assignmentGrade = "INSERT INTO assignmentgrade (assignmentTitle, studentFirstName, studentLastname, date, score, 
-  assignmentPoint, student_id, teacher_id, class_id, assignment_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)";
+  $sql_assignmentGrade = "INSERT INTO assignmentgrade (assignmentTitle, studentFirstName, studentLastname, date, gradeType, score, 
+  assignmentPoint, student_id, teacher_id, class_id, assignment_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?)";
   $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
   $assignmentGradeResult = $stmt_assignmentGrade->execute([$assignmentTitle, $studentFirstName, 
-  $studentLastName, $score, $assignmentPoint, $student_id, $teacher_id, $class_id, $assignment_id]);
+  $studentLastName, $type, $score, $assignmentPoint, $student_id, $teacher_id, $class_id, $assignment_id]);
 }
 ?>
 <!DOCTYPE html>

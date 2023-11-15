@@ -33,6 +33,7 @@ foreach ($result as $questionRow) {
   $title = $questionRow['title'];
   $question = $questionRow['question'];
   $instruction = $questionRow['instruction'];
+  $type = $questionRow['type'];
   $point = $questionRow['point'];
   $date = $questionRow['date'];
   $questionStatus = $questionRow['question_status'];
@@ -64,12 +65,13 @@ if (isset($_POST['submitGrade'])) {
   $student_id = $_POST['student_id'];
 
   $sql_questionGrade = "INSERT INTO questiongrade (questionTitle, studentFirstName, studentLastName, date,
-        score, questionPoint, student_id, teacher_id, class_id, question_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)";
+    gradeType, score, questionPoint, student_id, teacher_id, class_id, question_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?)";
   $stmt_questionGrade = $db->prepare($sql_questionGrade);
   $questionGradeResult = $stmt_questionGrade->execute([
     $questionTitle,
     $studentFirstName,
     $studentLastName,
+    $type,
     $score,
     $questionPoint,
     $student_id,

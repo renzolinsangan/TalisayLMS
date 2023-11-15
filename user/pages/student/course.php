@@ -40,7 +40,9 @@ if (isset($_POST['submit_code'])) {
       $_SESSION['first_name'] = $row['first_name'];
       $_SESSION['last_name'] = $row['last_name'];
 
-      $sql_insert_enrollment = "INSERT INTO class_enrolled (tc_id, class_name, section, subject, grade_level, strand, teacher_id, class_code, first_name, last_name, student_id, student_firstname, student_lastname) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      $sql_insert_enrollment = "INSERT INTO class_enrolled (tc_id, class_name, section, subject, grade_level, strand, teacher_id, 
+      class_code, first_name, last_name, student_id, student_firstname, student_lastname, date) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
       $stmt_insert_enrollment = $db->prepare($sql_insert_enrollment);
       $result_insert = $stmt_insert_enrollment->execute([
         $_SESSION['class_id'],

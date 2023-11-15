@@ -19,6 +19,7 @@ if (isset($_POST['setQuiz'])) {
   $quizLink = $_POST['link'];
   $class_name = $_POST['class_name'];
   $student = $_POST['student'];
+  $type = $_POST['type'];
   $quizPoint = $_POST['point'];
   $date = date('Y-m-d');
   $dueDate = $_POST['due_date'];
@@ -26,10 +27,10 @@ if (isset($_POST['setQuiz'])) {
   $classTopic = $_POST['class_topic'];
   $quizStatus = "assigned";
 
-  $sqlSetQuiz = "INSERT INTO classwork_quiz (quizTitle, quizInstruction, quizLink, class_name, student, quizPoint, 
-  date, dueDate, time, classTopic, class_id, teacher_id, quizStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  $sqlSetQuiz = "INSERT INTO classwork_quiz (quizTitle, quizInstruction, quizLink, class_name, student, type, quizPoint, 
+  date, dueDate, time, classTopic, class_id, teacher_id, quizStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
   $stmtSetQuiz = $db->prepare($sqlSetQuiz);
-  $stmtSetQuiz->execute([$quizTitle, $quizInstruction, $quizLink, $class_name, $student, $quizPoint, $date, $dueDate, 
+  $stmtSetQuiz->execute([$quizTitle, $quizInstruction, $quizLink, $class_name, $student, $type, $quizPoint, $date, $dueDate, 
   $time, $classTopic, $class_id, $teacher_id, $quizStatus]);
   header("Location: class_classwork.php?class_id=$class_id");
   exit;
@@ -173,6 +174,12 @@ if (isset($_POST['setQuiz'])) {
               </div>
             </div>
             <div class="row">
+              <label class="text-body-secondary mb-3" style="font-size: 20px;">Written / Performance</label>
+              <div class="col-md-10 mb-4">
+                <input type="text" class="form-control" name="type" style="padding: 10px;">
+              </div>
+            </div>
+            <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Points</label>
               <div class="col-md-6 mb-4">
                 <input type="text" name="point" class="form-control" style="padding: 10px;">
@@ -227,6 +234,8 @@ if (isset($_POST['setQuiz'])) {
         var quizTitleInput = document.querySelector('[name="title"]');
         var instructionInput = document.querySelector('[name="instruction"]');
         var quizLinkInput = document.querySelector('[name="link"]');
+        var typeInput = form.querySelector('[name="type"]');
+        var selectedType = typeInput.value;
         var pointInput = document.querySelector('[name="point"]');
         var duedateInput = document.querySelector('[name="due_date"]');
 
@@ -246,14 +255,21 @@ if (isset($_POST['setQuiz'])) {
           instructionInput.classList.remove('is-invalid');
         }
 
-        var googleFormsUrlPattern = /^https:\/\/(docs\.google\.com\/forms|forms\.gle)\/.*/;
-        if (!googleFormsUrlPattern.test(quizLinkInput.value)) {
+        var linkPattern = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
+
+        if (!linkPattern.test(quizLinkInput.value)) {
           isEmpty = true;
           quizLinkInput.classList.add('is-invalid');
         } else {
           quizLinkInput.classList.remove('is-invalid');
         }
 
+        if ((selectedType !== "written" && selectedType !== "performance") || selectedType === "") {
+        event.preventDefault();
+        typeInput.classList.add('is-invalid');
+        } else {
+          typeInput.classList.remove('is-invalid');
+        }
 
         var pointValue = pointInput.value.trim();
         if (pointValue === '' || isNaN(pointValue) || pointValue < 0 || pointValue > 100) {

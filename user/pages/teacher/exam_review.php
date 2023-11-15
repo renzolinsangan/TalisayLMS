@@ -62,10 +62,10 @@ if (isset($_POST['examGrade'])) {
   $examPoint = $_POST['examPoint'];
   $student_id = $_POST['student_id'];
 
-  $sql_assignmentGrade = "INSERT INTO examGrade (examTitle, studentFirstName, studentLastname, date, score, 
+  $sqlExamGrade = "INSERT INTO examGrade (examTitle, studentFirstName, studentLastname, date, score, 
   examPoint, student_id, teacher_id, class_id, exam_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)";
-  $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
-  $assignmentGradeResult = $stmt_assignmentGrade->execute([
+  $stmtExamGrade = $db->prepare($sqlExamGrade);
+  $examGradeResult = $stmtExamGrade->execute([
     $examTitle,
     $studentFirstName,
     $studentLastName,
@@ -314,6 +314,7 @@ if (isset($_POST['examGrade'])) {
                                   <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
                                   <?php echo $examTitle ?> (
                                   <?php echo $date ?>)
+                                  <input type="hidden" name="examTitle" value="<?php echo $examTitle ?>">
                                   <p class="text-body-secondary">by
                                     <?php echo $student_firstname . ' ' . $student_lastname ?>
                                     <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
@@ -341,7 +342,7 @@ if (isset($_POST['examGrade'])) {
                         border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
                                       /
                                       <?php echo $examPoint; ?>
-                                      <input type="hidden" name="questionPoint" value="<?php echo $examPoint; ?>">
+                                      <input type="hidden" name="examPoint" value="<?php echo $examPoint; ?>">
                                     </p>
                                     <?php
                                   } else {
@@ -353,7 +354,7 @@ if (isset($_POST['examGrade'])) {
                                         value="<?php echo $examScore; ?>" readonly>
                                       /
                                       <?php echo $examPoint; ?>
-                                      <input type="hidden" name="questionPoint" value="<?php echo $examPoint; ?>">
+                                      <input type="hidden" name="examPoint" value="<?php echo $examPoint; ?>">
                                     </p>
                                     <?php
                                   }
@@ -374,7 +375,6 @@ if (isset($_POST['examGrade'])) {
                                     status
                                     and provide scores for the student.
                                   </p>
-                                  <input type="hidden" name="examTitle" value="<?php echo $examTitle ?>">
                                   <?php
                                   ?>
                                 <?php endforeach; ?>
