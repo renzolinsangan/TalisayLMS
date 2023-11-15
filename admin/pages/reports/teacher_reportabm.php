@@ -40,48 +40,73 @@ if (!isset($_SESSION['id'])) {
               <i class="icon-bell mx-0"></i>
               <span class="count"></span>
             </a>
+            <?php
+            include("config.php");
+
+            // Fetch feedback notifications
+            $sqlFeedbackNotif = "SELECT firstname, lastname, date FROM feedback ORDER BY date DESC";
+            $resultFeedbackNotif = $db->query($sqlFeedbackNotif);
+
+            // Fetch news items
+            $sqlNews = "SELECT type, title, end_date FROM news";
+            $resultNews = $db->query($sqlNews);
+
+            // Current date
+            $currentDate = date('Y-m-d');
+            ?>
+
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
               <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
+
+              <?php
+              while ($row = $resultFeedbackNotif->fetch(PDO::FETCH_ASSOC)) {
+                $fullName = $row['firstname'] . ' ' . $row['lastname'];
+                $submissionDate = $row['date'];
+                ?>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-success">
+                      <i class="ti-info-alt mx-0"></i>
+                    </div>
                   </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
+                  <div class="preview-item-content">
+                    <h6 class="preview-subject font-weight-normal">
+                      <?php echo $fullName; ?> has sent a feedback
+                    </h6>
+                    <p class="font-weight-light small-text mb-0 text-muted">
+                      <?php echo date('F j', strtotime($submissionDate)); ?>
+                    </p>
                   </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+                </a>
+              <?php } ?>
+
+              <?php
+              while ($newsRow = $resultNews->fetch(PDO::FETCH_ASSOC)) {
+                $type = $newsRow['type'];
+                $title = $newsRow['title'];
+                $endDate = $newsRow['end_date'];
+
+                if ($currentDate > $endDate) {
+                  ?>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-danger">
+                        <i class="ti-alarm-clock mx-0"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <h6 class="preview-subject font-weight-normal">
+                        <?php echo ucfirst($type); ?> -
+                        <?php echo $title; ?> has expired
+                      </h6>
+                      <p class="font-weight-light small-text mb-0 text-muted">
+                        <?php echo date('F j', strtotime($endDate)); ?>
+                      </p>
+                    </div>
+                  </a>
+                <?php }
+              } ?>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -164,64 +189,64 @@ if (!isset($_SESSION['id'])) {
         </div>
         <div class="content-wrapper">
           <button id="print" class="btn btn-success mb-2">Download Data</button>
-            <div id="print-content">
-              <div class="row">
-                <div class="col-12 grid-margin stretch-card">
-                  <div class="card">
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="card-body">
-                          <h1 class="card-title" style="font-size: 30px; margin-left: 10px; margin-bottom: -20px;">ABM teachers</h1>
-                        </div>
+          <div id="print-content">
+            <div class="row">
+              <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="card-body">
+                        <h1 class="card-title" style="font-size: 30px; margin-left: 10px; margin-bottom: -20px;">ABM
+                          teachers</h1>
                       </div>
                     </div>
-                    <div class="card">
-                      <div class="row">
-                        <div class="col-md-12">
-                          <div class="card-body">
-                            <div class="table-responsive">
-                              <table id="example" class="table text-center"
+                  </div>
+                  <div class="card">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="card-body">
+                          <div class="table-responsive">
+                            <table id="example" class="table text-center"
                               style="width: 100%; table-layout: fixed; border-collapse: collapse;">
-                                <thead class="table" style="background-color: #4BB543; color: white;">
-                                  <tr>
-                                    <th scope="col" style="text-align: center; overflow: hidden;">Teacher's Name</th>
-                                    <th scope="col" style="text-align: center; overflow: hidden;">House Address</th>
-                                    <th scope="col" style="text-align: center; overflow: hidden;">Contact Number</th>
-                                    <th scope="col" style="text-align: center; overflow: hidden;">Email Address</th>
-                                    <th scope="col" style="text-align: center; overflow: hidden;">Department</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <?php
-                                  include("db_conn.php");
-                                  $sql = "SELECT * FROM user_account WHERE usertype='teacher' AND department='abm'";
-                                  $result = mysqli_query($conn, $sql);
+                              <thead class="table" style="background-color: #4BB543; color: white;">
+                                <tr>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Teacher's Name</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">House Address</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Contact Number</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Email Address</th>
+                                  <th scope="col" style="text-align: center; overflow: hidden;">Department</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <?php
+                                include("db_conn.php");
+                                $sql = "SELECT * FROM user_account WHERE usertype='teacher' AND department='abm'";
+                                $result = mysqli_query($conn, $sql);
 
-                                  while ($row = mysqli_fetch_assoc($result)) {
-                                    ?>
-                                    <tr>
-                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
-                                        <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
-                                      </td>
-                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
-                                        <?php echo $row['address']; ?>
-                                      </td>
-                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
-                                        <?php echo $row['contact']; ?>
-                                      </td>
-                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
-                                        <?php echo $row['email']; ?>
-                                      </td>
-                                      <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
-                                        <?php echo $row['department'] ?>
-                                      </td>
-                                    </tr>
-                                    <?php
-                                  }
+                                while ($row = mysqli_fetch_assoc($result)) {
                                   ?>
-                                </tbody>
-                              </table>
-                            </div>
+                                  <tr>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                      <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
+                                    </td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                      <?php echo $row['address']; ?>
+                                    </td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                      <?php echo $row['contact']; ?>
+                                    </td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                      <?php echo $row['email']; ?>
+                                    </td>
+                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                      <?php echo $row['department'] ?>
+                                    </td>
+                                  </tr>
+                                  <?php
+                                }
+                                ?>
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       </div>
@@ -230,6 +255,7 @@ if (!isset($_SESSION['id'])) {
                 </div>
               </div>
             </div>
+          </div>
         </div>
       </div>
     </div>

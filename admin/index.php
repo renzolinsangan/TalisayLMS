@@ -44,48 +44,73 @@ include("db_conn.php");
               <i class="icon-bell mx-0"></i>
               <span class="count"></span>
             </a>
+            <?php
+            include("config.php");
+
+            // Fetch feedback notifications
+            $sqlFeedbackNotif = "SELECT firstname, lastname, date FROM feedback ORDER BY date DESC";
+            $resultFeedbackNotif = $db->query($sqlFeedbackNotif);
+
+            // Fetch news items
+            $sqlNews = "SELECT type, title, end_date FROM news";
+            $resultNews = $db->query($sqlNews);
+
+            // Current date
+            $currentDate = date('Y-m-d');
+            ?>
+
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
               <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
+
+              <?php
+              while ($row = $resultFeedbackNotif->fetch(PDO::FETCH_ASSOC)) {
+                $fullName = $row['firstname'] . ' ' . $row['lastname'];
+                $submissionDate = $row['date'];
+                ?>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-success">
+                      <i class="ti-info-alt mx-0"></i>
+                    </div>
                   </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
+                  <div class="preview-item-content">
+                    <h6 class="preview-subject font-weight-normal">
+                      <?php echo $fullName; ?> has sent a feedback
+                    </h6>
+                    <p class="font-weight-light small-text mb-0 text-muted">
+                      <?php echo date('F j', strtotime($submissionDate)); ?>
+                    </p>
                   </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+                </a>
+              <?php } ?>
+
+              <?php
+              while ($newsRow = $resultNews->fetch(PDO::FETCH_ASSOC)) {
+                $type = $newsRow['type'];
+                $title = $newsRow['title'];
+                $endDate = $newsRow['end_date'];
+
+                if ($currentDate > $endDate) {
+                  ?>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-danger">
+                        <i class="ti-alarm-clock mx-0"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <h6 class="preview-subject font-weight-normal">
+                        <?php echo ucfirst($type); ?> -
+                        <?php echo $title; ?> has expired
+                      </h6>
+                      <p class="font-weight-light small-text mb-0 text-muted">
+                        <?php echo date('F j', strtotime($endDate)); ?>
+                      </p>
+                    </div>
+                  </a>
+                <?php }
+              } ?>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -295,13 +320,18 @@ include("db_conn.php");
                   $totalStudentReport = mysqli_num_rows($studentResult);
                   $studentRow = mysqli_fetch_assoc($studentResult);
 
-                  if($studentRow) {
+                  if ($studentRow) {
                     $usertype = $studentRow['usertype'];
                     ?>
-                    <p class="card-title mb-1"><?php echo ucfirst($usertype) ?> Reports <span class="text-body-secondary">
-                      ( <?php echo $totalStudentReport ?> )
-                    </span></p>
-                    <a href="student_report.php">View <?php echo ucfirst($usertype) ?> Report</a>
+                    <p class="card-title mb-1">
+                      <?php echo ucfirst($usertype) ?> Reports <span class="text-body-secondary">
+                        (
+                        <?php echo $totalStudentReport ?> )
+                      </span>
+                    </p>
+                    <a href="student_report.php">View
+                      <?php echo ucfirst($usertype) ?> Report
+                    </a>
                     <?php
                   }
 
@@ -310,13 +340,18 @@ include("db_conn.php");
                   $totalTeacherReport = mysqli_num_rows($teacherResult);
                   $teacherRow = mysqli_fetch_assoc($teacherResult);
 
-                  if($teacherRow) {
+                  if ($teacherRow) {
                     $usertype = $teacherRow["usertype"];
                     ?>
-                    <p class="card-title mt-4 mb-1"><?php echo ucfirst($usertype) ?> Reports <span class="text-body-secondary">
-                      ( <?php echo $totalTeacherReport ?> )
-                    </span></p>
-                    <a href="teacher_report.php">View <?php echo ucfirst($usertype) ?> Report</a>
+                    <p class="card-title mt-4 mb-1">
+                      <?php echo ucfirst($usertype) ?> Reports <span class="text-body-secondary">
+                        (
+                        <?php echo $totalTeacherReport ?> )
+                      </span>
+                    </p>
+                    <a href="teacher_report.php">View
+                      <?php echo ucfirst($usertype) ?> Report
+                    </a>
                     <?php
                   }
 
@@ -324,14 +359,19 @@ include("db_conn.php");
                   $parentResult = mysqli_query($conn, $sqlParentReport);
                   $totalParentReport = mysqli_num_rows($parentResult);
                   $parentRow = mysqli_fetch_assoc($parentResult);
-                  
-                  if($parentRow) {
+
+                  if ($parentRow) {
                     $usertype = $parentRow["usertype"];
                     ?>
-                    <p class="card-title mt-4 mb-1"><?php echo ucfirst($usertype) ?> Reports <span class="text-body-secondary">
-                      ( <?php echo $totalParentReport ?> )
-                    </span></p>
-                    <a href="parent_report.php">View <?php echo ucfirst($usertype) ?> Report</a>
+                    <p class="card-title mt-4 mb-1">
+                      <?php echo ucfirst($usertype) ?> Reports <span class="text-body-secondary">
+                        (
+                        <?php echo $totalParentReport ?> )
+                      </span>
+                    </p>
+                    <a href="parent_report.php">View
+                      <?php echo ucfirst($usertype) ?> Report
+                    </a>
                     <?php
                   }
                   ?>
@@ -371,18 +411,18 @@ include("db_conn.php");
           </div>
         </div>
 
-  <script src="vendors/js/vendor.bundle.base.js"></script>
-  <script src="vendors/chart.js/Chart.min.js"></script>
-  <script src="vendors/datatables.net/jquery.dataTables.js"></script>
-  <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
-  <script src="js/dataTables.select.min.js"></script>
-  <script src="js/off-canvas.js"></script>
-  <script src="js/hoverable-collapse.js"></script>
-  <script src="js/template.js"></script>
-  <script src="js/settings.js"></script>
-  <script src="js/todolist.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/Chart.roundedBarCharts.js"></script>
+        <script src="vendors/js/vendor.bundle.base.js"></script>
+        <script src="vendors/chart.js/Chart.min.js"></script>
+        <script src="vendors/datatables.net/jquery.dataTables.js"></script>
+        <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
+        <script src="js/dataTables.select.min.js"></script>
+        <script src="js/off-canvas.js"></script>
+        <script src="js/hoverable-collapse.js"></script>
+        <script src="js/template.js"></script>
+        <script src="js/settings.js"></script>
+        <script src="js/todolist.js"></script>
+        <script src="js/dashboard.js"></script>
+        <script src="js/Chart.roundedBarCharts.js"></script>
 </body>
 
 </html>

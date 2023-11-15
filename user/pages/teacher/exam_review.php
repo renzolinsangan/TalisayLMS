@@ -54,28 +54,27 @@ foreach ($result as $studentRow) {
   $otherProfile = $stmt_selectProfile->fetchColumn();
 }
 
-if (isset($_POST['assignmentGrade'])) {
-  $assignmentTitle = $_POST['assignmentTitle'];
+if (isset($_POST['examGrade'])) {
+  $examTitle = $_POST['examTitle'];
   $studentFirstName = $_POST['studentFirstName'];
   $studentLastName = $_POST['studentLastName'];
   $score = $_POST['score'];
-  $assignmentPoint = $_POST['assignmentPoint'];
+  $examPoint = $_POST['examPoint'];
   $student_id = $_POST['student_id'];
 
-  $sql_assignmentGrade = "INSERT INTO assignmentgrade (assignmentTitle, studentFirstName, studentLastname, date, score, 
-  assignmentPoint, student_id, teacher_id, class_id, assignment_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  $sql_assignmentGrade = "INSERT INTO examGrade (examTitle, studentFirstName, studentLastname, date, score, 
+  examPoint, student_id, teacher_id, class_id, exam_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)";
   $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
   $assignmentGradeResult = $stmt_assignmentGrade->execute([
-    $assignmentTitle,
+    $examTitle,
     $studentFirstName,
     $studentLastName,
-    $date,
     $score,
-    $assignmentPoint,
+    $examPoint,
     $student_id,
     $teacher_id,
     $class_id,
-    $assignment_id
+    $exam_id
   ]);
 }
 ?>
@@ -269,6 +268,27 @@ if (isset($_POST['assignmentGrade'])) {
                     $stmt_selectProfile->execute([$student_id]);
                     $profileResult = $stmt_selectProfile->fetchAll(PDO::FETCH_ASSOC);
 
+                    $sqlExamAnswer = "SELECT * FROM student_exam_course_answer WHERE user_id = ? AND exam_id = ?";
+                    $stmtExamAnswer = $db->prepare($sqlExamAnswer);
+                    $stmtExamAnswer->execute([$student_id, $exam_id]);
+                    $examResult = $stmtExamAnswer->fetchAll(PDO::FETCH_ASSOC);
+
+                    $hasTurnedInStatus = false;
+
+                    foreach ($examResult as $examRow) {
+                      $examCourseStatus = $examRow['exam_course_status'];
+                      if ($examCourseStatus === 'turned in' || $examCourseStatus === 'turned-in late') {
+                        $hasTurnedInStatus = true;
+                        break;
+                      }
+                    }
+
+                    $statusColorClass = '';
+
+                    if (!$hasTurnedInStatus) {
+                      $statusColorClass = ($examStatus === 'assigned') ? 'text-success' : 'text-danger';
+                    }
+
                     foreach ($profileResult as $profileRow) {
                       $otherProfile = $profileRow['profile'];
                       ?>
@@ -294,31 +314,77 @@ if (isset($_POST['assignmentGrade'])) {
                                   <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
                                   <?php echo $examTitle ?> (
                                   <?php echo $date ?>)
-                                  <input type="hidden" name="assignmentTitle" value="<?php echo $title ?>">
                                   <p class="text-body-secondary">by
                                     <?php echo $student_firstname . ' ' . $student_lastname ?>
                                     <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
                                     <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
                                   </p>
-                                  <p style="color: green;"><?php echo ucfirst($examStatus) ?></p>
-                                  <p>
-                                  <input type="text" name="score" style=" height: 4vh; width: 4vh; font-size: 13px; border: none;
-                                    border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
-                                  / <?php echo $examPoint ?>
-                                </p>
+                                  <?php
+                                  if (!$hasTurnedInStatus) {
+                                    ?>
+                                    <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                      <?php echo ucfirst($examStatus) ?>
+                                    </p>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php
+                                  $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND exam_id = ?";
+                                  $stmtExamScore = $db->prepare($sqlExamScore);
+                                  $stmtExamScore->execute([$student_id, $exam_id]);
+                                  $examScoreResult = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+
+                                  if (empty($examScoreResult)) {
+                                    ?>
+                                    <p>
+                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
+                                      /
+                                      <?php echo $examPoint; ?>
+                                      <input type="hidden" name="questionPoint" value="<?php echo $examPoint; ?>">
+                                    </p>
+                                    <?php
+                                  } else {
+                                    $examScore = $examScoreResult['score'];
+                                    ?>
+                                    <p>
+                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
+                                        value="<?php echo $examScore; ?>" readonly>
+                                      /
+                                      <?php echo $examPoint; ?>
+                                      <input type="hidden" name="questionPoint" value="<?php echo $examPoint; ?>">
+                                    </p>
+                                    <?php
+                                  }
+                                  ?>
                                 </h1>
                               </div>
-                              <div class="modal-body">
-                                <p>Exam are taken through Google Form. Please check the Google Form to review the exam and determine the score of the student.</p>
-                                <span>Link: <a href="https://docs.google.com/forms/" target="_blank">https://docs.google.com/forms/</a></span>
-                                <p class="text-body-secondary">(make sure to open the link with your account)</p>
+                              <div class="modal-body" style="margin-top: -10px;">
+                                <?php foreach ($examResult as $examRow): ?>
+                                  <?php
+                                  $examCourseStatus = $examRow['exam_course_status'];
+                                  $statusColor = ($examCourseStatus === 'turned in') ? 'green' : 'red';
+                                  ?>
+                                  <span style="color: <?php echo $statusColor; ?>">
+                                    <?php echo ucfirst($examCourseStatus) ?>
+                                  </span>
+                                  <p class="mt-1">
+                                    Exam are taken through face-to-face. Please tell the student to turn-in to change the exam
+                                    status
+                                    and provide scores for the student.
+                                  </p>
+                                  <input type="hidden" name="examTitle" value="<?php echo $examTitle ?>">
+                                  <?php
+                                  ?>
+                                <?php endforeach; ?>
                               </div>
                               <div class="modal-footer" style="border: none;">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                 <?php
-                                if (empty($assignmentScoreResult)) {
+                                if (empty($examScoreResult)) {
                                   ?>
-                                  <button type="submit" name="assignmentGrade" class="btn btn-success">Submit</button>
+                                  <button type="submit" name="examGrade" class="btn btn-success">Submit</button>
                                   <?php
                                 } else {
                                   ?>

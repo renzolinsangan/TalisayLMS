@@ -41,7 +41,8 @@ $stmt_department->close();
   <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css">
   <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/indexStyle.css">
+  <link rel="stylesheet" href="assets/css/notification.css">
   <link rel="shortcut icon" href="images/trace.svg" />
 </head>
 
@@ -61,48 +62,177 @@ $stmt_department->close();
               <i class="icon-bell mx-0"></i>
               <span class="count"></span>
             </a>
+            <?php
+            include("config.php");
+            include("notifications.php");
+
+            $fullName = getFullName($db, $user_id);
+            $studentFullName = ($fullName['firstname'] . ' ' . $fullName['lastname']);
+
+            $resultNewsNotif = getNewsNotifications($db);
+            $resultFriendNotif = getFriendNotifications($db, $user_id);
+            $resultTeacherNotif = getTeacherNotifications($db, $user_id);
+            $resultMaterialNotif = getMaterialNotifications($db, $studentFullName);
+            $resultQuestionNotif = getQuestionNotification($db, $studentFullName);
+            $resultAssignmentNotif = getAssignmentNotification($db, $studentFullName);
+            $resultQuizNotif = getQuizNotification($db, $studentFullName);
+            $resultExamNotif = getExamNotification($db, $studentFullName);
+            $resultQuestionGradeNotif = getQuestionScoreNotification($db, $user_id);
+            $resultAssignmentGradeNotif = getAssignmentScoreNotification($db, $user_id);
+            $resultQuizGradeNotif = getQuizScoreNotification($db, $user_id);
+            $resultExamGradeNotif = getExamScoreNotification($db, $user_id);
+
+            $allNotifications = array_merge(
+              $resultNewsNotif,
+              $resultFriendNotif,
+              $resultTeacherNotif,
+              $resultMaterialNotif,
+              $resultQuestionNotif,
+              $resultAssignmentNotif,
+              $resultQuizNotif,
+              $resultExamNotif,
+              $resultQuestionGradeNotif,
+              $resultAssignmentGradeNotif,
+              $resultQuizGradeNotif,
+              $resultExamGradeNotif
+            );
+            usort($allNotifications, function ($a, $b) {
+              return strtotime($b['date']) - strtotime($a['date']);
+            });
+            ?>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
-              <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+              <div class="scrollable-notifications">
+                <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+                <?php foreach ($allNotifications as $notification): ?>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <?php if (isset($notification['title'])): ?>
+                        <div class="preview-icon bg-success">
+                          <i class="ti-info-alt mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['friend_id'])): ?>
+                        <div class="preview-icon bg-warning">
+                          <i class="ti-user mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['teacher_id'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-book mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['score'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="preview-item-content">
+                      <?php if (isset($notification['title'])): ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $notification['title']; ?> (
+                          <?php echo ucfirst($notification['type']); ?>)
+                        </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          by
+                          <?php echo $notification['name']; ?> on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php elseif (isset($notification['friend_id'])): ?>
+                        <?php
+                        $friendNameParts = explode(' ', $notification['name']);
+                        $firstName = $friendNameParts[0];
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          You added
+                          <?php echo $firstName; ?> as your friend.
+                        </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php elseif (isset($notification['teacher_id'])): ?>
+                        <?php
+                        $sqlTeacherName = "SELECT firstname FROM user_account WHERE user_id = :teacher_id";
+                        $stmtTeacherName = $db->prepare($sqlTeacherName);
+                        $stmtTeacherName->bindParam(':teacher_id', $notification['teacher_id']);
+                        $stmtTeacherName->execute();
+                        $teacherName = $stmtTeacherName->fetchColumn();
+                        ?>
+                        <?php if ($notification['notification_type'] === 'teacher'): ?>
+                          <div class="preview-item-content">
+                            <h6 class="preview-subject font-weight-normal">
+                              You added
+                              <?php echo $teacherName; ?> as your teacher.
+                            </h6>
+                          </div>
+                        <?php else: ?>
+                          <h6 class="preview-subject font-weight-normal">
+                            <?php echo $teacherName; ?> posted
+                            <?php if ($notification['notification_type'] === 'material'): ?>
+                              a material in
+                            <?php elseif ($notification['notification_type'] === 'question'): ?>
+                              a question in
+                            <?php elseif ($notification['notification_type'] === 'assignment'): ?>
+                              an assignment in
+                            <?php elseif ($notification['notification_type'] === 'quiz'): ?>
+                              a quiz in
+                            <?php elseif ($notification['notification_type'] === 'exam'): ?>
+                              an exam in
+                            <?php endif; ?>
+                            <?php echo $notification['class_name']; ?>.
+                          </h6>
+                        <?php endif; ?>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php elseif (isset($notification['score'])): ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
+                            <?php echo $notification['teacherFirstName'] ?>
+                            posted your score in
+                            <?php echo $notification['questionTitle']; ?>
+                            (question).
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php elseif ($notification['scoreNotification_type'] === 'assignmentGrade'): ?>
+                          <?php echo $notification['teacherFirstName'] ?>
+                          posted your score in
+                          <?php echo $notification['assignmentTitle']; ?>
+                          (assignment).
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php elseif ($notification['scoreNotification_type'] === 'quizGrade'): ?>
+                          <?php echo $notification['teacherFirstName'] ?>
+                          posted your score in
+                          <?php echo $notification['quizTitle']; ?>
+                          (quiz).
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php elseif ($notification['scoreNotification_type'] === 'examGrade'): ?>
+                          <?php echo $notification['teacherFirstName'] ?>
+                          posted your score in
+                          <?php echo $notification['examTitle']; ?>
+                          (exam).
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php endif; ?>
+                      <?php endif; ?>
+                    </div>
+                  </a>
+                <?php endforeach; ?>
+              </div>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -349,36 +479,21 @@ $stmt_department->close();
             </div>
           </div>
         </div>
-        <!-- content-wrapper ends -->
-        <!-- partial -->
       </div>
-      <!-- main-panel ends -->
     </div>
-    <!-- page-body-wrapper ends -->
-  </div>
-  <!-- container-scroller -->
 
-  <!-- plugins:js -->
-  <script src="vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <script src="vendors/chart.js/Chart.min.js"></script>
-  <script src="vendors/datatables.net/jquery.dataTables.js"></script>
-  <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
-  <script src="js/dataTables.select.min.js"></script>
-
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="js/off-canvas.js"></script>
-  <script src="js/hoverable-collapse.js"></script>
-  <script src="js/template.js"></script>
-  <script src="js/settings.js"></script>
-  <script src="js/todolist.js"></script>
-  <!-- endinject -->
-  <!-- Custom js for this page-->
-  <script src="js/dashboard.js"></script>
-  <script src="js/Chart.roundedBarCharts.js"></script>
-  <!-- End custom js for this page-->
+    <script src="vendors/js/vendor.bundle.base.js"></script>
+    <script src="vendors/chart.js/Chart.min.js"></script>
+    <script src="vendors/datatables.net/jquery.dataTables.js"></script>
+    <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
+    <script src="js/dataTables.select.min.js"></script>
+    <script src="js/off-canvas.js"></script>
+    <script src="js/hoverable-collapse.js"></script>
+    <script src="js/template.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/todolist.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/Chart.roundedBarCharts.js"></script>
 </body>
 
 </html>

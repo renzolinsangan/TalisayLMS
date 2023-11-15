@@ -62,10 +62,10 @@ if (isset($_POST['assignmentGrade'])) {
   $student_id = $_POST['student_id'];
 
   $sql_assignmentGrade = "INSERT INTO assignmentgrade (assignmentTitle, studentFirstName, studentLastname, date, score, 
-  assignmentPoint, student_id, teacher_id, class_id, assignment_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+  assignmentPoint, student_id, teacher_id, class_id, assignment_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)";
   $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
   $assignmentGradeResult = $stmt_assignmentGrade->execute([$assignmentTitle, $studentFirstName, 
-  $studentLastName, $date, $score, $assignmentPoint, $student_id, $teacher_id, $class_id, $assignment_id]);
+  $studentLastName, $score, $assignmentPoint, $student_id, $teacher_id, $class_id, $assignment_id]);
 }
 ?>
 <!DOCTYPE html>

@@ -64,13 +64,12 @@ if (isset($_POST['submitGrade'])) {
   $student_id = $_POST['student_id'];
 
   $sql_questionGrade = "INSERT INTO questiongrade (questionTitle, studentFirstName, studentLastName, date,
-        score, questionPoint, student_id, teacher_id, class_id, question_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        score, questionPoint, student_id, teacher_id, class_id, question_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)";
   $stmt_questionGrade = $db->prepare($sql_questionGrade);
   $questionGradeResult = $stmt_questionGrade->execute([
     $questionTitle,
     $studentFirstName,
     $studentLastName,
-    $date,
     $score,
     $questionPoint,
     $student_id,
@@ -361,7 +360,7 @@ if (isset($_POST['submitGrade'])) {
                       ?>
                       <p>
                         <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
                         /
                         <?php echo $point; ?>
                         <input type="hidden" name="questionPoint" value="<?php echo $point; ?>">
@@ -372,7 +371,7 @@ if (isset($_POST['submitGrade'])) {
                       ?>
                       <p>
                         <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $questionScore; ?>"
+                      border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $questionScore; ?>"
                           readonly>
                         /
                         <?php echo $point; ?>

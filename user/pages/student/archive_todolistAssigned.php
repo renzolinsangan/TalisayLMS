@@ -46,6 +46,7 @@ if ($teacher_id) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/todolist.css">
+  <link rel="stylesheet" href="assets/css/notification.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
@@ -65,48 +66,177 @@ if ($teacher_id) {
               <i class="icon-bell mx-0"></i>
               <span class="count"></span>
             </a>
+            <?php
+            include("config.php");
+            include("notifications.php");
+
+            $fullName = getFullName($db, $user_id);
+            $studentFullName = ($fullName['firstname'] . ' ' . $fullName['lastname']);
+
+            $resultNewsNotif = getNewsNotifications($db);
+            $resultFriendNotif = getFriendNotifications($db, $user_id);
+            $resultTeacherNotif = getTeacherNotifications($db, $user_id);
+            $resultMaterialNotif = getMaterialNotifications($db, $studentFullName);
+            $resultQuestionNotif = getQuestionNotification($db, $studentFullName);
+            $resultAssignmentNotif = getAssignmentNotification($db, $studentFullName);
+            $resultQuizNotif = getQuizNotification($db, $studentFullName);
+            $resultExamNotif = getExamNotification($db, $studentFullName);
+            $resultQuestionGradeNotif = getQuestionScoreNotification($db, $user_id);
+            $resultAssignmentGradeNotif = getAssignmentScoreNotification($db, $user_id);
+            $resultQuizGradeNotif = getQuizScoreNotification($db, $user_id);
+            $resultExamGradeNotif = getExamScoreNotification($db, $user_id);
+
+            $allNotifications = array_merge(
+              $resultNewsNotif,
+              $resultFriendNotif,
+              $resultTeacherNotif,
+              $resultMaterialNotif,
+              $resultQuestionNotif,
+              $resultAssignmentNotif,
+              $resultQuizNotif,
+              $resultExamNotif,
+              $resultQuestionGradeNotif,
+              $resultAssignmentGradeNotif,
+              $resultQuizGradeNotif,
+              $resultExamGradeNotif
+            );
+            usort($allNotifications, function ($a, $b) {
+              return strtotime($b['date']) - strtotime($a['date']);
+            });
+            ?>
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
-              <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+              <div class="scrollable-notifications">
+                <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+                <?php foreach ($allNotifications as $notification): ?>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <?php if (isset($notification['title'])): ?>
+                        <div class="preview-icon bg-success">
+                          <i class="ti-info-alt mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['friend_id'])): ?>
+                        <div class="preview-icon bg-warning">
+                          <i class="ti-user mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['teacher_id'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-book mx-0"></i>
+                        </div>
+                      <?php elseif (isset($notification['score'])): ?>
+                        <div class="preview-icon bg-info">
+                          <i class="ti-pencil mx-0"></i>
+                        </div>
+                      <?php endif; ?>
+                    </div>
+                    <div class="preview-item-content">
+                      <?php if (isset($notification['title'])): ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php echo $notification['title']; ?> (
+                          <?php echo ucfirst($notification['type']); ?>)
+                        </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          by
+                          <?php echo $notification['name']; ?> on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php elseif (isset($notification['friend_id'])): ?>
+                        <?php
+                        $friendNameParts = explode(' ', $notification['name']);
+                        $firstName = $friendNameParts[0];
+                        ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          You added
+                          <?php echo $firstName; ?> as your friend.
+                        </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php elseif (isset($notification['teacher_id'])): ?>
+                        <?php
+                        $sqlTeacherName = "SELECT firstname FROM user_account WHERE user_id = :teacher_id";
+                        $stmtTeacherName = $db->prepare($sqlTeacherName);
+                        $stmtTeacherName->bindParam(':teacher_id', $notification['teacher_id']);
+                        $stmtTeacherName->execute();
+                        $teacherName = $stmtTeacherName->fetchColumn();
+                        ?>
+                        <?php if ($notification['notification_type'] === 'teacher'): ?>
+                          <div class="preview-item-content">
+                            <h6 class="preview-subject font-weight-normal">
+                              You added
+                              <?php echo $teacherName; ?> as your teacher.
+                            </h6>
+                          </div>
+                        <?php else: ?>
+                          <h6 class="preview-subject font-weight-normal">
+                            <?php echo $teacherName; ?> posted
+                            <?php if ($notification['notification_type'] === 'material'): ?>
+                              a material in
+                            <?php elseif ($notification['notification_type'] === 'question'): ?>
+                              a question in
+                            <?php elseif ($notification['notification_type'] === 'assignment'): ?>
+                              an assignment in
+                            <?php elseif ($notification['notification_type'] === 'quiz'): ?>
+                              a quiz in
+                            <?php elseif ($notification['notification_type'] === 'exam'): ?>
+                              an exam in
+                            <?php endif; ?>
+                            <?php echo $notification['class_name']; ?>.
+                          </h6>
+                        <?php endif; ?>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                          on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
+                      <?php elseif (isset($notification['score'])): ?>
+                        <h6 class="preview-subject font-weight-normal">
+                          <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
+                            <?php echo $notification['teacherFirstName'] ?>
+                            posted your score in
+                            <?php echo $notification['questionTitle']; ?>
+                            (question).
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php elseif ($notification['scoreNotification_type'] === 'assignmentGrade'): ?>
+                          <?php echo $notification['teacherFirstName'] ?>
+                          posted your score in
+                          <?php echo $notification['assignmentTitle']; ?>
+                          (assignment).
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php elseif ($notification['scoreNotification_type'] === 'quizGrade'): ?>
+                          <?php echo $notification['teacherFirstName'] ?>
+                          posted your score in
+                          <?php echo $notification['quizTitle']; ?>
+                          (quiz).
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php elseif ($notification['scoreNotification_type'] === 'examGrade'): ?>
+                          <?php echo $notification['teacherFirstName'] ?>
+                          posted your score in
+                          <?php echo $notification['examTitle']; ?>
+                          (exam).
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php endif; ?>
+                      <?php endif; ?>
+                    </div>
+                  </a>
+                <?php endforeach; ?>
+              </div>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -206,6 +336,8 @@ if ($teacher_id) {
               <?php
               $assignment_results = [];
               $question_results = [];
+              $quiz_results = [];
+              $exam_results = [];
 
               $sql_assignment = "SELECT a.assignment_id, a.title, a.date
                    FROM classwork_assignment a
@@ -230,8 +362,29 @@ if ($teacher_id) {
               $stmt_question = $db->prepare($sql_question);
               $stmt_question->execute([$user_id, $teacher_id, $class_name]);
               $question_results = $stmt_question->fetchall();
+              $sql_quiz = "SELECT q.quiz_id, q.quizTitle AS title, q.date 
+              FROM classwork_quiz q
+              LEFT JOIN student_quiz_course_answer sq
+              ON q.quiz_id = sq.quiz_id AND sq.user_id = ?
+              WHERE q.teacher_id = ? AND q.class_name = ? 
+              AND q.quizStatus = 'assigned'
+              AND sq.quiz_id IS NULL";
+              $stmt_quiz = $db->prepare($sql_quiz);
+              $stmt_quiz->execute([$user_id, $teacher_id, $class_name]);
+              $quiz_results = $stmt_quiz->fetchAll();
 
-              $combined_results = array_merge($assignment_results, $question_results);
+              $sql_exam = "SELECT e.exam_id, e.examTitle AS title, e.date 
+              FROM classwork_exam e
+              LEFT JOIN student_exam_course_answer se
+              ON e.exam_id = se.exam_id AND se.user_id = ?
+              WHERE e.teacher_id = ? AND e.class_name = ? 
+              AND e.examStatus = 'assigned'
+              AND se.exam_id IS NULL";
+              $stmt_exam = $db->prepare($sql_exam);
+              $stmt_exam->execute([$user_id, $teacher_id, $class_name]);
+              $exam_results = $stmt_exam->fetchAll();
+
+              $combined_results = array_merge($assignment_results, $question_results, $quiz_results, $exam_results);
               usort($combined_results, function ($a, $b) {
                 return strtotime($a['date']) - strtotime($b['date']);
               });
@@ -285,6 +438,66 @@ if ($teacher_id) {
                       <p
                         style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         <?php echo $title ?>
+                      </p>
+                      <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                        <?php echo $class_name ?>
+                      </div>
+                      <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                        <span>Posted
+                          <?php echo $formatted_date ?>
+                        </span>
+                      </div>
+                    </a>
+                  </div>
+                  <?php
+                } elseif (isset($row['quiz_id'])) {
+                  $quiz_id = $row['quiz_id'];
+                  $quizTitle = $row['title'];
+                  $date = $row['date'];
+                  $timestamp = strtotime($date);
+                  $formatted_date = date("F d", $timestamp);
+                  ?>
+                  <div class="d-grid gap-2 col-10 mx-auto mb-4">
+                    <a class="announce" type="button"
+                      href="archive_quizCourse.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $quiz_id ?>&user_id=<?php echo $user_id ?>"
+                      style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      <div
+                        style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                        <i class="bi bi-card-list" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                      </div>
+                      <p
+                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <?php echo $quizTitle ?>
+                      </p>
+                      <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
+                        <?php echo $class_name ?>
+                      </div>
+                      <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
+                        <span>Posted
+                          <?php echo $formatted_date ?>
+                        </span>
+                      </div>
+                    </a>
+                  </div>
+                  <?php
+                } elseif (isset($row['exam_id'])) {
+                  $exam_id = $row['exam_id'];
+                  $examTitle = $row['title'];
+                  $date = $row['date'];
+                  $timestamp = strtotime($date);
+                  $formatted_date = date("F d", $timestamp);
+                  ?>
+                  <div class="d-grid gap-2 col-10 mx-auto mb-4">
+                    <a class="announce" type="button"
+                      href="archive_examCourse.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $exam_id ?>&user_id=<?php echo $user_id ?>"
+                      style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      <div
+                        style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
+                        <i class="bi bi-card-list" style="color: white; line-height: 42px; font-size: 25px;"></i>
+                      </div>
+                      <p
+                        style="font-size: 17px; margin-top: -36px; margin-left: 7vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <?php echo $examTitle ?>
                       </p>
                       <div style="margin-left: 45px; margin-top: -10px; font-size: 14px;">
                         <?php echo $class_name ?>

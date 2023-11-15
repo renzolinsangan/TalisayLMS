@@ -40,48 +40,73 @@ if (!isset($_SESSION['id'])) {
               <i class="icon-bell mx-0"></i>
               <span class="count"></span>
             </a>
+            <?php
+            include("config.php");
+
+            // Fetch feedback notifications
+            $sqlFeedbackNotif = "SELECT firstname, lastname, date FROM feedback ORDER BY date DESC";
+            $resultFeedbackNotif = $db->query($sqlFeedbackNotif);
+
+            // Fetch news items
+            $sqlNews = "SELECT type, title, end_date FROM news";
+            $resultNews = $db->query($sqlNews);
+
+            // Current date
+            $currentDate = date('Y-m-d');
+            ?>
+
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
               <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
+
+              <?php
+              while ($row = $resultFeedbackNotif->fetch(PDO::FETCH_ASSOC)) {
+                $fullName = $row['firstname'] . ' ' . $row['lastname'];
+                $submissionDate = $row['date'];
+                ?>
+                <a class="dropdown-item preview-item">
+                  <div class="preview-thumbnail">
+                    <div class="preview-icon bg-success">
+                      <i class="ti-info-alt mx-0"></i>
+                    </div>
                   </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
+                  <div class="preview-item-content">
+                    <h6 class="preview-subject font-weight-normal">
+                      <?php echo $fullName; ?> has sent a feedback
+                    </h6>
+                    <p class="font-weight-light small-text mb-0 text-muted">
+                      <?php echo date('F j', strtotime($submissionDate)); ?>
+                    </p>
                   </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+                </a>
+              <?php } ?>
+
+              <?php
+              while ($newsRow = $resultNews->fetch(PDO::FETCH_ASSOC)) {
+                $type = $newsRow['type'];
+                $title = $newsRow['title'];
+                $endDate = $newsRow['end_date'];
+
+                if ($currentDate > $endDate) {
+                  ?>
+                  <a class="dropdown-item preview-item">
+                    <div class="preview-thumbnail">
+                      <div class="preview-icon bg-danger">
+                        <i class="ti-alarm-clock mx-0"></i>
+                      </div>
+                    </div>
+                    <div class="preview-item-content">
+                      <h6 class="preview-subject font-weight-normal">
+                        <?php echo ucfirst($type); ?> -
+                        <?php echo $title; ?> has expired
+                      </h6>
+                      <p class="font-weight-light small-text mb-0 text-muted">
+                        <?php echo date('F j', strtotime($endDate)); ?>
+                      </p>
+                    </div>
+                  </a>
+                <?php }
+              } ?>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -180,7 +205,8 @@ if (!isset($_SESSION['id'])) {
                       <div class="card-body">
                         <div class="feedback_header" style="margin-bottom: 4vh;">
                           <h2>
-                            <?php echo $row['report_title'] ?>
+                            <?php echo $row['report_title'] ?> (
+                            <?php echo $row['date'] ?>)
                           </h2>
                           <p class="text-body-secondary" style="font-size: 20px;">by
                             <?php echo $fullname ?>
@@ -209,18 +235,18 @@ if (!isset($_SESSION['id'])) {
       </div>
     </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
 </body>
 
 </html>
