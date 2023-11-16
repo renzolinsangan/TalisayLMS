@@ -316,7 +316,6 @@ if ($result) {
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
         <div class="header-sticky" style="overflow-x: auto; white-space: nowrap;">
           <div class="header-links">
@@ -498,19 +497,19 @@ if ($result) {
                                       $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
 
                                       $sqlAssignmentScore = "SELECT gradeType, score, assignmentPoint FROM assignmentgrade 
-                                          WHERE student_id = ? AND assignmentTitle = ?";
+                                      WHERE student_id = ? AND assignmentTitle = ?";
                                       $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
                                       $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
                                       $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
 
                                       $sqlQuizScore = "SELECT gradeType, score, quizPoint FROM quizgrade 
-                                     WHERE student_id = ? AND quizTitle = ?";
+                                      WHERE student_id = ? AND quizTitle = ?";
                                       $stmtQuizScore = $db->prepare($sqlQuizScore);
                                       $stmtQuizScore->execute([$student_id, $quizTitle]);
                                       $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
 
                                       $sqlExamScore = "SELECT score, examPoint FROM examgrade 
-                                    WHERE student_id = ? AND examTitle = ?";
+                                      WHERE student_id = ? AND examTitle = ?";
                                       $stmtExamScore = $db->prepare($sqlExamScore);
                                       $stmtExamScore->execute([$student_id, $examTitle]);
                                       $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);

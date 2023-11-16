@@ -335,6 +335,51 @@ $stmt->closeCursor();
         <div class="content-wrapper" style="margin-top: 10vh;">
           <div id="print-content">
             <div class="row">
+              <div class="col-12 grid-margin stretch-card mb-4">
+                <div class="card">
+                  <div class="card-body">
+                    <?php
+                    include("config.php");
+                    $sqlGradePercentage = "SELECT written, performance, exam FROM section WHERE class_id = ? AND teacher_id = ?";
+                    $stmtGradePercentage = $db->prepare($sqlGradePercentage);
+                    $stmtGradePercentage->execute([$tc_id, $teacher_id]);
+                    $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
+
+                    if ($result) {
+                      $written = $result['written'];
+                      $performance = $result['performance'];
+                      $exam = $result['exam'];
+                      ?>
+                      <div class="row">
+                        <div class="col-12 mb-3">
+                          <h2>Grading System</h2>
+                        </div>
+                        <div class="col-12 mb-3">
+                          <h4>Written Work = <span>
+                              <?php echo $written ?>%
+                            </span></h3>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12 mb-3">
+                          <h4>Performance Task = <span>
+                              <?php echo $performance ?>%
+                            </span></h3>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <h4>Quarterly Assessment = <span>
+                              <?php echo $exam ?>%
+                            </span></h3>
+                        </div>
+                      </div>
+                      <?php
+                    }
+                    ?>
+                  </div>
+                </div>
+              </div>
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="row">
@@ -408,6 +453,9 @@ $stmt->closeCursor();
                                   <?php
                                 }
                                 ?>
+                                <th scope="col" style="text-align: center; overflow: hidden;">
+                                  <p style="color: white; margin-bottom: -3px;">Grade</p>
+                                </th>
                               </thead>
                               <tbody>
                                 <?php
@@ -432,75 +480,92 @@ $stmt->closeCursor();
                                       $quizTitle = $title['title'];
                                       $examTitle = $title['title'];
 
-                                      $sqlQuestionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND questionTitle = ?";
+                                      $sqlQuestionScore = "SELECT gradeType, score, questionPoint 
+                                      FROM questiongrade WHERE student_id = ? AND questionTitle = ?";
                                       $stmtQuestionScore = $db->prepare($sqlQuestionScore);
                                       $stmtQuestionScore->execute([$student_id, $questionTitle]);
                                       $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
 
-                                      $sqlAssignmentScore = "SELECT score FROM assignmentgrade WHERE student_id = ? AND assignmentTitle = ?";
+                                      $sqlAssignmentScore = "SELECT gradeType, score, assignmentPoint 
+                                      FROM assignmentgrade WHERE student_id = ? AND assignmentTitle = ?";
                                       $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
                                       $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
                                       $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
 
-                                      $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quizTitle = ?";
+                                      $sqlQuizScore = "SELECT gradeType, score, quizPoint 
+                                      FROM quizgrade WHERE student_id = ? AND quizTitle = ?";
                                       $stmtQuizScore = $db->prepare($sqlQuizScore);
                                       $stmtQuizScore->execute([$student_id, $quizTitle]);
                                       $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
 
-                                      $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND examTitle = ?";
+                                      $sqlExamScore = "SELECT score, examPoint 
+                                      FROM examgrade WHERE student_id = ? AND examTitle = ?";
+                                      $stmtExamScore = $db->prepare($sqlExamScore);
+                                      $stmtExamScore->execute([$student_id, $examTitle]);
+                                      $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+                                      ?>
+                                      <td>
+                                        <?php
+                                        echo isset($questionScore['score']) ? $questionScore['score'] . "<br>" : "";
+                                        echo isset($assignmentScore['score']) ? $assignmentScore['score'] . "<br>" : "";
+                                        echo isset($quizScore['score']) ? $quizScore['score'] . "<br>" : "";
+                                        echo isset($examScore['score']) ? $examScore['score'] : "";
+                                        ?>
+                                      </td>
+                                      <?php
+                                    }
+                                    $totalScore = 0;
+                                    $totalPoints = 0;
+
+                                    foreach ($allTitles as $title) {
+                                      $questionTitle = $title['title'];
+                                      $assignmentTitle = $title['title'];
+                                      $quizTitle = $title['title'];
+                                      $examTitle = $title['title'];
+
+                                      $sqlQuestionScore = "SELECT gradeType, score, questionPoint FROM questiongrade 
+                                        WHERE student_id = ? AND questionTitle = ?";
+                                      $stmtQuestionScore = $db->prepare($sqlQuestionScore);
+                                      $stmtQuestionScore->execute([$student_id, $questionTitle]);
+                                      $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
+
+                                      $sqlAssignmentScore = "SELECT gradeType, score, assignmentPoint FROM assignmentgrade 
+                                          WHERE student_id = ? AND assignmentTitle = ?";
+                                      $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
+                                      $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
+                                      $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
+
+                                      $sqlQuizScore = "SELECT gradeType, score, quizPoint FROM quizgrade 
+                                      WHERE student_id = ? AND quizTitle = ?";
+                                      $stmtQuizScore = $db->prepare($sqlQuizScore);
+                                      $stmtQuizScore->execute([$student_id, $quizTitle]);
+                                      $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+
+                                      $sqlExamScore = "SELECT score, examPoint FROM examgrade 
+                                      WHERE student_id = ? AND examTitle = ?";
                                       $stmtExamScore = $db->prepare($sqlExamScore);
                                       $stmtExamScore->execute([$student_id, $examTitle]);
                                       $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
 
-                                      if ($questionScore && $assignmentScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore && $assignmentScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($assignmentScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $assignmentScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($assignmentScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $assignmentScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } else {
-                                        ?>
-                                        <td></td>
-                                        <?php
-                                      }
+                                      $totalScore += isset($questionScore['score']) ? ($questionScore['score'] / $questionScore['questionPoint']) : 0;
+                                      $totalScore += isset($assignmentScore['score']) ? ($assignmentScore['score'] / $assignmentScore['assignmentPoint']) : 0;
+                                      $totalScore += isset($quizScore['score']) ? ($quizScore['score'] / $quizScore['quizPoint']) : 0;
+                                      $totalScore += isset($examScore['score']) ? ($examScore['score'] / $examScore['examPoint']) : 0;
+
+                                      $totalPoints += isset($questionScore['score']) ? 1 : 0;
+                                      $totalPoints += isset($assignmentScore['score']) ? 1 : 0;
+                                      $totalPoints += isset($quizScore['score']) ? 1 : 0;
+                                      $totalPoints += isset($examScore['score']) ? 1 : 0;
                                     }
+
+                                    $averageGrade = ($totalPoints > 0) ? ($totalScore / $totalPoints) : 0;
+                                    $percentage = $averageGrade * 100;
+                                    $color = ($percentage < 75) ? 'red' : 'green';
+
                                     ?>
+                                    <td style="color: <?php echo $color; ?>">
+                                      <?php echo number_format($percentage, 2) . '%'; ?>
+                                    </td>
                                   </tr>
                                   <?php
                                 }
