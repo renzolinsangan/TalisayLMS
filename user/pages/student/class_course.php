@@ -319,7 +319,7 @@ $stmt->closeCursor();
         </ul>
       </nav>
       <div class="main-panel">
-        <div class="header-sticky">
+        <div class="header-sticky" style="overflow-y: auto;">
           <div class="header-links">
             <?php
             if (isset($_GET['class_id'])) {
@@ -392,6 +392,20 @@ $stmt->closeCursor();
                     <p class="text-body-secondary mt-3">Check the works assigned to you.</p>
                     <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
                       class="create mt-2" style="margin-left: auto; color: green;">View to-do list</a>
+                  </div>
+                  <div class="card mt-3"
+                    style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
+                    <h4>Leaderboard Points</h4>
+                    <p class="text-body-secondary mt-3">Check your points in class leaderboard points.</p>
+                    <a href="class_leaderboard.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+                    class="create mt-2" style="margin-left: auto; color: green;">View Points</a>
+                  </div>
+                  <div class="card mt-3"
+                    style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
+                    <h4>Leaderboard</h4>
+                    <p class="text-body-secondary mt-3">Check your position in class leaderboard.</p>
+                    <a href="class_leaderboardTable.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+                    class="create mt-2" style="margin-left: auto; color: green;">View Leaderboard</a>
                   </div>
                 </div>
                 <div class="col">

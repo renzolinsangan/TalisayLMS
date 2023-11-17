@@ -321,7 +321,7 @@ $stmt->closeCursor();
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="header-sticky" style="overflow-x: auto; white-space: nowrap;">
+        <div class="header-sticky" style="overflow-y: auto; white-space: nowrap;">
           <div class="header-links">
             <?php
             if (isset($_GET['class_id'])) {

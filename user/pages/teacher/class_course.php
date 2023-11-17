@@ -343,8 +343,6 @@ if ($themeData) {
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link"
                     href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a></li>
-                <li class="nav-item"> <a class="nav-link"
-                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a></li>
               </ul>
             </div>
           </li>
@@ -358,7 +356,7 @@ if ($themeData) {
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="header-sticky" style="overflow-x: auto; white-space: nowrap;">
+        <div class="header-sticky" style="overflow-y: auto; white-space: nowrap;">
           <div class="header-links">
             <?php
             if (isset($_GET['class_id'])) {
@@ -398,7 +396,6 @@ if ($themeData) {
                       if (isset($_GET['class_id'])) {
                         $class_id = $_GET['class_id'];
 
-                        // Retrieve class details based on class_id
                         $sql = "SELECT * FROM section WHERE class_id = ?";
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("i", $class_id);
@@ -437,6 +434,13 @@ if ($themeData) {
                     <p class="text-body-secondary mt-3">Provide to-do list for your students.</p>
                     <a href="toreview.php?class_id=<?php echo $class_id ?>" class="create mt-2"
                       style="margin-left: auto; color: green;">Manage to-review</a>
+                  </div>
+                  <div class="card mt-3"
+                    style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
+                    <h4>Leaderboard</h4>
+                    <p class="text-body-secondary mt-3">Check your position in class leaderboard.</p>
+                    <a href="class_leaderboardTable.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+                    class="create mt-2" style="margin-left: auto; color: green;">View Leaderboard</a>
                   </div>
                 </div>
                 <div class="col">

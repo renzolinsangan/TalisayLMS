@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 15, 2023 at 08:22 PM
+-- Generation Time: Nov 16, 2023 at 11:37 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -322,15 +322,15 @@ CREATE TABLE `class_enrolled` (
 --
 
 INSERT INTO `class_enrolled` (`class_id`, `tc_id`, `class_name`, `section`, `subject`, `grade_level`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`, `student_id`, `student_firstname`, `student_lastname`, `date`, `archive_status`) VALUES
-(42, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J.', 'Liwag', '2023-09-07', 'archive'),
+(42, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J.', 'Liwag', '2023-09-07', ''),
 (43, 40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'Grade 11', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-09-07', 'archive'),
 (44, 41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'Grade 11', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-09-07', 'archive'),
 (46, 43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'Grade 11', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia', '2023-10-12', ''),
-(47, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 37, 'Marco Luis', 'Hernandez', '2023-11-16', 'archive'),
-(48, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', '2023-11-16', 'archive'),
-(49, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 38, 'Martin Clarence', 'Guantes', '2023-11-16', 'archive'),
+(47, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 37, 'Marco Luis', 'Hernandez', '2023-11-16', ''),
+(48, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', '2023-11-16', ''),
+(49, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 38, 'Martin Clarence', 'Guantes', '2023-11-16', ''),
 (54, 45, 'STEM-Einstein - Oral Communication', 'Einstein', 'Oral Communication', 'Grade 11', 'STEM', 33, 'RchAh06', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-11-08', 'archive'),
-(56, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-11-16', 'archive');
+(56, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-11-16', '');
 
 -- --------------------------------------------------------
 
@@ -391,7 +391,7 @@ CREATE TABLE `examgrade` (
 INSERT INTO `examgrade` (`examGrade_id`, `examTitle`, `studentFirstName`, `studentLastName`, `date`, `score`, `examPoint`, `student_id`, `teacher_id`, `class_id`, `exam_id`) VALUES
 (2, 'Final Exam in General Biology', 'Marco Luis', 'Hernandez', '2023-11-15', 50, 50, 37, 33, 39, 1),
 (3, 'Final Exam in General Biology', 'R.J.', 'Liwag', '2023-11-15', 48, 50, 36, 33, 39, 1),
-(4, 'Final Exam in General Biology', 'John Renzo', 'Linsangan', '2023-11-16', 25, 50, 28, 33, 39, 1);
+(5, 'Final Exam in General Biology', 'John Renzo', 'Linsangan', '2023-11-17', 25, 50, 28, 33, 39, 1);
 
 -- --------------------------------------------------------
 
@@ -526,10 +526,10 @@ CREATE TABLE `quizgrade` (
 --
 
 INSERT INTO `quizgrade` (`quizGrade_id`, `quizTitle`, `studentFirstName`, `studentLastName`, `date`, `gradeType`, `score`, `quizPoint`, `student_id`, `teacher_id`, `class_id`, `quiz_id`) VALUES
-(9, 'Cell Biology Quiz', 'John Renzo', 'Linsangan', '2023-11-15', 'written', 10, 10, 28, 33, 39, 15),
 (10, 'Cell Biology Quiz', 'Marco Luis', 'Hernandez', '2023-11-15', 'written', 10, 10, 37, 33, 39, 15),
 (12, 'Cell Biology Quiz', 'Martin Clarence', 'Guantes', '2023-11-16', 'written', 10, 10, 38, 33, 39, 15),
-(13, 'Cell Biology Quiz', 'R.J.', 'Liwag', '2023-11-16', 'written', 10, 10, 36, 33, 39, 15);
+(13, 'Cell Biology Quiz', 'R.J.', 'Liwag', '2023-11-16', 'written', 10, 10, 36, 33, 39, 15),
+(14, 'Cell Biology Quiz', 'John Renzo', 'Linsangan', '2023-11-17', 'written', 10, 10, 28, 33, 39, 15);
 
 -- --------------------------------------------------------
 
@@ -558,7 +558,7 @@ CREATE TABLE `section` (
 --
 
 INSERT INTO `section` (`class_id`, `class_name`, `section`, `subject`, `strand`, `written`, `performance`, `exam`, `teacher_id`, `class_code`, `first_name`, `last_name`, `archive_status`) VALUES
-(39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 25, 50, 25, 33, 'ke1IPj7', 'Patrick', 'Star', 'archive'),
+(39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 25, 50, 25, 33, 'ke1IPj7', 'Patrick', 'Star', ''),
 (40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'STEM', 25, 50, 25, 33, 'D6XDFLx', 'Patrick', 'Star', 'archive'),
 (41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'STEM', 25, 50, 25, 33, '3YzS3aC', 'Patrick', 'Star', 'archive'),
 (43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'TVL', 25, 50, 25, 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', ''),
@@ -640,7 +640,7 @@ CREATE TABLE `student_exam_course_answer` (
 --
 
 INSERT INTO `student_exam_course_answer` (`answer_exam_id`, `exam_id`, `examTitle`, `examLink`, `examPoint`, `date`, `user_id`, `class_id`, `teacher_id`, `exam_course_status`) VALUES
-(3, 1, 'Final Exam in General Biology', 'https://docs.google.com/forms/d/e/1FAIpQLSc0jl5ypYrj5NU8E05cAnb5QFZv3IxCd6nMyIg-s850bTbSVA/viewform?', 50, '2023-11-10', 28, 52, 33, 'turned-in late');
+(4, 1, 'Final Exam in General Biology', 'https://docs.google.com/forms/d/e/1FAIpQLSc0jl5ypYrj5NU8E05cAnb5QFZv3IxCd6nMyIg-s850bTbSVA/viewform?', 50, '2023-11-10', 28, 56, 33, 'turned-in late');
 
 -- --------------------------------------------------------
 
@@ -694,7 +694,7 @@ CREATE TABLE `student_quiz_course_answer` (
 --
 
 INSERT INTO `student_quiz_course_answer` (`answer_quiz_id`, `quiz_id`, `quizTitle`, `quizLink`, `quizPoint`, `date`, `user_id`, `class_id`, `teacher_id`, `quiz_course_status`) VALUES
-(1, 15, 'Cell Biology Quiz', 'https://forms.gle/Ln2Mf75r5EU62BDM6', 10, '2023-11-10', 28, 52, 33, 'turned in');
+(2, 15, 'Cell Biology Quiz', 'https://forms.gle/Ln2Mf75r5EU62BDM6', 10, '2023-11-10', 28, 56, 33, 'turned in');
 
 -- --------------------------------------------------------
 
@@ -1097,7 +1097,7 @@ ALTER TABLE `class_theme`
 -- AUTO_INCREMENT for table `examgrade`
 --
 ALTER TABLE `examgrade`
-  MODIFY `examGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `examGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `feedback`
@@ -1127,7 +1127,7 @@ ALTER TABLE `questiongrade`
 -- AUTO_INCREMENT for table `quizgrade`
 --
 ALTER TABLE `quizgrade`
-  MODIFY `quizGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `quizGrade_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `section`
@@ -1151,7 +1151,7 @@ ALTER TABLE `student_assignment_course_answer`
 -- AUTO_INCREMENT for table `student_exam_course_answer`
 --
 ALTER TABLE `student_exam_course_answer`
-  MODIFY `answer_exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `answer_exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `student_question_course_answer`
@@ -1163,7 +1163,7 @@ ALTER TABLE `student_question_course_answer`
 -- AUTO_INCREMENT for table `student_quiz_course_answer`
 --
 ALTER TABLE `student_quiz_course_answer`
-  MODIFY `answer_quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `answer_quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `teacher`

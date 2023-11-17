@@ -334,7 +334,7 @@ $stmt->close();
       <!-- partial -->
       <div class="main-panel">
         <div class="header-sticky">
-          <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
+          <div class="header-links" style="overflow-y: auto; white-space: nowrap;">
             <?php
             if (isset($_GET['class_id'])) {
               $class_id = $_GET['class_id'];

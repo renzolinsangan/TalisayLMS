@@ -16,6 +16,10 @@ $stmt->execute();
 $stmt->bind_result($profile);
 $stmt->fetch();
 $stmt->close();
+
+if (isset($_GET['class_id'])) {
+  $class_id = $_GET['class_id'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -297,173 +301,188 @@ $stmt->close();
       <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
-          <div class="row align-items-center justify-content-center">
-            <div class="col-md-3 grid-margin stretch-card">
-              <div class="card position-relative align-items-center">
-                <div class="card-body align-items-center justify-content-center">
-                  <h2>Awards</h2>
-                </div>
-              </div>
-            </div>
-          </div>
           <div class="row">
-            <div class="col-md-4">
-              <div class="card align-items-center justify-content-center">
+            <div class="col-md-5 mb-3">
+              <div class="card" style="padding: 20px;">
+                <h2>Leaderboard Points</h2>
+                <a href="class_course.php?class_id=<?php echo $class_id ?>" style="color: green;">
+                  Click here to go back to class course.
+                </a>
+              </div>
+            </div>
+            <div class="col-12 grid-margin stretch-card">
+              <div class="card position-relative">
                 <div class="card-body">
+                  <div class="row">
+                    <div class="col d-flex align-items-center justify-content-center" style="height: 100%;">
+                      <i class="bi bi-patch-question" style="font-size: 10vw; color: green; margin-right: 50px;"></i>
+                    </div>
+                    <div class="col-md-7">
+                    <h2 style="color: green;">Question Leaderboard Points <i class="bi bi-award-fill"
+                      style="font-size: 40px; color: green;"></i></h2>
+                  <p class="text-body-secondary mb-3" style="font-size: 17px;">(1 score = 10 points)</p>
                   <?php
-                  $sqlQuestionScore = "SELECT questionTitle, score, questionPoint FROM questiongrade
-                    WHERE student_id = ?";
-                  $stmtQuestionScore = $conn->prepare($sqlQuestionScore);
-                  $stmtQuestionScore->bind_param("i", $user_id);
-                  $stmtQuestionScore->execute();
-                  $stmtQuestionScore->bind_result($questionTitle, $score, $questionPoint);
+                  $sqlQuestionScoreToPoints = "SELECT questionTitle, score, questionPoint from questiongrade WHERE student_id = ?";
+                  $stmtQuestionScoreToPoints = $db->prepare($sqlQuestionScoreToPoints);
+                  $stmtQuestionScoreToPoints->execute([$user_id]);
+                  $questionResults = $stmtQuestionScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
 
-                  $stmtQuestionScore->fetch();
-                  if ($score == $questionPoint) {
-                    ?>
-                    <div class="col mb-3 align-items-center justify-content-center">
-                      <h2 class="text-body-secondary" style="text-align: center;">
-                        <?php echo $questionTitle; ?>
-                      </h2>
-                      <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                      <p style="text-align: center;">You got a perfect score in question! Congratulations, keep it up!</p>
-                    </div>
-                    <?php
-                  }
-                  while ($stmtQuestionScore->fetch()) {
-                    if ($score == $questionPoint) {
+                  if ($questionResults) {
+                    foreach ($questionResults as $row) {
+                      $questionTitle = $row['questionTitle'];
+                      $questionScore = $row['score'];
+                      $questionPoint = $row['questionPoint'];
+
+                      $questionLeaderboardPoint = $questionScore * 10;
                       ?>
-                      <div class="col mb-3 align-items-center justify-content-center">
-                        <h2 class="text-body-secondary" style="text-align: center;">
-                          <?php echo $questionTitle; ?>
-                        </h2>
-                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                        <p style="text-align: center;">You got a perfect score in question! Congratulations, keep it up!</p>
-                      </div>
+                      <h4 class="mb-3">
+                        <?php echo $questionTitle ?> (
+                        <?php echo $questionScore ?> /
+                        <?php echo $questionPoint ?> ) =
+                        <?php echo $questionLeaderboardPoint ?> Leaderboard Points
+                      </h4>
                       <?php
                     }
+                  } else {
+                    ?>
+                    <h3>There is no available question score to compute.</h3>
+                    <?php
                   }
                   ?>
                 </div>
+                    </div>
+                  </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="card align-items-center justify-content-center">
+            <div class="col-12 grid-margin stretch-card">
+              <div class="card position-relative">
                 <div class="card-body">
-                <?php
-                  $sqlAssignmentScore = "SELECT assignmentTitle, score, assignmentPoint FROM assignmentgrade
-                    WHERE student_id = ?";
-                  $stmtAssignmentScore = $conn->prepare($sqlAssignmentScore);
-                  $stmtAssignmentScore->bind_param("i", $user_id);
-                  $stmtAssignmentScore->execute();
-                  $stmtAssignmentScore->bind_result($assignmentTitle, $score, $assignmentPoint);
-
-                  $stmtAssignmentScore->fetch();
-                  if ($score == $assignmentPoint) {
-                    ?>
-                    <div class="col mb-3 align-items-center justify-content-center">
-                      <h2 class="text-body-secondary" style="text-align: center;">
-                        <?php echo $assignmentTitle; ?>
-                      </h2>
-                      <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                      <p style="text-align: center;">You got a perfect score in assignment! Congratulations, keep it up!</p>
+                  <div class="row">
+                    <div class="col d-flex align-items-center justify-content-center" style="height: 100%;">
+                      <i class="bi bi-book" style="font-size: 10vw; color: green; margin-right: 50px;"></i>
                     </div>
-                    <?php
-                  }
-                  while ($stmtAssignmentScore->fetch()) {
-                    if ($score == $assignmentPoint) {
+                    <div class="col-md-7">
+                    <h2 style="color: green;">Assignment Leaderboard Points <i class="bi bi-award-fill"
+                      style="font-size: 40px; color: green;"></i></h2>
+                  <p class="text-body-secondary mb-3" style="font-size: 17px;">(1 score = 20 points)</p>
+                  <?php
+                  $sqlAssignmentScoreToPoints = "SELECT assignmentTitle, score, assignmentPoint from assignmentgrade WHERE student_id = ?";
+                  $stmtAssignmentScoreToPoints = $db->prepare($sqlAssignmentScoreToPoints);
+                  $stmtAssignmentScoreToPoints->execute([$user_id]);
+                  $assignmentResults = $stmtAssignmentScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
+
+                  if ($assignmentResults) {
+                    foreach ($assignmentResults as $row) {
+                      $assignmentTitle = $row['assignmentTitle'];
+                      $assignmentScore = $row['score'];
+                      $assignmentPoint = $row['assignmentPoint'];
+
+                      $assignmentLeaderboardPoint = $assignmentScore * 20;
                       ?>
-                      <div class="col mb-3 align-items-center justify-content-center">
-                        <h2 class="text-body-secondary" style="text-align: center;">
-                          <?php echo $assignmentTitle; ?>
-                        </h2>
-                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                        <p style="text-align: center;">You got a perfect score in assignment! Congratulations, keep it up!</p>
-                      </div>
+                      <h4 class="mb-3">
+                        <?php echo $assignmentTitle ?> (
+                        <?php echo $assignmentScore ?> /
+                        <?php echo $assignmentPoint ?> ) =
+                        <?php echo $assignmentLeaderboardPoint ?> Leaderboard Points
+                      </h4>
                       <?php
                     }
+                  } else {
+                    ?>
+                    <h3>There is no available assignment score to compute.</h3>
+                    <?php
                   }
                   ?>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="card align-items-center justify-content-center">
+            <div class="col-12 grid-margin stretch-card">
+              <div class="card position-relative">
                 <div class="card-body">
-                <?php
-                  $sqlQuizScore = "SELECT quizTitle, score, quizPoint FROM quizgrade
-                    WHERE student_id = ?";
-                  $stmtQuizScore = $conn->prepare($sqlQuizScore);
-                  $stmtQuizScore->bind_param("i", $user_id);
-                  $stmtQuizScore->execute();
-                  $stmtQuizScore->bind_result($quizTitle, $score, $quizPoint);
-
-                  $stmtQuizScore->fetch();
-                  if ($score == $quizPoint) {
-                    ?>
-                    <div class="col mb-3 align-items-center justify-content-center">
-                      <h2 class="text-body-secondary" style="text-align: center;">
-                        <?php echo $quizTitle; ?>
-                      </h2>
-                      <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                      <p style="text-align: center;">You got a perfect score in quiz! Congratulations, keep it up!</p>
+                  <div class="row">
+                    <div class="col d-flex align-items-center justify-content-center" style="height: 100%;">
+                      <i class="bi bi-card-checklist" style="font-size: 10vw; color: green; margin-right: 50px;"></i>
                     </div>
-                    <?php
-                  }
-                  while ($stmtQuizScore->fetch()) {
-                    if ($score == $quizPoint) {
-                      ?>
-                      <div class="col mb-3 align-items-center justify-content-center">
-                        <h2 class="text-body-secondary" style="text-align: center;">
-                          <?php echo $quizTitle; ?>
-                        </h2>
-                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                        <p style="text-align: center;">You got a perfect score in quiz! Congratulations, keep it up!</p>
-                      </div>
+                    <div class="col-md-7">
+                      <h2 style="color: green;">Quiz Leaderboard Points <i class="bi bi-award-fill"
+                          style="font-size: 40px; color: green;"></i></h2>
+                      <p class="text-body-secondary mb-3" style="font-size: 17px;">(1 score = 40 points)</p>
                       <?php
-                    }
-                  }
-                  ?>
+                      $sqlQuizScoreToPoints = "SELECT quizTitle, score, quizPoint from quizgrade WHERE student_id = ?";
+                      $stmtQuizScoreToPoints = $db->prepare($sqlQuizScoreToPoints);
+                      $stmtQuizScoreToPoints->execute([$user_id]);
+                      $quizResults = $stmtQuizScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
+
+                      if ($quizResults) {
+                        foreach ($quizResults as $row) {
+                          $quizTitle = $row['quizTitle'];
+                          $quizScore = $row['score'];
+                          $quizPoint = $row['quizPoint'];
+
+                          $quizLeaderboardPoint = $quizScore * 40;
+                          ?>
+                          <h4 class="mb-3">
+                            <?php echo $quizTitle ?> (
+                            <?php echo $quizScore ?> /
+                            <?php echo $quizPoint ?> ) =
+                            <?php echo $quizLeaderboardPoint ?> Leaderboard Points
+                          </h4>
+                          <?php
+                        }
+                      } else {
+                        ?>
+                        <h3>There is no available quiz score to compute.</h3>
+                        <?php
+                      }
+                      ?>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="card align-items-center justify-content-center">
+            <div class="col-12 grid-margin stretch-card">
+              <div class="card position-relative">
                 <div class="card-body">
-                <?php
-                  $sqlExamScore = "SELECT examTitle, score, examPoint FROM examgrade
-                    WHERE student_id = ?";
-                  $stmtExamScore = $conn->prepare($sqlExamScore);
-                  $stmtExamScore->bind_param("i", $user_id);
-                  $stmtExamScore->execute();
-                  $stmtExamScore->bind_result($examTitle, $score, $examPoint);
-
-                  $stmtExamScore->fetch();
-                  if ($score == $examPoint) {
-                    ?>
-                    <div class="col mb-3 align-items-center justify-content-center">
-                      <h2 class="text-body-secondary" style="text-align: center;">
-                        <?php echo $examTitle; ?>
-                      </h2>
-                      <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                      <p style="text-align: center;">You got a perfect score in quiz! Congratulations, keep it up!</p>
+                  <div class="row">
+                    <div class="col d-flex align-items-center justify-content-center" style="height: 100%;">
+                      <i class="bi bi-pencil-square" style="font-size: 10vw; color: green; margin-right: 50px;"></i>
                     </div>
-                    <?php
-                  }
-                  while ($stmtExamScore->fetch()) {
-                    if ($score == $examPoint) {
-                      ?>
-                      <div class="col mb-3 align-items-center justify-content-center">
-                        <h2 class="text-body-secondary" style="text-align: center;">
-                          <?php echo $examTitle; ?>
-                        </h2>
-                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                        <p style="text-align: center;">You got a perfect score in quiz! Congratulations, keep it up!</p>
-                      </div>
+                    <div class="col-md-7">
+                      <h2 style="color: green;">Exam Leaderboard Points <i class="bi bi-award-fill"
+                          style="font-size: 40px; color: green;"></i></h2>
+                      <p class="text-body-secondary" style="font-size: 17px;">(1 score = 50 points)</p>
                       <?php
-                    }
-                  }
-                  ?>
+                      $sqlExamScoreToPoints = "SELECT examTitle, score, examPoint from examgrade WHERE student_id = ?";
+                      $stmtExamScoreToPoints = $db->prepare($sqlExamScoreToPoints);
+                      $stmtExamScoreToPoints->execute([$user_id]);
+                      $examResults = $stmtExamScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
+
+                      if ($examResults) {
+                        foreach ($examResults as $row) {
+                          $examTitle = $row['examTitle'];
+                          $examScore = $row['score'];
+                          $examPoint = $row['examPoint'];
+
+                          $examLeaderboardPoint = $examScore * 50;
+                          ?>
+                          <h4 class="mb-3">
+                            <?php echo $examTitle ?> (
+                            <?php echo $examScore ?> /
+                            <?php echo $examPoint ?> ) =
+                            <?php echo $examLeaderboardPoint ?> Leaderboard Points
+                          </h4>
+                          <?php
+                        }
+                      } else {
+                        ?>
+                        <h3>There is no available exam score to compute.</h3>
+                        <?php
+                      }
+                      ?>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -471,27 +490,20 @@ $stmt->close();
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-    crossorigin="anonymous"></script>
-  <!-- container-scroller -->
-  <!-- plugins:js -->
-  <script src="../../vendors/js/vendor.bundle.base.js"></script>
-  <!-- endinject -->
-  <!-- Plugin js for this page -->
-  <!-- End plugin js for this page -->
-  <!-- inject:js -->
-  <script src="../../js/off-canvas.js"></script>
-  <script src="../../js/hoverable-collapse.js"></script>
-  <script src="../../js/template.js"></script>
-  <script src="../../js/settings.js"></script>
-  <script src="../../js/todolist.js"></script>
-  <!-- endinject -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+      crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+      crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
+    <script src="../../js/off-canvas.js"></script>
+    <script src="../../js/hoverable-collapse.js"></script>
+    <script src="../../js/template.js"></script>
+    <script src="../../js/settings.js"></script>
+    <script src="../../js/todolist.js"></script>
+    <!-- endinject -->
 </body>
 
 </html>

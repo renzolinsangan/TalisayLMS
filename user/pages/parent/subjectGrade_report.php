@@ -233,12 +233,11 @@ if ($row) {
               <h2>
                 <?php echo $childrenFullName ?>
               </h2>
-              <h2 class="ml-auto">75.75%</h2>
             </div>
           </div>
           <div class="card">
             <div class="ml-3 mt-3">
-              <h3 style="color: green;">Grade Report in
+              <h3 style="color: green;">Score Report in
                 <?php echo $selectedSubject ?>
               </h3>
             </div>
@@ -263,21 +262,36 @@ if ($row) {
                         $getTeacher_id = $_GET['teacher_id'];
 
                         $sqlGetQuestionDetail = "SELECT title, date, due_date, question_status FROM classwork_question 
-                        WHERE class_id = ? AND teacher_id = ? ORDER BY date";
+WHERE class_id = ? AND teacher_id = ? ORDER BY date";
                         $stmtGetQuestionDetail = $db->prepare($sqlGetQuestionDetail);
                         $stmtGetQuestionDetail->execute([$getClass_id, $getTeacher_id]);
                         $questionDetail = $stmtGetQuestionDetail->fetchAll(PDO::FETCH_ASSOC);
 
                         $sqlGetAssignmentDetail = "SELECT title, date, due_date, assignment_status FROM classwork_assignment 
-                        WHERE class_id = ? AND teacher_id = ? ORDER BY date";
+WHERE class_id = ? AND teacher_id = ? ORDER BY date";
                         $stmtGetAssignmentDetail = $db->prepare($sqlGetAssignmentDetail);
                         $stmtGetAssignmentDetail->execute([$getClass_id, $getTeacher_id]);
                         $assignmentDetail = $stmtGetAssignmentDetail->fetchAll(PDO::FETCH_ASSOC);
 
-                        $allDetails = array_merge($questionDetail, $assignmentDetail);
+                        $sqlGetQuizDetail = "SELECT quizTitle AS title, date, dueDate AS due_date, quizStatus FROM classwork_quiz
+WHERE class_id = ? AND teacher_id = ? ORDER BY date";
+                        $stmtGetQuizDetail = $db->prepare($sqlGetQuizDetail);
+                        $stmtGetQuizDetail->execute([$getClass_id, $getTeacher_id]);
+                        $quizDetail = $stmtGetQuizDetail->fetchAll(PDO::FETCH_ASSOC);
+
+                        $sqlGetExamDetail = "SELECT examTitle AS title, date, dueDate AS due_date, examStatus FROM classwork_exam
+WHERE class_id = ? AND teacher_id = ? ORDER BY date";
+                        $stmtGetExamDetail = $db->prepare($sqlGetExamDetail);
+                        $stmtGetExamDetail->execute([$getClass_id, $getTeacher_id]);
+                        $examDetail = $stmtGetExamDetail->fetchAll(PDO::FETCH_ASSOC);
+
+                        $allDetails = array_merge($questionDetail, $assignmentDetail, $quizDetail, $examDetail);
                         usort($allDetails, function ($a, $b) {
                           return strtotime($a['date']) - strtotime($b['date']);
                         });
+
+                        $totalScore = 0;
+                        $totalPoints = 0;
 
                         foreach ($allDetails as $detail) {
                           $title = $detail['title'];
@@ -285,13 +299,19 @@ if ($row) {
 
                           if (isset($detail['question_status'])) {
                             $sqlGetAnswerStatus = "SELECT question_course_status AS status FROM student_question_course_answer
-                             WHERE user_id = ? AND teacher_id = ? AND title = ?";
+                           WHERE user_id = ? AND teacher_id = ? AND title = ?";
                           } elseif (isset($detail['assignment_status'])) {
                             $sqlGetAnswerStatus = "SELECT assignment_course_status AS status FROM student_assignment_course_answer
-                               WHERE user_id = ? AND teacher_id = ? AND title = ?";
+                             WHERE user_id = ? AND teacher_id = ? AND title = ?";
+                          } elseif (isset($detail['quizStatus'])) {
+                            $sqlGetAnswerStatus = "SELECT quiz_course_status AS status FROM student_quiz_course_answer
+                            WHERE user_id = ? AND teacher_id = ? AND quizTitle = ?";
+                          } elseif (isset($detail['examStatus'])) {
+                            $sqlGetAnswerStatus = "SELECT exam_course_status AS status FROM student_exam_course_answer
+                          WHERE user_id = ? AND teacher_id = ? AND examTitle = ?";
                           }
                           $stmtGetAnswerStatus = $db->prepare($sqlGetAnswerStatus);
-                          $stmtGetAnswerStatus->execute([$childrenID, $teacher_id, $title]);
+                          $stmtGetAnswerStatus->execute([$childrenID, $getTeacher_id, $title]);
 
                           $answerStatus = $stmtGetAnswerStatus->fetch(PDO::FETCH_ASSOC);
 
@@ -301,17 +321,27 @@ if ($row) {
                             $status = $detail['question_status'];
                           } elseif (isset($detail['assignment_status'])) {
                             $status = $detail['assignment_status'];
+                          } elseif (isset($detail['quizStatus'])) {
+                            $status = $detail['quizStatus'];
+                          } elseif (isset($detail['examStatus'])) {
+                            $status = $detail['examStatus'];
                           }
 
                           if (isset($detail['question_status'])) {
                             $sqlGetScore = "SELECT score, questionPoint FROM questiongrade 
-                                           WHERE student_id = ? AND teacher_id = ? AND questionTitle = ?";
+                            WHERE student_id = ? AND teacher_id = ? AND questionTitle = ?";
                           } elseif (isset($detail['assignment_status'])) {
                             $sqlGetScore = "SELECT score, assignmentPoint FROM assignmentgrade 
-                                           WHERE student_id = ? AND teacher_id = ? AND assignmentTitle = ?";
+                            WHERE student_id = ? AND teacher_id = ? AND assignmentTitle = ?";
+                          } elseif (isset($detail['quizStatus'])) {
+                            $sqlGetScore = "SELECT score, quizPoint FROM quizgrade
+                          WHERE student_id = ? AND teacher_id = ? AND quizTitle = ?";
+                          } elseif (isset($detail['examStatus'])) {
+                            $sqlGetScore = "SELECT score, examPoint FROM examgrade
+                          WHERE student_id = ? AND teacher_id = ? AND examTitle = ?";
                           }
                           $stmtGetScore = $db->prepare($sqlGetScore);
-                          $stmtGetScore->execute([$childrenID, $teacher_id, $title]);
+                          $stmtGetScore->execute([$childrenID, $getTeacher_id, $title]);
                           $answerScore = $stmtGetScore->fetch(PDO::FETCH_ASSOC);
                           ?>
                           <tr>
@@ -329,10 +359,24 @@ if ($row) {
                                 <?php echo $answerScore['score']; ?>
                               <?php endif; ?>
                               <?php if (isset($answerScore['questionPoint'])): ?>
-                                <span style="color: grey;"> / <?php echo $answerScore['questionPoint']; ?></span>
+                                <span style="color: grey;"> /
+                                  <?php echo $answerScore['questionPoint']; ?>
+                                </span>
                               <?php endif; ?>
                               <?php if (isset($answerScore['assignmentPoint'])): ?>
-                                <span style="color: grey;"> / <?php echo $answerScore['assignmentPoint']; ?></span>
+                                <span style="color: grey;"> /
+                                  <?php echo $answerScore['assignmentPoint']; ?>
+                                </span>
+                              <?php endif; ?>
+                              <?php if (isset($answerScore['quizPoint'])): ?>
+                                <span style="color: grey;"> /
+                                  <?php echo $answerScore['quizPoint']; ?>
+                                </span>
+                              <?php endif; ?>
+                              <?php if (isset($answerScore['examPoint'])): ?>
+                                <span style="color: grey;"> /
+                                  <?php echo $answerScore['examPoint']; ?>
+                                </span>
                               <?php endif; ?>
                             </td>
                           </tr>

@@ -41,7 +41,7 @@ $stmt->close();
   <!-- Plugin css for this page -->
   <!-- End plugin css for this page -->
   <!-- inject:css -->
-  <link rel="stylesheet" href="assets/css/student_report.css">
+  <link rel="stylesheet" href="assets/css/report_student.css">
   <link rel="stylesheet" href="assets/css/notif.css">
   <link rel="shortcut icon" href="images/trace.svg" />
 </head>
@@ -298,8 +298,6 @@ $stmt->close();
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link"
                     href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a></li>
-                <li class="nav-item"> <a class="nav-link"
-                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a></li>
               </ul>
             </div>
           </li>
@@ -316,7 +314,7 @@ $stmt->close();
         <div class="card d-flex align-items-left justify-content-between"
           style="position: relative; background-color: none; height: 8vh;">
           <div class="row">
-            <div class="col-1" style="margin-left: 45px; margin-top: 10px; margin-right: -7px;">
+            <div class="col-md-4" style="margin-left: 45px; margin-top: 10px; margin-right: -7px;">
               <a href="student_report.php?user_id=<?= $teacher_id ?>" class="nav-link active"
                 style="color: green; text-decoration: none; font-size: 14px;">All</a>
             </div>
@@ -335,7 +333,7 @@ $stmt->close();
                   <div class="dropdown-container">
                     <div class="dropdown" style="position: relative;">
                       <button class="btn dropdown-toggle" type="button" data-toggle="dropdown"
-                        style="color: green; margin-top: 6px; margin-right: -20px; border-radius: 0;">
+                        style="background-color: transparent; color: green; margin-top: 10px;">
                         <?= $section ?>
                       </button>
                       <div class="dropdown-menu">

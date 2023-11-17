@@ -297,7 +297,7 @@ if ($stmt) {
     </nav>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item mb-3">
             <a class="nav-link" href="index.php">
@@ -320,17 +320,22 @@ if ($stmt) {
             </a>
             <div class="collapse" id="form-elements">
               <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="friends.php">My Friends</a></li>
-                <li class="nav-item"><a class="nav-link" href="teacher.php">My Teachers</a></li>
-                <li class="nav-item"><a class="nav-link" href="parent.php">My Parent</a></li>
+                <li class="nav-item"><a class="nav-link" href="student.php">My Students</a></li>
               </ul>
             </div>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" href="awards.php">
-              <i class="menu-icon"><i class="bi bi-award"></i></i>
-              <span class="menu-title">Awards</span>
+            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
+              <i class="menu-icon"><i class="bi bi-exclamation-triangle"></i></i>
+              <span class="menu-title">Reports</span>
+              <i class="menu-arrow"></i>
             </a>
+            <div class="collapse" id="charts">
+              <ul class="nav flex-column sub-menu">
+                <li class="nav-item"> <a class="nav-link"
+                    href="student_report.php?user_id=<?php echo $user_id ?>">Student Reports</a></li>
+              </ul>
+            </div>
           </li>
           <li class="nav-item mb-3">
             <a class="nav-link" href="feedback.php">

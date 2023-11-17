@@ -328,8 +328,6 @@ if (isset($_POST['unarchive'])) {
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link"
                     href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a></li>
-                <li class="nav-item"> <a class="nav-link"
-                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a></li>
               </ul>
             </div>
           </li>

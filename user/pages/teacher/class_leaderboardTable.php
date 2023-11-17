@@ -1,17 +1,12 @@
 <?php
 session_start();
+include("db_conn.php");
 
 if (!isset($_SESSION['user_id'])) {
-  header("Location:../../user_login.php");
+  header("Location: ../../user_login.php");
   exit();
 }
 
-if (isset($_GET['user_id'])) {
-  $user_id = $_GET['user_id'];
-}
-
-include("db_conn.php");
-$teacher_id = $_SESSION['user_id'];
 $user_id = $_SESSION['user_id'];
 
 $sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
@@ -21,6 +16,27 @@ $stmt->execute();
 $stmt->bind_result($profile);
 $stmt->fetch();
 $stmt->close();
+
+if (isset($_GET['class_id'])) {
+  $class_id = $_GET['class_id'];
+}
+
+$sqlClassName = "SELECT class_name FROM class_enrolled WHERE tc_id = ?";
+$stmtClassName = $conn->prepare($sqlClassName);
+$stmtClassName->bind_param("i", $class_id);
+$stmtClassName->execute();
+$stmtClassName->bind_result($class_name);
+$stmtClassName->fetch();
+$stmtClassName->close();
+
+function calculatePoints($results, $pointPerItem)
+{
+  $totalPoints = 0;
+  foreach ($results as $row) {
+    $totalPoints += $row['score'];
+  }
+  return $totalPoints * $pointPerItem;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,16 +45,17 @@ $stmt->close();
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Talisay Senior High School LMS</title>
+  <title>Talisay Senior High School LMS User</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-  <link rel="stylesheet" href="assets/css/student_report.css">
-  <link rel="stylesheet" href="assets/css/notif.css">
-  <link rel="shortcut icon" href="images/trace.svg" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/awards.css">
+  <link rel="stylesheet" href="assets/css/notification.css">
+  <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
 <body>
@@ -271,6 +288,12 @@ $stmt->close();
             </a>
           </li>
           <li class="nav-item mb-3">
+            <a href="archive.php" class="nav-link">
+              <i class="menu-icon"><i class="bi bi-archive"></i></i>
+              <span class="menu-title">Archive Courses</span>
+            </a>
+          </li>
+          <li class="nav-item mb-3">
             <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false"
               aria-controls="form-elements">
               <i class="menu-icon"><i class="bi bi-people"></i></i>
@@ -292,11 +315,7 @@ $stmt->close();
             <div class="collapse" id="charts">
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link"
-                    href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a>
-                </li>
-                <li class="nav-item"> <a class="nav-link"
-                    href="grade_report.php?user_id=<?php echo $teacher_id ?>">Report of Grades</a>
-                </li>
+                    href="student_report.php?user_id=<?php echo $user_id ?>">Student Reports</a></li>
               </ul>
             </div>
           </li>
@@ -310,224 +329,126 @@ $stmt->close();
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="header-links" style="overflow-x: auto; white-space: nowrap;">
-          <?php
-          include("config.php");
-
-          $classFromUrl = isset($_GET['class_name']) ? urldecode($_GET['class_name']) : '';
-
-          $sql = "SELECT DISTINCT class_name, class_id FROM section WHERE teacher_id = ?";
-          $stmt = $conn->prepare($sql);
-          $stmt->bind_param("i", $user_id);
-          $stmt->execute();
-          $result = $stmt->get_result();
-
-          $class_names_and_tc_ids = array();
-
-          while ($row = $result->fetch_assoc()) {
-            $class_names_and_class_ids[] = $row;
-          }
-
-          foreach ($class_names_and_class_ids as $class_data) {
-            $class_name = $class_data['class_name'];
-            $class_id = $class_data['class_id'];
-
-            $safeClass = str_replace(' ', '_', $class_name);
-            $cssClass = ($classFromUrl === $class_name) ? 'active' : '';
-
-            $encodedClass = urlencode($class_name);
-
-            echo '<a href="grade_report_subject.php?user_id=' . $teacher_id . '&class_name=' . $encodedClass . '&class_id=' . $class_id . '" class="' . $cssClass . '">' . $class_name . '</a>';
-          }
-          ?>
-        </div>
         <div class="content-wrapper">
-          <button id="print" class="btn btn-success mb-2">Download Data</button>
-          <div id="print-content">
-            <div class="row">
-              <div class="col-12 grid-margin stretch-card">
-                <div class="card">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="card-body">
-                        <h1 class="card-title" style="font-size: 30px; margin-left: 10px;">Grade
-                          Reports in
-                          <?php echo isset($_GET['class_name']) ? urldecode($_GET['class_name']) : 'Unknown Subject'; ?>
-                        </h1>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="card">
-                    <div class="row">
-                      <div class="col-md-12">
-                        <div class="card-body">
-                          <div class="table-responsive">
-                            <table id="example" class="table table-bordered table-hover text-center"
-                              style="width: 100%; table-layout: fixed; border-collapse: collapse;">
-                              <thead class="table" style="background-color: #4BB543; color: white;">
-                                <th scope="col" style="overflow: hidden;">Student Name</th>
-                                <?php
-                                include("config.php");
-                                $class_id = $_GET['class_id'];
+          <div class="row align-items-center justify-content-center">
+            <div class="col-md-6 mb-3">
+              <div class="card align-items-center justify-content-center" style="padding: 20px;">
+                <h2>Leaderboard Table</h2>
+                <a href="class_course.php?class_id=<?php echo $class_id ?>" style="color: green;">
+                  Click here to go back to class course.
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="row align-items-center justify-content-center">
+            <div class="col-md-6 align-items-center justify-content-center">
+              <div class="card">
+                <?php
+                $sqlAllStudentsUserIds = "SELECT user_id FROM user_account WHERE usertype = 'student'";
+                $stmtAllStudentsUserIds = $db->prepare($sqlAllStudentsUserIds);
+                $stmtAllStudentsUserIds->execute();
+                $allStudentsUserIds = $stmtAllStudentsUserIds->fetchAll(PDO::FETCH_COLUMN);
 
-                                $sqlQuestion = "SELECT title, date, point, 'Question' as type FROM classwork_question 
-                                WHERE class_id = ? AND teacher_id = ?";
-                                $stmtQuestion = $db->prepare($sqlQuestion);
-                                $stmtQuestion->execute([$class_id, $teacher_id]);
-                                $questionTitles = $stmtQuestion->fetchAll(PDO::FETCH_ASSOC);
+                $studentsWithPoints = [];
 
-                                $sqlAssignment = "SELECT title, date, point, 'Assignment' as type FROM classwork_assignment 
-                                WHERE class_id = ? AND teacher_id = ?";
-                                $stmtAssignment = $db->prepare($sqlAssignment);
-                                $stmtAssignment->execute([$class_id, $teacher_id]);
-                                $assignmentTitles = $stmtAssignment->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($allStudentsUserIds as $user_id) {
+                  $sqlAllStudent = "SELECT student_id, student_firstname, student_lastname FROM class_enrolled 
+                  WHERE student_id = ? AND class_name = ?";
+                  $stmtAllStudent = $db->prepare($sqlAllStudent);
+                  $stmtAllStudent->execute([$user_id, $class_name]);
+                  $studentResult = $stmtAllStudent->fetch(PDO::FETCH_ASSOC);
 
-                                $sqlQuiz = "SELECT quizTitle as title, date, quizPoint as point, 'Quiz' as type FROM classwork_quiz 
-                                WHERE class_id = ? AND teacher_id = ?";
-                                $stmtQuiz = $db->prepare($sqlQuiz);
-                                $stmtQuiz->execute([$class_id, $teacher_id]);
-                                $quizTitles = $stmtQuiz->fetchAll(PDO::FETCH_ASSOC);
+                  if ($studentResult) {
+                    $student_firstname = $studentResult['student_firstname'];
+                    $student_lastname = $studentResult['student_lastname'];
+                    $student_id = $studentResult['student_id'];
 
-                                $sqlExam = "SELECT examTitle as title, date, examPoint as point, 'Exam' as type FROM classwork_exam 
-                                WHERE class_id = ? AND teacher_id = ?";
-                                $stmtExam = $db->prepare($sqlExam);
-                                $stmtExam->execute([$class_id, $teacher_id]);
-                                $examTitles = $stmtExam->fetchAll(PDO::FETCH_ASSOC);
+                    $questionPoint = 10;
+                    $assignmentPoint = 20;
+                    $quizPoint = 40;
+                    $examPoint = 50;
 
-                                $allTitles = array_merge($questionTitles, $assignmentTitles, $quizTitles, $examTitles);
+                    $sqlQuestionScoreToPoints = "SELECT score FROM questiongrade WHERE student_id = ?";
+                    $stmtQuestionScoreToPoints = $db->prepare($sqlQuestionScoreToPoints);
+                    $stmtQuestionScoreToPoints->execute([$student_id]);
+                    $questionResults = $stmtQuestionScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
 
-                                usort($allTitles, function ($a, $b) {
-                                  return strtotime($a['date']) - strtotime($b['date']);
-                                });
+                    $sqlAssignmentScoreToPoints = "SELECT score FROM assignmentgrade WHERE student_id = ?";
+                    $stmtAssignmentScoreToPoints = $db->prepare($sqlAssignmentScoreToPoints);
+                    $stmtAssignmentScoreToPoints->execute([$student_id]);
+                    $assignmentResults = $stmtAssignmentScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
 
-                                foreach ($allTitles as $title) {
-                                  $formattedDate = date("F j", strtotime($title['date']));
-                                  ?>
-                                  <th scope="col" style="text-align: left; overflow: hidden;">
-                                    <p style="color: white; margin-bottom: -3px;">
-                                      <?php echo $formattedDate; ?>
-                                    </p>
-                                    <p
-                                      style="border-bottom: 1px solid white; color: black; width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                                      <?php echo $title['title']; ?>
-                                    </p>
-                                    <p style="color: white;">out of
-                                      <?php echo $title['point']; ?>
-                                    </p>
-                                  </th>
-                                  <?php
-                                }
-                                ?>
-                              </thead>
-                              <tbody>
-                                <?php
-                                include("config.php");
-                                $class_id = $_GET['class_id'];
+                    $sqlQuizScoreToPoints = "SELECT score FROM quizgrade WHERE student_id = ?";
+                    $stmtQuizScoreToPoints = $db->prepare($sqlQuizScoreToPoints);
+                    $stmtQuizScoreToPoints->execute([$student_id]);
+                    $quizResults = $stmtQuizScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
 
-                                $sqlAllStudent = "SELECT student_id, student_firstname, student_lastname FROM class_enrolled WHERE tc_id = ? AND teacher_id = ?";
-                                $stmtAllStudent = $db->prepare($sqlAllStudent);
-                                $stmtAllStudent->execute([$class_id, $teacher_id]);
-                                $students = $stmtAllStudent->fetchAll(PDO::FETCH_ASSOC);
+                    $sqlExamScoreToPoints = "SELECT score FROM examgrade WHERE student_id = ?";
+                    $stmtExamScoreToPoints = $db->prepare($sqlExamScoreToPoints);
+                    $stmtExamScoreToPoints->execute([$student_id]);
+                    $examResults = $stmtExamScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
 
-                                usort($students, function ($a, $b) {
-                                  return strcasecmp($a['student_lastname'], $b['student_lastname']);
-                                });
+                    $questionPoints = calculatePoints($questionResults, $questionPoint);
+                    $assignmentPoints = calculatePoints($assignmentResults, $assignmentPoint);
+                    $quizPoints = calculatePoints($quizResults, $quizPoint);
+                    $examPoints = calculatePoints($examResults, $examPoint);
 
-                                foreach ($students as $student) {
-                                  ?>
-                                  <tr>
-                                    <td style="overflow: hidden;">
-                                      <?php echo $student['student_lastname'] ?>
-                                    </td>
-                                    <?php
-                                    foreach ($allTitles as $title) {
-                                      $student_id = $student['student_id'];
-                                      $questionTitle = $title['title'];
-                                      $assignmentTitle = $title['title'];
-                                      $quizTitle = $title['title'];
-                                      $examTitle = $title['title'];
+                    $overallPoints = $questionPoints + $assignmentPoints + $quizPoints + $examPoints;
 
-                                      $sqlQuestionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND questionTitle = ?";
-                                      $stmtQuestionScore = $db->prepare($sqlQuestionScore);
-                                      $stmtQuestionScore->execute([$student_id, $questionTitle]);
-                                      $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
+                    $studentsWithPoints[] = array(
+                      'student_id' => $student_id,
+                      'student_firstname' => $student_firstname,
+                      'student_lastname' => $student_lastname,
+                      'overallPoints' => $overallPoints
+                    );
+                  }
+                }
 
-                                      $sqlAssignmentScore = "SELECT score FROM assignmentgrade WHERE student_id = ? AND assignmentTitle = ?";
-                                      $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
-                                      $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
-                                      $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
+                usort($studentsWithPoints, function ($a, $b) {
+                  return $b['overallPoints'] - $a['overallPoints'];
+                });
+                ?>
 
-                                      $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quizTitle = ?";
-                                      $stmtQuizScore = $db->prepare($sqlQuizScore);
-                                      $stmtQuizScore->execute([$student_id, $quizTitle]);
-                                      $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+                <!DOCTYPE html>
+                <html lang="en">
 
-                                      $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND examTitle = ?";
-                                      $stmtExamScore = $db->prepare($sqlExamScore);
-                                      $stmtExamScore->execute([$student_id, $examTitle]);
-                                      $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+                <head>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <title>Student Rankings</title>
+                </head>
 
-                                      if ($questionScore && $assignmentScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore && $assignmentScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $assignmentScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($assignmentScore && $quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $assignmentScore['score'] . "<br> " . $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($questionScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $questionScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($assignmentScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $assignmentScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } elseif ($quizScore) {
-                                        ?>
-                                        <td>
-                                          <?php echo $quizScore['score'] ?>
-                                        </td>
-                                        <?php
-                                      } else {
-                                        ?>
-                                        <td></td>
-                                        <?php
-                                      }
-                                    }
-                                    ?>
-                                  </tr>
-                                  <?php
-                                }
-                                ?>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <body>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Ranking</th>
+                        <th scope="col">First Name</th>
+                        <th scope="col">Last Name</th>
+                        <th scope="col">Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php
+                      $ranking = 1;
+                      $counter = 0;
+                      while ($counter < count($studentsWithPoints)) {
+                        $student = $studentsWithPoints[$counter];
+
+                        echo "<tr>";
+                        echo "<th scope='row' style='text-align: center;'>" . $ranking . "</th>";
+                        echo "<td>" . $student['student_firstname'] . "</td>";
+                        echo "<td>" . $student['student_lastname'] . "</td>";
+                        echo "<td>" . $student['overallPoints'] . "</td>";
+                        echo "</tr>";
+
+                        $ranking++;
+                        $counter++;
+                      }
+                      ?>
+                    </tbody>
+                  </table>
+
               </div>
             </div>
           </div>
@@ -535,48 +456,19 @@ $stmt->close();
       </div>
     </div>
 
-    <script src="../../vendors/js/vendor.bundle.base.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script>
-      $(document).ready(function () {
-        $('#example').DataTable();
-      });
-    </script>
-    <script>
-      const printBtn = document.getElementById('print');
-
-      function preparePrintContent() {
-        const content = document.createElement('div');
-        content.innerHTML = '<html><head><title>Print</title></head><body>';
-        content.innerHTML += document.getElementById('print-content').innerHTML;
-        content.innerHTML += '</body></html>';
-        return content;
-      }
-
-      printBtn.addEventListener('click', function () {
-        const printContent = preparePrintContent();
-
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(printContent.innerHTML);
-
-        printWindow.document.close();
-        printWindow.print();
-        printWindow.close();
-      });
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
       crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
       integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
       crossorigin="anonymous"></script>
+    <script src="../../vendors/js/vendor.bundle.base.js"></script>
     <script src="../../js/off-canvas.js"></script>
     <script src="../../js/hoverable-collapse.js"></script>
     <script src="../../js/template.js"></script>
     <script src="../../js/settings.js"></script>
     <script src="../../js/todolist.js"></script>
+    <!-- endinject -->
 </body>
 
 </html>
