@@ -260,10 +260,10 @@ include("db_conn.php");
             <div class="col-md-3 grid-margin transparent">
               <div class="card card-light-danger text-center">
                 <div class="card-body">
-                  <h5>MECHANICS Department</h5>
+                  <h5>TVL Department</h5>
                   <p class="mb-3">Users</p>
                   <?php
-                  $dash_category_query = "SELECT * FROM user_account WHERE department='mechanic'";
+                  $dash_category_query = "SELECT * FROM user_account WHERE department='tvl'";
                   $dash_category_query_run = mysqli_query($conn, $dash_category_query);
 
                   if ($category_total = mysqli_num_rows($dash_category_query_run)) {

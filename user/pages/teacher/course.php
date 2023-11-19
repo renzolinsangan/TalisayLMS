@@ -458,14 +458,14 @@ if (isset($_POST['archive'])) {
                         <label for="floatingSubject">Subject</label>
                       </div>
                       <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                           <div class="form-group mb-4">
                             <label for="floatingWrittenGrade">Written Works %</label>
                             <input type="text" name="written" class="form-control" id="floatingInput"
                               placeholder="Grade">
                           </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                           <div class="form-group mb-4">
                             <label for="floatingPerformanceGrade">Performance Task %</label>
                             <input type="text" name="performance" class="form-control" id="floatingInput"
@@ -473,14 +473,14 @@ if (isset($_POST['archive'])) {
                           </div>
                         </div>
                         <div></div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                           <div class="form-group mb-4">
                             <label for="floatingExamGrade">Exam %</label>
                             <input type="text" name="exam" class="form-control" id="floatingInput"
                               placeholder="Grade">
                           </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                           <label for="floatingBaseGrade">Base Grade</label>
                           <input type="text" name="basegrade" class="form-control" id="floatingInput"
                             placeholder="Base Grade">
