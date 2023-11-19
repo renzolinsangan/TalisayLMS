@@ -66,6 +66,7 @@ $stmt->closeCursor();
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/feedback.css">
+  <link rel="stylesheet" href="assets/css/notification.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
 
@@ -88,45 +89,44 @@ $stmt->closeCursor();
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
               <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+              <?php
+              include("config.php");
+
+              $sqlAnnounceNews = "SELECT news_id, title, name, type, date, end_date FROM NEWS";
+              $stmtAnnounceNews = $db->prepare($sqlAnnounceNews);
+              $stmtAnnounceNews->execute();
+              $resultAnnounceNews = $stmtAnnounceNews->fetchAll(PDO::FETCH_ASSOC);
+
+              foreach ($resultAnnounceNews as $news) {
+                $news_id = $news['news_id'];
+                $title = $news['title'];
+                $name = $news['name'];
+                $type = $news['type'];
+                $date = date('M d', strtotime($news['date']));
+                $end_date = $news['end_date'];
+                $current_date = date('Y-m-d H:i:s');
+
+                if ($current_date > $end_date) {
+                  header('Location: index.php');
+                  exit();
+                }
+                $link = ($type === 'news') ? 'news.php' : 'announcement.php';
+
+                echo '<a href="view_' . $link . '?news_id='. $news_id .'" class="dropdown-item preview-item">';
+                echo '<div class="preview-thumbnail">';
+                echo '<div class="preview-icon bg-success">';
+                echo '<i class="ti-info-alt mx-0"></i>';
+                echo '</div>';
+                echo '</div>';
+                echo '<div class="preview-item-content">';
+                echo '<h6 class="preview-subject font-weight-normal">' . $title . ' ' . $type . ' is posted</h6>';
+                echo '<p class="font-weight-light small-text mb-0 text-muted">';
+                echo 'In ' . $date . ' by ' . $name;
+                echo '</p>';
+                echo '</div>';
+                echo '</a>';
+              }
+              ?>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">

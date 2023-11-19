@@ -131,10 +131,32 @@ if ($teacher_id) {
                     </div>
                     <div class="preview-item-content">
                       <?php if (isset($notification['title']) && isset($notification['type'])): ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <?php
+                        $link = '';
+
+                        $currentDate = new DateTime();
+                        $endDate = new DateTime($notification['end_date']);
+                        if ($currentDate > $endDate) {
+                          $link = 'index.php';
+                        } else {
+                          if ($notification['type'] === 'announcement') {
+                            $link = 'view_announcement.php' . $notification['news_id'];
+                          } elseif ($notification['type'] === 'news') {
+                            $link = 'view_news.php?news_id=' . $notification['news_id'];
+                          }
+                        }
+                        ?>
+                        <h6 class="preview-subject font-weight-normal"
+                          onclick="window.location.href='<?php echo $link; ?>';">
                           <?php echo $notification['title']; ?> (
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted"
+                        onclick="window.location.href='<?php echo $link; ?>';">
+                          by
+                          <?php echo $notification['name']; ?> on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
                       <?php elseif (isset($notification['student_id'])): ?>
                         <?php
                         $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
@@ -143,12 +165,19 @@ if ($teacher_id) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal" 
+                        onclick="window.location.href='student.php'">
                           You added
                           <?php echo $studentName; ?> as student.
                         </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='student.php'">
+                          on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
                       <?php elseif (isset($notification['class_name'])): ?>
-                        <div class="preview-item-content">
+                        <div class="preview-item-content"
+                          onclick="window.location.href='class_people.php?class_id=<?php echo $notification['tc_id'] ?>'">
                           <h6 class="preview-subject font-weight-normal">
                             <?php echo $notification['student_firstname']; ?> joined from
                             <?php echo $notification['class_name']; ?>
@@ -166,11 +195,13 @@ if ($teacher_id) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                          <h6 class="preview-subject font-weight-normal"
+                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['question_course_status']; ?>
                           <?php echo $notification['title']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -183,11 +214,13 @@ if ($teacher_id) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['assignment_course_status']; ?>
                           <?php echo $notification['title']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -200,11 +233,13 @@ if ($teacher_id) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['quiz_course_status']; ?>
                           <?php echo $notification['quizTitle']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -217,22 +252,17 @@ if ($teacher_id) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['exam_course_status']; ?>
                           <?php echo $notification['examTitle']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
                         </h6>
-                      <?php endif; ?>
-                      <?php if (isset($notification['name'])): ?>
-                        <p class="font-weight-light small-text mb-0 text-muted">
-                          by
-                          <?php echo $notification['name']; ?> on
-                          <?php echo date('F j', strtotime($notification['date'])); ?>
-                        </p>
                       <?php endif; ?>
                     </div>
                   </a>
@@ -320,7 +350,6 @@ if ($teacher_id) {
                 class="bi bi-arrow-bar-left" style="color: white;"></i></a>
             <a href="toreview.php?class_id=<?php echo $class_id ?>" class="nav-link active"
               style="margin-left: 2vh;">To-review</a>
-            <a href="#" class="people">Reviewed</a>
           </div>
         </div>
         <div class="content-wrapper align-items-center justify-content-center" style="margin-top: 10vh;">

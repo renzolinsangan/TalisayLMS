@@ -12,7 +12,6 @@ $result = mysqli_query($conn, $sql);
 $row = mysqli_fetch_assoc($result);
 
 $username = $row['username'];
-$password = $row['password'];
 $address = $row['address'];
 $email = $row['email'];
 $contact = $row['contact'];
@@ -24,8 +23,6 @@ $usertype = $row['usertype'];
 
 if (isset($_POST['submit'])) {
     $username = $_POST['username'];
-    $password = $_POST['password'];
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     $address = $_POST['address'];
     $email = $_POST['email'];
     $contact = $_POST['contact'];
@@ -35,7 +32,7 @@ if (isset($_POST['submit'])) {
     $children = $_POST['children'];
     $usertype = $_POST['usertype'];
 
-    $sql = "UPDATE user_account SET username='$username', password='$hashedPassword', address='$address', email='$email', 
+    $sql = "UPDATE user_account SET username='$username', address='$address', email='$email', 
     contact='$contact', firstname='$firstname', middlename='$middlename', lastname='$lastname', children='$children', 
     usertype='$usertype' WHERE user_id=$id";
     $result = mysqli_query($conn, $sql);
@@ -79,14 +76,9 @@ if (isset($_POST['submit'])) {
                 <div class="container d-flex justify-content-center">
                     <form action="#" method="post" style="width: 50vw; min-width: 300px;">
                         <div class="row" style="flex: 1; padding-bottom: 8vh;">
-                            <div class="col mb-4">
+                            <div class="col-md-6 mb-4">
                                 <label class="form-label">Username</label>
                                 <input type="text" class="form-control" name="username" value="<?php echo $username ?>">
-                            </div>
-
-                            <div class="col mb-4">
-                                <label class="form-label">Password</label>
-                                <input type="password" class="form-control" name="password" value="<?php echo $password ?>">
                             </div>
 
                             <div></div>

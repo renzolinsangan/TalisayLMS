@@ -289,7 +289,7 @@ $stmt->closeCursor();
             <div class="collapse" id="charts">
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link"
-                    href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a></li>
+                    href="student_report.php?user_id=<?php echo $user_id ?>">Student Reports</a></li>
               </ul>
             </div>
           </li>

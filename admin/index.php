@@ -65,7 +65,7 @@ include("db_conn.php");
                 $fullName = $row['firstname'] . ' ' . $row['lastname'];
                 $submissionDate = $row['date'];
                 ?>
-                <a class="dropdown-item preview-item">
+                <a href="pages/feedback/feedback.php"class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
                     <div class="preview-icon bg-success">
                       <i class="ti-info-alt mx-0"></i>
@@ -90,7 +90,7 @@ include("db_conn.php");
 
                 if ($currentDate > $endDate) {
                   ?>
-                  <a class="dropdown-item preview-item">
+                  <a href="pages/announcement/announcement.php" class="dropdown-item preview-item">
                     <div class="preview-thumbnail">
                       <div class="preview-icon bg-danger">
                         <i class="ti-alarm-clock mx-0"></i>
@@ -326,7 +326,7 @@ include("db_conn.php");
                         <?php echo $totalStudentReport ?> )
                       </span>
                     </p>
-                    <a href="student_report.php">View
+                    <a href="pages/reports/student_report.php">View
                       <?php echo ucfirst($usertype) ?> Report
                     </a>
                     <?php
@@ -346,7 +346,7 @@ include("db_conn.php");
                         <?php echo $totalTeacherReport ?> )
                       </span>
                     </p>
-                    <a href="teacher_report.php">View
+                    <a href="pages/reports/teacher_report.php">View
                       <?php echo ucfirst($usertype) ?> Report
                     </a>
                     <?php
@@ -366,7 +366,7 @@ include("db_conn.php");
                         <?php echo $totalParentReport ?> )
                       </span>
                     </p>
-                    <a href="parent_report.php">View
+                    <a href="pages/reports/parent_report.php">View
                       <?php echo ucfirst($usertype) ?> Report
                     </a>
                     <?php

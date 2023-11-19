@@ -12,7 +12,6 @@ $result = mysqli_query($conn, $sql);
 $row = mysqli_fetch_assoc($result);
 
 $username = $row['username'];
-$password = $row['password'];
 $email = $row['email'];
 $firstname = $row['firstname'];
 $middlename = $row['middlename'];
@@ -24,8 +23,7 @@ $contact = $row['contact'];
 
 if (isset($_POST['submit'])) {
     $username = $_POST['username'];
-    $password = $_POST['password'];
-    $hashedPassword=password_hash($password, PASSWORD_DEFAULT);
+
     $email = $_POST['email'];
     $firstname = $_POST['firstname'];
     $middlename = $_POST['middlename'];
@@ -35,7 +33,7 @@ if (isset($_POST['submit'])) {
     $address = $_POST['address'];
     $contact = $_POST['contact'];
 
-    $sql = "UPDATE user_account SET username='$username', password='$hashedPassword', email='$email', firstname='$firstname', middlename='$middlename', lastname='$lastname', department='$department', usertype='$usertype', address='$address', contact='$contact' WHERE user_id=$id";
+    $sql = "UPDATE user_account SET username='$username', email='$email', firstname='$firstname', middlename='$middlename', lastname='$lastname', department='$department', usertype='$usertype', address='$address', contact='$contact' WHERE user_id=$id";
     $result = mysqli_query($conn, $sql);
 
     if ($result) {
@@ -82,15 +80,9 @@ if (isset($_POST['submit'])) {
                             </div>
 
                             <div></div>
-                            <div class="col mb-4">
+                            <div class="col-md-6 mb-4">
                                 <label class="form-label">Username</label>
                                 <input type="text" class="form-control" name="username" value="<?php echo $username ?>">
-                            </div>
-
-                            <div class="col mb-4">
-                                <label class="form-label">Password</label>
-                                <input type="password" class="form-control" name="password"
-                                    value="<?php echo $password ?>">
                             </div>
 
                             <div class="email mb-4">

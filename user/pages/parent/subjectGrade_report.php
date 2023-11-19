@@ -72,6 +72,7 @@ if ($row) {
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link rel="stylesheet" href="assets/css/report_grade.css">
+  <link rel="stylesheet" href="assets/css/notification.css">
   <link rel="shortcut icon" href="images/trace.svg" />
 </head>
 
@@ -94,45 +95,44 @@ if ($row) {
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
               <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+              <?php
+              include("config.php");
+
+              $sqlAnnounceNews = "SELECT news_id, title, name, type, date, end_date FROM NEWS";
+              $stmtAnnounceNews = $db->prepare($sqlAnnounceNews);
+              $stmtAnnounceNews->execute();
+              $resultAnnounceNews = $stmtAnnounceNews->fetchAll(PDO::FETCH_ASSOC);
+
+              foreach ($resultAnnounceNews as $news) {
+                $news_id = $news['news_id'];
+                $title = $news['title'];
+                $name = $news['name'];
+                $type = $news['type'];
+                $date = date('M d', strtotime($news['date']));
+                $end_date = $news['end_date'];
+                $current_date = date('Y-m-d H:i:s');
+
+                if ($current_date > $end_date) {
+                  header('Location: index.php');
+                  exit();
+                }
+                $link = ($type === 'news') ? 'news.php' : 'announcement.php';
+
+                echo '<a href="view_' . $link . '?news_id='. $news_id .'" class="dropdown-item preview-item">';
+                echo '<div class="preview-thumbnail">';
+                echo '<div class="preview-icon bg-success">';
+                echo '<i class="ti-info-alt mx-0"></i>';
+                echo '</div>';
+                echo '</div>';
+                echo '<div class="preview-item-content">';
+                echo '<h6 class="preview-subject font-weight-normal">' . $title . ' ' . $type . ' is posted</h6>';
+                echo '<p class="font-weight-light small-text mb-0 text-muted">';
+                echo 'In ' . $date . ' by ' . $name;
+                echo '</p>';
+                echo '</div>';
+                echo '</a>';
+              }
+              ?>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -226,13 +226,79 @@ if ($row) {
         <div class="content-wrapper">
           <div class="row">
             <div class="col d-flex align-items-center">
-              <div class="circle-image mb-3 mr-3">
+              <div class="circle-image mb-3">
                 <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
                   onerror="this.src='images/profile.png'">
               </div>
-              <h2>
-                <?php echo $childrenFullName ?>
-              </h2>
+              <div class="col-md-9 mr-2">
+                <h2>
+                  <?php echo $childrenFullName ?>
+                </h2>
+              </div>
+              <?php
+              $getClassID = $_GET['class_id'];
+
+              $sqlUnion = "
+                  (SELECT score, questionPoint AS point FROM questiongrade WHERE student_id = ? AND class_id = ?)
+                  UNION ALL
+                  (SELECT score, assignmentPoint AS point FROM assignmentgrade WHERE student_id = ? AND class_id = ?)
+                  UNION ALL
+                  (SELECT score, quizPoint AS point FROM quizgrade WHERE student_id = ? AND class_id = ?)
+                  UNION ALL
+                  (SELECT score, examPoint AS point FROM examgrade WHERE student_id = ? AND class_id = ?)
+              ";
+
+              $stmtUnion = $db->prepare($sqlUnion);
+              $stmtUnion->execute([$childrenID, $getClassID, $childrenID, $getClassID, $childrenID, $getClassID, $childrenID, $getClassID]);
+              $unionResult = $stmtUnion->fetchAll(PDO::FETCH_ASSOC);
+
+              $totalScore = 0;
+              $totalPoints = 0;
+
+              foreach ($unionResult as $row) {
+                $totalScore += $row['score'];
+                $totalPoints += $row['point'];
+              }
+
+              if ($totalPoints !== 0) {
+                $getTeacherID = $_GET['teacher_id'];
+
+                $sqlGradePercentage = "SELECT written, performance, exam, basegrade FROM section
+        WHERE class_id = ? AND teacher_id = ?";
+                $stmtGradePercentage = $db->prepare($sqlGradePercentage);
+                $stmtGradePercentage->execute([$getClassID, $getTeacherID]);
+                $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
+
+                $written = $result['written'];
+                $writtenPercentage = $written / 100;
+
+                $performance = $result['performance'];
+                $performancePercentage = $performance / 100;
+
+                $exam = $result['exam'];
+                $examPercentage = $exam / 100;
+
+                $basegrade = $result['basegrade'];
+                $basegradeMinus = 100 - $basegrade;
+
+                $firstResult = ($basegradeMinus * $totalScore) / $totalPoints;
+                $finalResult = $firstResult + $basegrade;
+
+                $writtenResult = $finalResult * $writtenPercentage;
+                $performanceResult = $finalResult * $performancePercentage;
+                $examResult = $finalResult * $examPercentage;
+
+                $finalGrade = $writtenResult + $performanceResult + $examResult;
+              } else {
+                $finalGrade = 0;
+              }
+              ?>
+
+              <div class="col text-end">
+                <h2 style="color: <?php echo $finalGrade < 75 ? 'red' : 'green'; ?>">
+                  <?php echo floor($finalGrade) == $finalGrade ? number_format($finalGrade, 0) : number_format($finalGrade, 2); ?>%
+                </h2>
+              </div>
             </div>
           </div>
           <div class="card">

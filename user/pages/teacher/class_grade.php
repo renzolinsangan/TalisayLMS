@@ -343,7 +343,7 @@ if ($result) {
                   <div class="card-body">
                     <?php
                     include("config.php");
-                    $sqlGradePercentage = "SELECT written, performance, exam FROM section WHERE class_id = ? AND teacher_id = ?";
+                    $sqlGradePercentage = "SELECT written, performance, exam, basegrade FROM section WHERE class_id = ? AND teacher_id = ?";
                     $stmtGradePercentage = $db->prepare($sqlGradePercentage);
                     $stmtGradePercentage->execute([$class_id, $user_id]);
                     $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
@@ -352,6 +352,7 @@ if ($result) {
                       $written = $result['written'];
                       $performance = $result['performance'];
                       $exam = $result['exam'];
+                      $basegrade = $result['basegrade'];
                       ?>
                       <div class="row">
                         <div class="col-12 mb-3">
@@ -371,10 +372,17 @@ if ($result) {
                         </div>
                       </div>
                       <div class="row">
-                        <div class="col-12">
+                        <div class="col-12 mb-3">
                           <h4>Quarterly Assessment = <span>
                               <?php echo $exam ?>%
                             </span></h3>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <h4>Base Grade = <span>
+                              <?php echo $basegrade ?>
+                            </span></h4>
                         </div>
                       </div>
                       <?php
@@ -523,63 +531,70 @@ if ($result) {
                                       <?php
                                     }
 
-                                    $totalScore = 0;
-                                    $totalPoints = 0;
-
                                     foreach ($allTitles as $title) {
                                       $questionTitle = $title['title'];
                                       $assignmentTitle = $title['title'];
                                       $quizTitle = $title['title'];
                                       $examTitle = $title['title'];
 
-                                      $sqlQuestionScore = "SELECT gradeType, score, questionPoint FROM questiongrade 
-                                        WHERE student_id = ? AND questionTitle = ?";
-                                      $stmtQuestionScore = $db->prepare($sqlQuestionScore);
-                                      $stmtQuestionScore->execute([$student_id, $questionTitle]);
-                                      $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
+                                      $sqlTotalScores = "
+                                      (SELECT score, questionPoint AS point FROM questiongrade WHERE student_id = ?)
+                                      UNION ALL
+                                      (SELECT score, assignmentPoint AS point FROM assignmentgrade WHERE student_id = ?)
+                                      UNION ALL
+                                      (SELECT score, quizPoint AS point FROM quizgrade WHERE student_id = ?)
+                                      UNION ALL
+                                      (SELECT score, examPoint AS point FROM examgrade WHERE student_id = ?)
+                                  ";
 
-                                      $sqlAssignmentScore = "SELECT gradeType, score, assignmentPoint FROM assignmentgrade 
-                                          WHERE student_id = ? AND assignmentTitle = ?";
-                                      $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
-                                      $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
-                                      $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
+                                      $stmtTotalScores = $db->prepare($sqlTotalScores);
+                                      $stmtTotalScores->execute([$student_id, $student_id, $student_id, $student_id]);
 
-                                      $sqlQuizScore = "SELECT gradeType, score, quizPoint FROM quizgrade 
-                                      WHERE student_id = ? AND quizTitle = ?";
-                                      $stmtQuizScore = $db->prepare($sqlQuizScore);
-                                      $stmtQuizScore->execute([$student_id, $quizTitle]);
-                                      $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+                                      $totalScores = $stmtTotalScores->fetchAll(PDO::FETCH_ASSOC);
 
-                                      $sqlExamScore = "SELECT score, examPoint FROM examgrade 
-                                      WHERE student_id = ? AND examTitle = ?";
-                                      $stmtExamScore = $db->prepare($sqlExamScore);
-                                      $stmtExamScore->execute([$student_id, $examTitle]);
-                                      $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+                                      $totalScore = 0;
+                                      $totalPoints = 0;
 
-                                      $sqlGradePercentage = "SELECT written, performance, exam FROM section WHERE class_id = ? AND teacher_id = ?";
-                                      $stmtGradePercentage = $db->prepare($sqlGradePercentage);
-                                      $stmtGradePercentage->execute([$class_id, $user_id]);
-                                      $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
-                                      
-                                      $totalScore += isset($questionScore['score']) ? ($questionScore['score'] / $questionScore['questionPoint']) : 0;
-                                      $totalScore += isset($assignmentScore['score']) ? ($assignmentScore['score'] / $assignmentScore['assignmentPoint']) : 0;
-                                      $totalScore += isset($quizScore['score']) ? ($quizScore['score'] / $quizScore['quizPoint']) : 0;
-                                      $totalScore += isset($examScore['score']) ? ($examScore['score'] / $examScore['examPoint']) : 0;
+                                      foreach ($totalScores as $score) {
+                                        $totalScore += $score['score'];
+                                        $totalPoints += $score['point'];
 
-                                      $totalPoints += isset($questionScore['score']) ? 1 : 0;
-                                      $totalPoints += isset($assignmentScore['score']) ? 1 : 0;
-                                      $totalPoints += isset($quizScore['score']) ? 1 : 0;
-                                      $totalPoints += isset($examScore['score']) ? 1 : 0;
+                                        $sqlGradePercentage = "SELECT written, performance, exam, basegrade FROM section
+                                        WHERE class_id = ? AND teacher_id = ?";
+                                        $stmtGradePercentage = $db->prepare($sqlGradePercentage);
+                                        $stmtGradePercentage->execute([$class_id, $user_id]);
+                                        $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
+
+                                        $written = $result['written'];
+                                        $writtenPercentage = $written / 100;
+
+                                        $performance = $result['performance'];
+                                        $performancePercentage = $performance / 100;
+
+                                        $exam = $result['exam'];
+                                        $examPercentage = $exam / 100;
+
+                                        $basegrade = $result['basegrade'];
+                                        $basegradeMinus = 100 - $basegrade;
+
+                                        $firstResult = ($basegradeMinus * $totalScore) / $totalPoints;
+                                        $finalResult = $firstResult + $basegrade;
+
+                                        $writtenResult = $finalResult * $writtenPercentage;
+                                        $performanceResult = $finalResult * $performancePercentage;
+                                        $examResult = $finalResult * $examPercentage;
+
+                                        $finalGrade = $writtenResult + $performanceResult + $examResult;
+                                      }
                                     }
-
-                                    $averageGrade = ($totalPoints > 0) ? ($totalScore / $totalPoints) : 0;
-                                    $percentage = $averageGrade * 100;
-                                    $color = ($percentage < 75) ? 'red' : 'green';
-
+                                    if (!empty($totalScores)) {
+                                      ?>
+                                      <td style="color: <?php echo $finalGrade < 75 ? 'red' : 'green'; ?>">
+                                        <?php echo floor($finalGrade) == $finalGrade ? number_format($finalGrade, 0) : number_format($finalGrade, 2); ?>
+                                      </td>
+                                      <?php
+                                    }
                                     ?>
-                                    <td style="color: <?php echo $color; ?>">
-                                      <?php echo number_format($percentage, 2) . '%'; ?>
-                                    </td>
                                   </tr>
                                   <?php
                                 }

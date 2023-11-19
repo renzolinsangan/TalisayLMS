@@ -48,11 +48,7 @@ $stmt->close();
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
-  <link rel="stylesheet" href="assets/css/report_student.css">
+  <link rel="stylesheet" href="assets/css/student_report.css">
   <link rel="stylesheet" href="assets/css/notif.css">
   <link rel="shortcut icon" href="images/trace.svg" />
 </head>
@@ -139,10 +135,32 @@ $stmt->close();
                     </div>
                     <div class="preview-item-content">
                       <?php if (isset($notification['title']) && isset($notification['type'])): ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <?php
+                        $link = '';
+
+                        $currentDate = new DateTime();
+                        $endDate = new DateTime($notification['end_date']);
+                        if ($currentDate > $endDate) {
+                          $link = 'index.php';
+                        } else {
+                          if ($notification['type'] === 'announcement') {
+                            $link = 'view_announcement.php' . $notification['news_id'];
+                          } elseif ($notification['type'] === 'news') {
+                            $link = 'view_news.php?news_id=' . $notification['news_id'];
+                          }
+                        }
+                        ?>
+                        <h6 class="preview-subject font-weight-normal"
+                          onclick="window.location.href='<?php echo $link; ?>';">
                           <?php echo $notification['title']; ?> (
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted"
+                        onclick="window.location.href='<?php echo $link; ?>';">
+                          by
+                          <?php echo $notification['name']; ?> on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
                       <?php elseif (isset($notification['student_id'])): ?>
                         <?php
                         $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
@@ -151,12 +169,19 @@ $stmt->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal" 
+                        onclick="window.location.href='student.php'">
                           You added
                           <?php echo $studentName; ?> as student.
                         </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='student.php'">
+                          on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
                       <?php elseif (isset($notification['class_name'])): ?>
-                        <div class="preview-item-content">
+                        <div class="preview-item-content"
+                          onclick="window.location.href='class_people.php?class_id=<?php echo $notification['tc_id'] ?>'">
                           <h6 class="preview-subject font-weight-normal">
                             <?php echo $notification['student_firstname']; ?> joined from
                             <?php echo $notification['class_name']; ?>
@@ -174,11 +199,13 @@ $stmt->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                          <h6 class="preview-subject font-weight-normal"
+                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['question_course_status']; ?>
                           <?php echo $notification['title']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -191,11 +218,13 @@ $stmt->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['assignment_course_status']; ?>
                           <?php echo $notification['title']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -208,11 +237,13 @@ $stmt->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['quiz_course_status']; ?>
                           <?php echo $notification['quizTitle']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -225,22 +256,17 @@ $stmt->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['exam_course_status']; ?>
                           <?php echo $notification['examTitle']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
                         </h6>
-                      <?php endif; ?>
-                      <?php if (isset($notification['name'])): ?>
-                        <p class="font-weight-light small-text mb-0 text-muted">
-                          by
-                          <?php echo $notification['name']; ?> on
-                          <?php echo date('F j', strtotime($notification['date'])); ?>
-                        </p>
                       <?php endif; ?>
                     </div>
                   </a>
@@ -325,9 +351,9 @@ $stmt->close();
         <div class="card d-flex align-items-left justify-content-between"
           style="position: relative; background-color: none; height: 8vh;">
           <div class="row">
-            <div class="col-1" style="margin-left: 35px; margin-top: 9px;">
+            <div class="col-1" style="margin-left: 45px; margin-top: 10px; margin-right: -7px;">
               <a href="student_report.php?user_id=<?= $teacher_id ?>" class="nav-link active"
-              style="color: green; text-decoration: none; font-size: 14px;">All</a>
+                style="color: green; text-decoration: none; font-size: 14px;">All</a>
             </div>
             <div class="row">
               <?php
@@ -340,7 +366,7 @@ $stmt->close();
               while ($sectionrow = $sectionResult->fetch_assoc()):
                 $section = $sectionrow['section'];
                 ?>
-                <div class="col">
+                <div class="col-5">
                   <div class="dropdown-container">
                     <div class="dropdown" style="position: relative;">
                       <button class="btn dropdown-toggle" type="button" data-toggle="dropdown"
@@ -360,8 +386,9 @@ $stmt->close();
                           $class_name = $subjectRow['class_name'];
                           $subject = $subjectRow['subject'];
                           ?>
-                          <a class="dropdown-item" href="student_report_subject.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" 
-                          style="background-color: transparent;">
+                          <a class="dropdown-item"
+                            href="student_report_subject.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>"
+                            style="background-color: transparent;">
                             <?= $subject ?>
                           </a>
                         <?php endwhile; ?>
@@ -375,7 +402,7 @@ $stmt->close();
         </div>
         <div class="content-wrapper">
           <button id="print" class="btn btn-success mb-2">Download Data</button>
-          <div id="print-content">
+          <div class="print-content" id="print-content">
             <div class="row">
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
@@ -395,16 +422,15 @@ $stmt->close();
                       <div class="col-md-12">
                         <div class="card-body">
                           <div class="table-responsive">
-                            <table id="example" class="table table-hover text-center"
-                              style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                            <table id="example" class="table table-hover text-center">
                               <thead class="table" style="background-color: #4BB543; color: white;">
                                 <tr>
-                                  <th scope="col" style="text-align: center; overflow: hidden;">Student's Name</th>
-                                  <th scope="col" style="text-align: center; overflow: hidden;">Class Name</th>
-                                  <th scope="col" style="text-align: center; overflow: hidden;">Section</th>
-                                  <th scope="col" style="text-align: center; overflow: hidden;">Subject</th>
-                                  <th scope="col" style="text-align: center; overflow: hidden;">Grade Level</th>
-                                  <th scope="col" style="text-align: center; overflow: hidden;">Department</th>
+                                  <th scope="col" style="text-align: center;">Student's Name</th>
+                                  <th scope="col" style="text-align: center;">Class Name</th>
+                                  <th scope="col" style="text-align: center;">Section</th>
+                                  <th scope="col" style="text-align: center;">Subject</th>
+                                  <th scope="col" style="text-align: center;">Grade Level</th>
+                                  <th scope="col" style="text-align: center;">Department</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -416,22 +442,22 @@ $stmt->close();
                                 while ($row = mysqli_fetch_assoc($result)) {
                                   ?>
                                   <tr>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['student_firstname'] . ' ' . $row['student_lastname']; ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['class_name'] ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['section'] ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['subject'] ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['grade_level'] ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['strand'] ?>
                                     </td>
                                   </tr>
@@ -465,27 +491,9 @@ $stmt->close();
     <script>
       const printBtn = document.getElementById('print');
 
-      function preparePrintContent() {
-        const content = document.createElement('div');
-        content.innerHTML = '<html><head><title>Print</title></head><body>';
-        content.innerHTML += document.getElementById('print-content').innerHTML;
-        content.innerHTML += '</body></html>';
-        return content;
-      }
-
       printBtn.addEventListener('click', function () {
-        // Prepare the content to be printed
-        const printContent = preparePrintContent();
-
-        // Create a new window
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(printContent.innerHTML);
-
-        // Close the document and trigger printing
-        printWindow.document.close();
-        printWindow.print();
-        printWindow.close();
-      });
+        print();
+      })
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"

@@ -129,11 +129,24 @@ if ($studentNameRow) {
                     </div>
                     <div class="preview-item-content">
                       <?php if (isset($notification['title'])): ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <?php
+                        $link = ($notification['type'] === 'news') ? 'news.php' : 'announcement.php';
+
+                        $end_date = $notification['end_date'];
+                        $current_date = date('Y-m-d H:i:s');
+
+                        if ($current_date > $end_date) {
+                          header('Location: index.php');
+                          exit();
+                        }
+                        ?>
+                        <h6 class="preview-subject font-weight-normal"
+                          onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
                           <?php echo $notification['title']; ?> (
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
-                        <p class="font-weight-light small-text mb-0 text-muted">
+                        <p class="font-weight-light small-text mb-0 text-muted"
+                        onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
                           by
                           <?php echo $notification['name']; ?> on
                           <?php echo date('F j', strtotime($notification['date'])); ?>
@@ -143,7 +156,7 @@ if ($studentNameRow) {
                         $friendNameParts = explode(' ', $notification['name']);
                         $firstName = $friendNameParts[0];
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='friends.php'">
                           You added
                           <?php echo $firstName; ?> as your friend.
                         </h6>
@@ -160,42 +173,79 @@ if ($studentNameRow) {
                         $teacherName = $stmtTeacherName->fetchColumn();
                         ?>
                         <?php if ($notification['notification_type'] === 'teacher'): ?>
-                          <div class="preview-item-content">
-                            <h6 class="preview-subject font-weight-normal">
+                          <div class="preview-item-content" onclick="window.location.href='teacher.php'">
+                            <h6 class="preview-subject font-weight-normal" onclick="window.location.href='teacher.php'">
                               You added
                               <?php echo $teacherName; ?> as your teacher.
                             </h6>
+                            <p class="font-weight-light small-text mb-0 text-muted"
+                              onclick="window.location.href='teacher.php'">
+                              on
+                              <?php echo date('F j', strtotime($notification['date'])); ?>
+                            </p>
                           </div>
                         <?php else: ?>
-                          <h6 class="preview-subject font-weight-normal">
-                            <?php echo $teacherName; ?> posted
-                            <?php if ($notification['notification_type'] === 'material'): ?>
-                              a material in
-                            <?php elseif ($notification['notification_type'] === 'question'): ?>
-                              a question in
-                            <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                              an assignment in
-                            <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                              a quiz in
-                            <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                              an exam in
-                            <?php endif; ?>
-                            <?php echo $notification['class_name']; ?>.
-                          </h6>
+                          <?php if ($notification['notification_type'] === 'material'): ?>
+                            <div class="material-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal"
+                              onclick="window.location.href='course.php'">
+                                <?php echo $teacherName; ?> posted a material in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php elseif ($notification['notification_type'] === 'question'): ?>
+                            <div class="question-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal"
+                              onclick="window.location.href='course.php'">
+                                <?php echo $teacherName; ?> posted a question in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php elseif ($notification['notification_type'] === 'assignment'): ?>
+                            <div class="assignment-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal"
+                              onclick="window.location.href='course.php'">
+                                <?php echo $teacherName; ?> posted an assignment in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php elseif ($notification['notification_type'] === 'quiz'): ?>
+                            <div class="quiz-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal"
+                              onclick="window.location.href='course.php'">
+                                <?php echo $teacherName; ?> posted a quiz in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php elseif ($notification['notification_type'] === 'exam'): ?>
+                            <div class="exam-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal">
+                                <?php echo $teacherName; ?> posted an exam in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php endif; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
                         <?php endif; ?>
-                        <p class="font-weight-light small-text mb-0 text-muted">
-                          on
-                          <?php echo date('F j', strtotime($notification['date'])); ?>
-                        </p>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -205,7 +255,8 @@ if ($studentNameRow) {
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -215,7 +266,8 @@ if ($studentNameRow) {
                           <?php echo $notification['quizTitle']; ?>
                           (quiz).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -225,7 +277,8 @@ if ($studentNameRow) {
                           <?php echo $notification['examTitle']; ?>
                           (exam).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -236,6 +289,8 @@ if ($studentNameRow) {
                 <?php endforeach; ?>
               </div>
             </div>
+            <?php
+            ?>
           </li>
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">

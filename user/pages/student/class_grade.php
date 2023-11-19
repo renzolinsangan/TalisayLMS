@@ -138,11 +138,24 @@ $stmt->closeCursor();
                     </div>
                     <div class="preview-item-content">
                       <?php if (isset($notification['title'])): ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <?php
+                        $link = ($notification['type'] === 'news') ? 'news.php' : 'announcement.php';
+
+                        $end_date = $notification['end_date'];
+                        $current_date = date('Y-m-d H:i:s');
+
+                        if ($current_date > $end_date) {
+                          header('Location: index.php');
+                          exit();
+                        }
+                        ?>
+                        <h6 class="preview-subject font-weight-normal"
+                          onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
                           <?php echo $notification['title']; ?> (
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
-                        <p class="font-weight-light small-text mb-0 text-muted">
+                        <p class="font-weight-light small-text mb-0 text-muted"
+                        onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
                           by
                           <?php echo $notification['name']; ?> on
                           <?php echo date('F j', strtotime($notification['date'])); ?>
@@ -152,7 +165,7 @@ $stmt->closeCursor();
                         $friendNameParts = explode(' ', $notification['name']);
                         $firstName = $friendNameParts[0];
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='friends.php'">
                           You added
                           <?php echo $firstName; ?> as your friend.
                         </h6>
@@ -169,42 +182,79 @@ $stmt->closeCursor();
                         $teacherName = $stmtTeacherName->fetchColumn();
                         ?>
                         <?php if ($notification['notification_type'] === 'teacher'): ?>
-                          <div class="preview-item-content">
-                            <h6 class="preview-subject font-weight-normal">
+                          <div class="preview-item-content" onclick="window.location.href='teacher.php'">
+                            <h6 class="preview-subject font-weight-normal" onclick="window.location.href='teacher.php'">
                               You added
                               <?php echo $teacherName; ?> as your teacher.
                             </h6>
+                            <p class="font-weight-light small-text mb-0 text-muted"
+                              onclick="window.location.href='teacher.php'">
+                              on
+                              <?php echo date('F j', strtotime($notification['date'])); ?>
+                            </p>
                           </div>
                         <?php else: ?>
-                          <h6 class="preview-subject font-weight-normal">
-                            <?php echo $teacherName; ?> posted
-                            <?php if ($notification['notification_type'] === 'material'): ?>
-                              a material in
-                            <?php elseif ($notification['notification_type'] === 'question'): ?>
-                              a question in
-                            <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                              an assignment in
-                            <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                              a quiz in
-                            <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                              an exam in
-                            <?php endif; ?>
-                            <?php echo $notification['class_name']; ?>.
-                          </h6>
+                          <?php if ($notification['notification_type'] === 'material'): ?>
+                            <div class="material-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal"
+                              onclick="window.location.href='course.php'">
+                                <?php echo $teacherName; ?> posted a material in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php elseif ($notification['notification_type'] === 'question'): ?>
+                            <div class="question-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal"
+                              onclick="window.location.href='course.php'">
+                                <?php echo $teacherName; ?> posted a question in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php elseif ($notification['notification_type'] === 'assignment'): ?>
+                            <div class="assignment-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal"
+                              onclick="window.location.href='course.php'">
+                                <?php echo $teacherName; ?> posted an assignment in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php elseif ($notification['notification_type'] === 'quiz'): ?>
+                            <div class="quiz-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal"
+                              onclick="window.location.href='course.php'">
+                                <?php echo $teacherName; ?> posted a quiz in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php elseif ($notification['notification_type'] === 'exam'): ?>
+                            <div class="exam-notification clickable"
+                            onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal">
+                                <?php echo $teacherName; ?> posted an exam in
+                                <?php echo $notification['class_name']; ?>.
+                              </h6>
+                            </div>
+                          <?php endif; ?>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
                         <?php endif; ?>
-                        <p class="font-weight-light small-text mb-0 text-muted">
-                          on
-                          <?php echo date('F j', strtotime($notification['date'])); ?>
-                        </p>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -214,7 +264,8 @@ $stmt->closeCursor();
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -224,7 +275,8 @@ $stmt->closeCursor();
                           <?php echo $notification['quizTitle']; ?>
                           (quiz).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -234,7 +286,8 @@ $stmt->closeCursor();
                           <?php echo $notification['examTitle']; ?>
                           (exam).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -245,6 +298,8 @@ $stmt->closeCursor();
                 <?php endforeach; ?>
               </div>
             </div>
+            <?php
+            ?>
           </li>
           <li class="nav-item nav-profile dropdown">
             <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
@@ -340,7 +395,7 @@ $stmt->closeCursor();
                   <div class="card-body">
                     <?php
                     include("config.php");
-                    $sqlGradePercentage = "SELECT written, performance, exam FROM section WHERE class_id = ? AND teacher_id = ?";
+                    $sqlGradePercentage = "SELECT written, performance, exam, basegrade FROM section WHERE class_id = ? AND teacher_id = ?";
                     $stmtGradePercentage = $db->prepare($sqlGradePercentage);
                     $stmtGradePercentage->execute([$tc_id, $teacher_id]);
                     $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
@@ -349,6 +404,7 @@ $stmt->closeCursor();
                       $written = $result['written'];
                       $performance = $result['performance'];
                       $exam = $result['exam'];
+                      $basegrade = $result['basegrade'];
                       ?>
                       <div class="row">
                         <div class="col-12 mb-3">
@@ -368,10 +424,17 @@ $stmt->closeCursor();
                         </div>
                       </div>
                       <div class="row">
-                        <div class="col-12">
+                        <div class="col-12 mb-3">
                           <h4>Quarterly Assessment = <span>
                               <?php echo $exam ?>%
                             </span></h3>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12">
+                          <h4>Base Grade = <span>
+                              <?php echo $basegrade ?>
+                            </span></h4>
                         </div>
                       </div>
                       <?php
@@ -523,49 +586,62 @@ $stmt->closeCursor();
                                       $quizTitle = $title['title'];
                                       $examTitle = $title['title'];
 
-                                      $sqlQuestionScore = "SELECT gradeType, score, questionPoint FROM questiongrade 
-                                        WHERE student_id = ? AND questionTitle = ?";
-                                      $stmtQuestionScore = $db->prepare($sqlQuestionScore);
-                                      $stmtQuestionScore->execute([$student_id, $questionTitle]);
-                                      $questionScore = $stmtQuestionScore->fetch(PDO::FETCH_ASSOC);
+                                      $sqlTotalScores = "
+                                      (SELECT score, questionPoint AS point FROM questiongrade WHERE student_id = ?)
+                                      UNION ALL
+                                      (SELECT score, assignmentPoint AS point FROM assignmentgrade WHERE student_id = ?)
+                                      UNION ALL
+                                      (SELECT score, quizPoint AS point FROM quizgrade WHERE student_id = ?)
+                                      UNION ALL
+                                      (SELECT score, examPoint AS point FROM examgrade WHERE student_id = ?)
+                                      ";
+                                      $stmtTotalScores = $db->prepare($sqlTotalScores);
+                                      $stmtTotalScores->execute([$student_id, $student_id, $student_id, $student_id]);
+                                      $totalScores = $stmtTotalScores->fetchAll(PDO::FETCH_ASSOC);
 
-                                      $sqlAssignmentScore = "SELECT gradeType, score, assignmentPoint FROM assignmentgrade 
-                                          WHERE student_id = ? AND assignmentTitle = ?";
-                                      $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
-                                      $stmtAssignmentScore->execute([$student_id, $assignmentTitle]);
-                                      $assignmentScore = $stmtAssignmentScore->fetch(PDO::FETCH_ASSOC);
+                                      $totalScore = 0;
+                                      $totalPoints = 0;
 
-                                      $sqlQuizScore = "SELECT gradeType, score, quizPoint FROM quizgrade 
-                                      WHERE student_id = ? AND quizTitle = ?";
-                                      $stmtQuizScore = $db->prepare($sqlQuizScore);
-                                      $stmtQuizScore->execute([$student_id, $quizTitle]);
-                                      $quizScore = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+                                      foreach ($totalScores as $score) {
+                                        $totalScore += $score['score'];
+                                        $totalPoints += $score['point'];
 
-                                      $sqlExamScore = "SELECT score, examPoint FROM examgrade 
-                                      WHERE student_id = ? AND examTitle = ?";
-                                      $stmtExamScore = $db->prepare($sqlExamScore);
-                                      $stmtExamScore->execute([$student_id, $examTitle]);
-                                      $examScore = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+                                        $sqlGradePercentage = "SELECT written, performance, exam, basegrade FROM section
+                                        WHERE class_id = ? AND teacher_id = ?";
+                                        $stmtGradePercentage = $db->prepare($sqlGradePercentage);
+                                        $stmtGradePercentage->execute([$tc_id, $teacher_id]);
+                                        $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
 
-                                      $totalScore += isset($questionScore['score']) ? ($questionScore['score'] / $questionScore['questionPoint']) : 0;
-                                      $totalScore += isset($assignmentScore['score']) ? ($assignmentScore['score'] / $assignmentScore['assignmentPoint']) : 0;
-                                      $totalScore += isset($quizScore['score']) ? ($quizScore['score'] / $quizScore['quizPoint']) : 0;
-                                      $totalScore += isset($examScore['score']) ? ($examScore['score'] / $examScore['examPoint']) : 0;
+                                        $written = $result['written'];
+                                        $writtenPercentage = $written / 100;
 
-                                      $totalPoints += isset($questionScore['score']) ? 1 : 0;
-                                      $totalPoints += isset($assignmentScore['score']) ? 1 : 0;
-                                      $totalPoints += isset($quizScore['score']) ? 1 : 0;
-                                      $totalPoints += isset($examScore['score']) ? 1 : 0;
+                                        $performance = $result['performance'];
+                                        $performancePercentage = $performance / 100;
+
+                                        $exam = $result['exam'];
+                                        $examPercentage = $exam / 100;
+
+                                        $basegrade = $result['basegrade'];
+                                        $basegradeMinus = 100 - $basegrade;
+
+                                        $firstResult = ($basegradeMinus * $totalScore) / $totalPoints;
+                                        $finalResult = $firstResult + $basegrade;
+
+                                        $writtenResult = $finalResult * $writtenPercentage;
+                                        $performanceResult = $finalResult * $performancePercentage;
+                                        $examResult = $finalResult * $examPercentage;
+
+                                        $finalGrade = $writtenResult + $performanceResult + $examResult;
+                                      }
                                     }
-
-                                    $averageGrade = ($totalPoints > 0) ? ($totalScore / $totalPoints) : 0;
-                                    $percentage = $averageGrade * 100;
-                                    $color = ($percentage < 75) ? 'red' : 'green';
-
+                                    if (!empty($totalScores)) {
+                                      ?>
+                                      <td style="color: <?php echo $finalGrade < 75 ? 'red' : 'green'; ?>">
+                                        <?php echo floor($finalGrade) == $finalGrade ? number_format($finalGrade, 0) : number_format($finalGrade, 2); ?>
+                                      </td>
+                                      <?php
+                                    }
                                     ?>
-                                    <td style="color: <?php echo $color; ?>">
-                                      <?php echo number_format($percentage, 2) . '%'; ?>
-                                    </td>
                                   </tr>
                                   <?php
                                 }

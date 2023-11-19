@@ -340,12 +340,14 @@ $stmt->close();
               $class_id = $_GET['class_id'];
               ?>
               <a class="btn-success" href="course.php"><i class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-              <a href="class_course.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" class="people"
-                style="margin-left: 2vh;">Stream</a>
-              <a href="class_classwork.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" class="people">Classwork</a>
-              <a href="class_people.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" class="nav-link active">People</a>
-              <a href="class_grade.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>" 
-              class="people">Grade</a>
+              <a href="class_course.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>"
+                class="people" style="margin-left: 2vh;">Stream</a>
+              <a href="class_classwork.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>"
+                class="people">Classwork</a>
+              <a href="class_people.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>"
+                class="nav-link active">People</a>
+              <a href="class_grade.php?user_id=<?php echo $user_id ?>&class_id=<?php echo $class_id ?>&class_name=<?php echo $class_name ?>"
+                class="people">Grade</a>
               <?php
             }
             ?>
@@ -385,16 +387,24 @@ $stmt->close();
                       <?php
                       while ($student = $enrolled_students_result->fetch_assoc()) {
                         ?>
-                        <h4 class="mt-4 d-flex justify-content-between" style="margin-left: 20px; font-weight: normal;">
-                          <span>
-                            <?php echo strtoupper($student['student_firstname'] . ' ' . $student['student_lastname']); ?>
-                          </span>
-                          <a href="studentView_profile.php?user_id=<?php echo $student['student_id'] ?>" class="ml-auto mr-4 mb-2">
-                            <div data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="View Profile">
+                        <div class="d-flex justify-content-between align-items-center" style="padding: 3px;">
+                          <h4 class="" style="margin-left: 20px; font-weight: normal;">
+                            <span>
+                              <?php echo strtoupper($student['student_firstname'] . ' ' . $student['student_lastname']); ?>
+                            </span>
+                          </h4>
+                          <div class="d-flex">
+                            <a href="removeStudent.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>&student_id=<?php echo $student['student_id'] ?>" class="ml-2 mb-2" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                              data-bs-title="Remove Student">
+                              <i class="bi bi-person-dash-fill" style="color: red; font-size: 20px;"></i>
+                            </a>
+                            <a href="studentView_profile.php?user_id=<?php echo $student['student_id'] ?>"
+                              class="ml-3 mb-2" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                              data-bs-title="View Profile">
                               <i class="bi bi-person-circle" style="color: green; font-size: 20px;"></i>
-                            </div>
-                          </a>
-                        </h4>
+                            </a>
+                          </div>
+                        </div>
                         <hr class="divider" style="border-color: green;">
                         <?php
                       }

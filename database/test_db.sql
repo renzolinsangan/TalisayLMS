@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 16, 2023 at 11:37 PM
+-- Generation Time: Nov 19, 2023 at 04:35 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -52,7 +52,7 @@ INSERT INTO `assignmentgrade` (`assignmentGrade_id`, `assignmentTitle`, `student
 (12, 'Cell Energetics', 'Marco Luis', 'Hernandez', '2023-11-15', 'written', 20, 20, 37, 33, 39, 33),
 (15, 'Cell Model', 'Carl Justine', 'Aala', '2023-11-15', 'performance', 8, 20, 29, 33, 39, 32),
 (16, 'Cell Energetics', 'Martin Clarence', 'Guantes', '2023-11-16', 'written', 12, 20, 38, 33, 39, 33),
-(17, 'Cell Model', 'John Renzo', 'Linsangan', '2023-11-16', 'performance', 18, 20, 28, 33, 39, 32),
+(17, 'Cell Model', 'John Renzo', 'Linsangan', '2023-11-16', 'performance', 20, 20, 28, 33, 39, 32),
 (18, 'Cell Model', 'R.J.', 'Liwag', '2023-11-16', 'performance', 15, 20, 36, 33, 39, 32),
 (19, 'Cell Energetics', 'R.J.', 'Liwag', '2023-11-16', 'written', 10, 20, 36, 33, 39, 33);
 
@@ -322,15 +322,15 @@ CREATE TABLE `class_enrolled` (
 --
 
 INSERT INTO `class_enrolled` (`class_id`, `tc_id`, `class_name`, `section`, `subject`, `grade_level`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`, `student_id`, `student_firstname`, `student_lastname`, `date`, `archive_status`) VALUES
-(42, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J.', 'Liwag', '2023-09-07', ''),
 (43, 40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'Grade 11', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-09-07', 'archive'),
 (44, 41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'Grade 11', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-09-07', 'archive'),
 (46, 43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'Grade 11', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia', '2023-10-12', ''),
-(47, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 37, 'Marco Luis', 'Hernandez', '2023-11-16', ''),
-(48, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', '2023-11-16', ''),
-(49, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 38, 'Martin Clarence', 'Guantes', '2023-11-16', ''),
 (54, 45, 'STEM-Einstein - Oral Communication', 'Einstein', 'Oral Communication', 'Grade 11', 'STEM', 33, 'RchAh06', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-11-08', 'archive'),
-(56, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-11-16', '');
+(58, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-11-19', ''),
+(60, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J.', 'Liwag', '2023-11-19', ''),
+(61, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 38, 'Martin Clarence', 'Guantes', '2023-11-19', ''),
+(62, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 37, 'Marco Luis', 'Hernandez', '2023-11-19', ''),
+(64, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', '2023-11-19', '');
 
 -- --------------------------------------------------------
 
@@ -391,7 +391,7 @@ CREATE TABLE `examgrade` (
 INSERT INTO `examgrade` (`examGrade_id`, `examTitle`, `studentFirstName`, `studentLastName`, `date`, `score`, `examPoint`, `student_id`, `teacher_id`, `class_id`, `exam_id`) VALUES
 (2, 'Final Exam in General Biology', 'Marco Luis', 'Hernandez', '2023-11-15', 50, 50, 37, 33, 39, 1),
 (3, 'Final Exam in General Biology', 'R.J.', 'Liwag', '2023-11-15', 48, 50, 36, 33, 39, 1),
-(5, 'Final Exam in General Biology', 'John Renzo', 'Linsangan', '2023-11-17', 25, 50, 28, 33, 39, 1);
+(5, 'Final Exam in General Biology', 'John Renzo', 'Linsangan', '2023-11-17', 50, 50, 28, 33, 39, 1);
 
 -- --------------------------------------------------------
 
@@ -463,7 +463,7 @@ CREATE TABLE `news` (
 --
 
 INSERT INTO `news` (`news_id`, `title`, `type`, `name`, `date`, `track`, `start_date`, `end_date`, `detail`, `attachment`) VALUES
-(7, 'Smog O Vog', 'news', 'DOST_PHIVOLCS', '2023-11-12', 'all', '2023-11-12', '2023-11-13', 'Narito ang mga kaalaman tungkol sa Volcanic Smog o Vog at mga pamamaraan upang makaiwas sa panganib na dulot nito. \r\nAng vog ay isang uri ng polusyon sa hangin na sanhi ng mga bulkan. Binubo ito ng mga pinong patak na naglalaman ng volcanic gas tulad ng Sulfur Dioxide (SO2).\r\n• Ano ang Sulfur Dioxide o SO2?\r\nAng sulfur dioxide ay isang nakakalasong usok na maa-aring maka-apekto sa kalusugan ng tao at hayop, pati na rin sa mga halaman. Maaring ma expose ang isang indibidwal kung ito ay malalanghap o sa pamamagitan ng skin contact\r\n• Ano ang epekto ng vog?\r\nMaaring magdulot ito ng iritasyon sa mga mata, lalamunan at respiratory tract na maaaring maging malubha depende sa kosentrasyon o tagal ng pagkalanghap nito.\r\n• Sinu-sino ang mga sensitibo sa masamang epekto ng vog? \r\nMga may kondisyon sa kalusugan tulad ng hika, sakit sa baga at sakit sa puso. Matatanda, mga buntis at mga bata.\r\n• Ano ang dapat gawin?\r\nLimitahan ang pagkakalantad o exposure sa vog. Iwasan ang mga aktibidad sa labas o manatili na lamang sa loob ng bahay at isara ang mga bintana at pintuan upang maiwasang makapasok ang vog sa loob ng bahay.\r\n• Paano pu-protektahan ang sarili?\r\nMagsuot ng facemask o mas mabuti kung N95 facemasks o gas mask. Uminom ng maraming tubig upang maibsan ang iritasyon o paninikip ng daluyan ng paghinga. Kung kabilang sa mga sensitibong grupo, siguraduhing subaybayan ang inyong klagayan at magpatingin agad sa doktor o sa barangay health unit kung kinakailangan. Kung makakaranas ng matinding epekto, magpatingin agad sa doktor o sa barangay health unit.', 'picture_652681a2d64fd.jpg');
+(7, 'Smog O Vog', 'news', 'DOST_PHIVOLCS', '2023-11-12', 'all', '2023-11-12', '2023-11-21', 'Narito ang mga kaalaman tungkol sa Volcanic Smog o Vog at mga pamamaraan upang makaiwas sa panganib na dulot nito. \r\nAng vog ay isang uri ng polusyon sa hangin na sanhi ng mga bulkan. Binubo ito ng mga pinong patak na naglalaman ng volcanic gas tulad ng Sulfur Dioxide (SO2).\r\n• Ano ang Sulfur Dioxide o SO2?\r\nAng sulfur dioxide ay isang nakakalasong usok na maa-aring maka-apekto sa kalusugan ng tao at hayop, pati na rin sa mga halaman. Maaring ma expose ang isang indibidwal kung ito ay malalanghap o sa pamamagitan ng skin contact\r\n• Ano ang epekto ng vog?\r\nMaaring magdulot ito ng iritasyon sa mga mata, lalamunan at respiratory tract na maaaring maging malubha depende sa kosentrasyon o tagal ng pagkalanghap nito.\r\n• Sinu-sino ang mga sensitibo sa masamang epekto ng vog? \r\nMga may kondisyon sa kalusugan tulad ng hika, sakit sa baga at sakit sa puso. Matatanda, mga buntis at mga bata.\r\n• Ano ang dapat gawin?\r\nLimitahan ang pagkakalantad o exposure sa vog. Iwasan ang mga aktibidad sa labas o manatili na lamang sa loob ng bahay at isara ang mga bintana at pintuan upang maiwasang makapasok ang vog sa loob ng bahay.\r\n• Paano pu-protektahan ang sarili?\r\nMagsuot ng facemask o mas mabuti kung N95 facemasks o gas mask. Uminom ng maraming tubig upang maibsan ang iritasyon o paninikip ng daluyan ng paghinga. Kung kabilang sa mga sensitibong grupo, siguraduhing subaybayan ang inyong klagayan at magpatingin agad sa doktor o sa barangay health unit kung kinakailangan. Kung makakaranas ng matinding epekto, magpatingin agad sa doktor o sa barangay health unit.', 'picture_652681a2d64fd.jpg');
 
 -- --------------------------------------------------------
 
@@ -546,6 +546,7 @@ CREATE TABLE `section` (
   `written` int(11) NOT NULL,
   `performance` int(11) NOT NULL,
   `exam` int(11) NOT NULL,
+  `basegrade` int(11) NOT NULL,
   `teacher_id` int(11) NOT NULL,
   `class_code` varchar(11) NOT NULL,
   `first_name` varchar(50) NOT NULL,
@@ -557,14 +558,14 @@ CREATE TABLE `section` (
 -- Dumping data for table `section`
 --
 
-INSERT INTO `section` (`class_id`, `class_name`, `section`, `subject`, `strand`, `written`, `performance`, `exam`, `teacher_id`, `class_code`, `first_name`, `last_name`, `archive_status`) VALUES
-(39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 25, 50, 25, 33, 'ke1IPj7', 'Patrick', 'Star', ''),
-(40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'STEM', 25, 50, 25, 33, 'D6XDFLx', 'Patrick', 'Star', 'archive'),
-(41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'STEM', 25, 50, 25, 33, '3YzS3aC', 'Patrick', 'Star', 'archive'),
-(43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'TVL', 25, 50, 25, 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', ''),
-(45, 'STEM-Einstein - Oral Communication', 'Einstein', 'Oral Communication', 'STEM', 25, 50, 25, 33, 'RchAh06', 'Patrick', 'Star', 'archive'),
-(46, 'STEM-Newton - General Chemistry', 'Newton', 'General Chemistry', 'STEM', 25, 50, 25, 33, 'yAY1qt9', 'Patrick', 'Star', ''),
-(47, 'STEM Einstein - Science', 'Einstein', 'Science', 'STEM', 25, 50, 25, 33, 'mDnlUBK', 'Patrick', 'Star', '');
+INSERT INTO `section` (`class_id`, `class_name`, `section`, `subject`, `strand`, `written`, `performance`, `exam`, `basegrade`, `teacher_id`, `class_code`, `first_name`, `last_name`, `archive_status`) VALUES
+(39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 25, 50, 25, 60, 33, 'ke1IPj7', 'Patrick', 'Star', ''),
+(40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'STEM', 25, 50, 25, 60, 33, 'D6XDFLx', 'Patrick', 'Star', 'archive'),
+(41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'STEM', 25, 50, 25, 60, 33, '3YzS3aC', 'Patrick', 'Star', 'archive'),
+(43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'TVL', 25, 50, 25, 60, 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', ''),
+(45, 'STEM-Einstein - Oral Communication', 'Einstein', 'Oral Communication', 'STEM', 25, 50, 25, 60, 33, 'RchAh06', 'Patrick', 'Star', 'archive'),
+(46, 'STEM-Newton - General Chemistry', 'Newton', 'General Chemistry', 'STEM', 25, 50, 25, 60, 33, 'yAY1qt9', 'Patrick', 'Star', ''),
+(47, 'STEM Einstein - Science', 'Einstein', 'Science', 'STEM', 25, 50, 25, 60, 33, 'mDnlUBK', 'Patrick', 'Star', '');
 
 -- --------------------------------------------------------
 
@@ -715,7 +716,7 @@ CREATE TABLE `teacher` (
 --
 
 INSERT INTO `teacher` (`primary_id`, `user_id`, `teacher_id`, `name`, `date`) VALUES
-(7, 28, 33, 'Patrick H. Star', '2023-11-15');
+(8, 28, 33, 'Patrick H. Star', '2023-11-18');
 
 -- --------------------------------------------------------
 
@@ -1085,7 +1086,7 @@ ALTER TABLE `classwork_quiz`
 -- AUTO_INCREMENT for table `class_enrolled`
 --
 ALTER TABLE `class_enrolled`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `class_theme`
@@ -1169,7 +1170,7 @@ ALTER TABLE `student_quiz_course_answer`
 -- AUTO_INCREMENT for table `teacher`
 --
 ALTER TABLE `teacher`
-  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `primary_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `topic`

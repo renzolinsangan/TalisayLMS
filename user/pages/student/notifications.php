@@ -10,7 +10,7 @@ function getFullName($db, $user_id)
 
 function getNewsNotifications($db)
 {
-    $sql = "SELECT title, type, name, date FROM news";
+    $sql = "SELECT news_id, title, type, name, date, end_date FROM news";
     $stmt = $db->prepare($sql);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -65,7 +65,7 @@ if (!isset($_SESSION['id'])) {
                 $fullName = $row['firstname'] . ' ' . $row['lastname'];
                 $submissionDate = $row['date'];
                 ?>
-                <a class="dropdown-item preview-item">
+                <a href="feedback.php" class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
                     <div class="preview-icon bg-success">
                       <i class="ti-info-alt mx-0"></i>
@@ -90,7 +90,7 @@ if (!isset($_SESSION['id'])) {
 
                 if ($currentDate > $endDate) {
                   ?>
-                  <a class="dropdown-item preview-item">
+                  <a href="../announcement/announcement.php" class="dropdown-item preview-item">
                     <div class="preview-thumbnail">
                       <div class="preview-icon bg-danger">
                         <i class="ti-alarm-clock mx-0"></i>

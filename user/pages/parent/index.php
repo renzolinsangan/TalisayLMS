@@ -42,6 +42,7 @@ $stmt_department->close();
   <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/notification.css">
   <link rel="shortcut icon" href="images/trace.svg" />
 </head>
 
@@ -64,45 +65,44 @@ $stmt_department->close();
             <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
               aria-labelledby="notificationDropdown">
               <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-success">
-                    <i class="ti-info-alt mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Just now
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-warning">
-                    <i class="ti-settings mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">Settings</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    Private message
-                  </p>
-                </div>
-              </a>
-              <a class="dropdown-item preview-item">
-                <div class="preview-thumbnail">
-                  <div class="preview-icon bg-info">
-                    <i class="ti-user mx-0"></i>
-                  </div>
-                </div>
-                <div class="preview-item-content">
-                  <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                  <p class="font-weight-light small-text mb-0 text-muted">
-                    2 days ago
-                  </p>
-                </div>
-              </a>
+              <?php
+              include("config.php");
+
+              $sqlAnnounceNews = "SELECT news_id, title, name, type, date, end_date FROM NEWS";
+              $stmtAnnounceNews = $db->prepare($sqlAnnounceNews);
+              $stmtAnnounceNews->execute();
+              $resultAnnounceNews = $stmtAnnounceNews->fetchAll(PDO::FETCH_ASSOC);
+
+              foreach ($resultAnnounceNews as $news) {
+                $news_id = $news['news_id'];
+                $title = $news['title'];
+                $name = $news['name'];
+                $type = $news['type'];
+                $date = date('M d', strtotime($news['date']));
+                $end_date = $news['end_date'];
+                $current_date = date('Y-m-d H:i:s');
+
+                if ($current_date > $end_date) {
+                  header('Location: index.php');
+                  exit();
+                }
+                $link = ($type === 'news') ? 'news.php' : 'announcement.php';
+
+                echo '<a href="view_' . $link . '?news_id='. $news_id .'" class="dropdown-item preview-item">';
+                echo '<div class="preview-thumbnail">';
+                echo '<div class="preview-icon bg-success">';
+                echo '<i class="ti-info-alt mx-0"></i>';
+                echo '</div>';
+                echo '</div>';
+                echo '<div class="preview-item-content">';
+                echo '<h6 class="preview-subject font-weight-normal">' . $title . ' ' . $type . ' is posted</h6>';
+                echo '<p class="font-weight-light small-text mb-0 text-muted">';
+                echo 'In ' . $date . ' by ' . $name;
+                echo '</p>';
+                echo '</div>';
+                echo '</a>';
+              }
+              ?>
             </div>
           </li>
           <li class="nav-item nav-profile dropdown">
@@ -188,7 +188,7 @@ $stmt_department->close();
                   <?php
                   while ($row = mysqli_fetch_assoc($result)) {
                     ?>
-                    <a href="view_announcement.php?news_id=<?php $row['news_id'] ?>">
+                    <a href="view_announcement.php?news_id=<?php echo $row['news_id'] ?>">
                       <h3 style="margin-top: 2vh;">
                         <?php echo $row['title'] ?>
                       </h3>
@@ -226,7 +226,7 @@ $stmt_department->close();
                   <?php
                   while ($row = mysqli_fetch_assoc($result)) {
                     ?>
-                    <a href="view_news.php?news_id=<?php $row['news_id'] ?>">
+                    <a href="view_news.php?news_id=<?php echo $row['news_id'] ?>">
                       <h3 style="margin-top: 2vh;">
                         <?php echo $row['title'] ?>
                       </h3>
@@ -247,18 +247,18 @@ $stmt_department->close();
         </div>
       </div>
 
-  <script src="vendors/js/vendor.bundle.base.js"></script>
-  <script src="vendors/chart.js/Chart.min.js"></script>
-  <script src="vendors/datatables.net/jquery.dataTables.js"></script>
-  <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
-  <script src="js/dataTables.select.min.js"></script>
-  <script src="js/off-canvas.js"></script>
-  <script src="js/hoverable-collapse.js"></script>
-  <script src="js/template.js"></script>
-  <script src="js/settings.js"></script>
-  <script src="js/todolist.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/Chart.roundedBarCharts.js"></script>
+      <script src="vendors/js/vendor.bundle.base.js"></script>
+      <script src="vendors/chart.js/Chart.min.js"></script>
+      <script src="vendors/datatables.net/jquery.dataTables.js"></script>
+      <script src="vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
+      <script src="js/dataTables.select.min.js"></script>
+      <script src="js/off-canvas.js"></script>
+      <script src="js/hoverable-collapse.js"></script>
+      <script src="js/template.js"></script>
+      <script src="js/settings.js"></script>
+      <script src="js/todolist.js"></script>
+      <script src="js/dashboard.js"></script>
+      <script src="js/Chart.roundedBarCharts.js"></script>
 </body>
 
 </html>

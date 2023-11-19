@@ -36371,5 +36371,27 @@
       display: none;
     }
   }
+
+  @media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #print-content, #print-content * {
+        visibility: visible;
+    }
+
+    #print-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    @page {
+      size: landscape;
+    }
+
+}
   
-  /*# sourceMappingURL=../maps/vertical-layout-light/style.css.map */

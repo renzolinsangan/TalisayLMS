@@ -11393,22 +11393,6 @@
     color: #fff;
     background-color: rgba(255, 255, 255, 0.075);
   }
-
-  .table-responsive {
-    max-width: 100%; /* Adjust this width as needed */
-    overflow-x: auto;
-  }
-
-  table {
-    width: 100%; /* Set a fixed width for the table */
-    table-layout: fixed; /* Fix the table layout */
-    border-collapse: collapse; /* Collapse the table borders for a cleaner look */
-  }
-
-  table th, table td {
-    padding: 8px; /* Adjust the padding to control the cell gap */
-    border: 1px solid #e1e1e1; /* Add borders for cells */
-  }
   
   @media (max-width: 575.98px) {
     .table-responsive-sm {
@@ -36388,4 +36372,27 @@
     }
   }
 
+  @media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #print-content, #print-content * {
+        visibility: visible;
+    }
+
+    #print-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    @page {
+        size: landscape;
+    }
+  }
+  
+  
   /*# sourceMappingURL=../maps/vertical-layout-light/style.css.map */

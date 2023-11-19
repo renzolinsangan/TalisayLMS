@@ -64,7 +64,7 @@ if (!isset($_SESSION['id'])) {
                 $fullName = $row['firstname'] . ' ' . $row['lastname'];
                 $submissionDate = $row['date'];
                 ?>
-                <a class="dropdown-item preview-item">
+                <a href="../feedback/feedback.php" class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
                     <div class="preview-icon bg-success">
                       <i class="ti-info-alt mx-0"></i>
@@ -89,7 +89,7 @@ if (!isset($_SESSION['id'])) {
 
                 if ($currentDate > $endDate) {
                   ?>
-                  <a class="dropdown-item preview-item">
+                  <a href="announcement.php" class="dropdown-item preview-item">
                     <div class="preview-thumbnail">
                       <div class="preview-icon bg-danger">
                         <i class="ti-alarm-clock mx-0"></i>
@@ -216,8 +216,7 @@ if (!isset($_SESSION['id'])) {
                   <div class="col-md-12">
                     <div class="card-body">
                       <div class="table-responsive">
-                        <table id="example" class="table text-center"
-                          style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                        <table id="example" class="table text-center">
                           <thead class="table" style="background-color: #4BB543; color: white;">
                             <tr>
                               <th scope="col" style="text-align: center; overflow: hidden;">Title</th>
@@ -242,29 +241,29 @@ if (!isset($_SESSION['id'])) {
                             while ($row = mysqli_fetch_assoc($result)) {
                               ?>
                               <tr>
-                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                <td>
                                   <?php echo $row['title'] ?>
                                 </td>
-                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                <td>
                                   <?php echo $row['type'] ?>
                                 </td>
-                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                <td>
                                   <?php echo $row['name'] ?>
                                 </td>
-                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                <td>
                                   <?php echo $row['date'] ?>
                                 </td>
-                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                <td>
                                   <?php echo $row['track'] ?>
                                 </td>
-                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                <td>
                                   <?php echo $row['start_date'] ?>
                                 </td>
-                                <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                <td>
                                   <?php echo $row['end_date'] ?>
                                 </td>
                                 <td
-                                  style="padding: 3vh !imporant; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                  style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
                                   <?php echo $row['detail'] ?>
                                 </td>
                                 <td>

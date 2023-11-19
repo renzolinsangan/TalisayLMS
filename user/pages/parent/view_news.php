@@ -3,61 +3,37 @@ session_start();
 include("config.php");
 
 if (!isset($_SESSION['user_id'])) {
-  header("Location: ../../user_login.php");
+  header("Location:../../user_login.php");
   exit();
+}
+
+if (isset($_SESSION['user_id'])) {
+  $user_id = $_SESSION['user_id'];
 }
 
 $user_id = $_SESSION['user_id'];
 
-$sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+$sql = "SELECT profile FROM user_profile WHERE user_id = :user_id AND profile_status = 'recent'";
 $stmt = $db->prepare($sql);
-$stmt->execute([$user_id]);
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if ($row) {
-  $profile = $row['profile'];
-}
-
-$sql_children = "SELECT children FROM user_account WHERE user_id = ?";
-$stmt_children = $db->prepare($sql_children);
-$stmt_children->execute([$user_id]);
-$row = $stmt_children->fetch(PDO::FETCH_ASSOC);
-
-if ($row) {
-  $children = $row['children'];
-  $nameParts = explode(' ', $children);
-
-  if (count($nameParts) >= 2) {
-    $childFirstName = $nameParts[0] . ' ' . $nameParts[1];
-    $childLastName = $nameParts[2];
-
-    $sql_chosenChildren = "SELECT user_id, firstname, lastname FROM user_account WHERE firstname = ? AND lastname = ?";
-    $stmt_chosenChildren = $db->prepare($sql_chosenChildren);
-    $stmt_chosenChildren->execute([$childFirstName, $childLastName]);
-    $childRow = $stmt_chosenChildren->fetch(PDO::FETCH_ASSOC);
-
-    if ($childRow && isset($childRow['firstname']) && isset($childRow['lastname'])) {
-      $childrenID = $childRow['user_id'];
-      $childrenFirstName = $childRow['firstname'];
-      $childrenLastName = $childRow['lastname'];
-      $childrenFullName = $childrenFirstName . ' ' . $childrenLastName;
-    }
-  }
-}
+$stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+$stmt->execute();
+$profile = $stmt->fetch(PDO::FETCH_COLUMN);
+$stmt->closeCursor();
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<!-- Problem, wherein it only select one child-->
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Talisay Senior High School LMS User</title>
+  <title>Talisay Senior High School LMS</title>
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="assets/css/add_friend.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/feedback.css">
   <link rel="stylesheet" href="assets/css/notification.css">
   <link rel="shortcut icon" href="assets/image/trace.svg" />
 </head>
@@ -159,22 +135,6 @@ if ($row) {
             </a>
           </li>
           <li class="nav-item mb-3">
-            <a class="nav-link" data-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
-              <i class="menu-icon"><i class="bi bi-exclamation-triangle"></i></i>
-              <span class="menu-title">Grade Report</span>
-              <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="charts">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item" >
-                  <a class="nav-link" href="grade_report.php?user_id=<?php echo $childrenID ?>">
-                    <?php echo $childrenLastName ?>
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item mb-3">
             <a class="nav-link" href="feedback.php">
               <i class="menu-icon"><i class="bi bi-chat-right-quote"></i></i>
               <span class="menu-title">Feedbacks</span>
@@ -182,76 +142,76 @@ if ($row) {
           </li>
         </ul>
       </nav>
+      <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
-            <div class="col mb-3">
-              <h2>Children</h2>
-            </div>
-          </div>
-          <?php
-          include("config.php");
+            <div class="col mb-4">
+              <?php
+              include("db_conn.php");
 
-          $sql_selectChild = "SELECT * FROM user_account WHERE user_id = ?";
-          $stmt_selectChild = $db->prepare($sql_selectChild);
-          $result = $stmt_selectChild->execute([$childrenID]);
-          $childrenExist = false;
+              $sql_newsType = "SELECT type FROM news WHERE type = 'news'";
+              $result_newsType = mysqli_query($conn, $sql_newsType);
 
-          if ($result) {
-            $childrenExist = $stmt_selectChild->rowCount() > 0;
-            if($childrenExist) {
+              if ($row = mysqli_fetch_assoc($result_newsType)) {
+                $type = $row['type'];
+              }
               ?>
-              <div class="row">
-                <?php
-                while ($row = $stmt_selectChild->fetch(PDO::FETCH_ASSOC)) {
-  
-                  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                  $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                  $profile_result = $stmt_selectProfile->execute([$childrenID]);
-  
-                  $defaultProfile = "images/profile.png";
-  
-                  if ($profile_result) {
-                    $profile_row = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                    $otherProfile = !empty($profile_row['profile']) ? $profile_row['profile'] : $defaultProfile;
-                    ?>
-                    <div class="col-md-4 mb-4">
-                      <a href="grade_report.php?user_id=<?php echo $childrenID ?>" class="course">
-                        <div class="card card-tale justify-content-center align-items-center"
-                          style="background-image: url(../student/assets/image/user.png);">
-                          <div class="circle-image mt-4 mb-3">
-                            <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image"
-                              onerror="this.src='images/profile.png'">
-                          </div>
-                          <p class="text-body-secondary mb-4" style="font-size: 20px;">
-                            <?php echo $childrenFullName ?>
+              <h2 style="margin-left: 8px;">
+                <?php echo ucfirst($type) ?> Feed
+              </h2>
+              <p class="text-body-secondary" style="margin-left: 8px;">(From Talisay Senior High School)</p>
+              <span style="margin-left: 8px;">Go back to <a href="index.php"
+                  style="text-decoration: none; color: green;">homepage.</a></span>
+            </div>
+            <?php
+            include("db_conn.php");
+
+            $sql = "SELECT * FROM news WHERE type = 'news'";
+            $result = mysqli_query($conn, $sql);
+            ?>
+
+            <?php
+            while ($row = mysqli_fetch_assoc($result)) {
+              $title = $row['title'];
+              $name = $row['name'];
+              $date = $row['date'];
+              $detail = $row['detail'];
+              $attachment = $row['attachment'];
+              ?>
+              <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="card-body">
+                        <div class="feedback_header" style="margin-bottom: 4vh;">
+                          <h2>
+                            <?php echo $title ?>
+                          </h2>
+                          <p class="text-body-secondary" style="font-size: 20px;">by
+                            <?php echo $name ?>
+                          </p>
+                          <p class="text-body-secondary">Posted:
+                            <?php echo $date ?>
                           </p>
                         </div>
-                      </a>
+                        <div class="feedback_body">
+                          <p style="font-size: 17px;">
+                            <?php echo $detail ?>
+                          </p>
+                        </div>
+                        <img
+                          src="../../../admin/pages/announcement/assets/image/announcement_upload/<?php echo $attachment ?>"
+                          alt="News Image" class="img-fluid">
+                      </div>
                     </div>
-                    <?php
-                  }
-                }
-                ?>
-              </div>
-              <?php
-            }
-          }
-          if (!$childrenExist) {
-            ?>
-            <div class="row">
-              <div class="col-md-4">
-                <div class="card">
-                  <div class="card-body">
-                    <h3>You have no children.</h3>
-                    <p class="text-body-secondary">There is no registered account for your children, please proceed to feedback section to fix it.</p>
                   </div>
                 </div>
               </div>
-            </div>
-            <?php
-          }
-          ?>
+              <?php
+            }
+            ?>
+          </div>
         </div>
       </div>
     </div>

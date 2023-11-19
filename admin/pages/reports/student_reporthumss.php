@@ -64,7 +64,7 @@ if (!isset($_SESSION['id'])) {
                 $fullName = $row['firstname'] . ' ' . $row['lastname'];
                 $submissionDate = $row['date'];
                 ?>
-                <a class="dropdown-item preview-item">
+                <a href="../feedback/feedback.php" class="dropdown-item preview-item">
                   <div class="preview-thumbnail">
                     <div class="preview-icon bg-success">
                       <i class="ti-info-alt mx-0"></i>
@@ -89,7 +89,7 @@ if (!isset($_SESSION['id'])) {
 
                 if ($currentDate > $endDate) {
                   ?>
-                  <a class="dropdown-item preview-item">
+                  <a href="../announcement/announcement.php" class="dropdown-item preview-item">
                     <div class="preview-thumbnail">
                       <div class="preview-icon bg-danger">
                         <i class="ti-alarm-clock mx-0"></i>
@@ -206,8 +206,7 @@ if (!isset($_SESSION['id'])) {
                       <div class="col-md-12">
                         <div class="card-body">
                           <div class="table-responsive">
-                            <table id="example" class="table text-center"
-                              style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                            <table id="example" class="table text-center">
                               <thead class="table" style="background-color: #4BB543; color: white;">
                                 <tr>
                                   <th scope="col" style="text-align: center; overflow: hidden;">Student's Name</th>
@@ -228,25 +227,25 @@ if (!isset($_SESSION['id'])) {
                                 while ($row = mysqli_fetch_assoc($result)) {
                                   ?>
                                   <tr>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['firstname'] . ' ' . ucfirst(substr($row['middlename'], 0, 1)) . '. ' . $row['lastname']; ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['address']; ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['contact']; ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['email']; ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['grade_level'] ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo strtoupper($row['department']) ?>
                                     </td>
-                                    <td style="padding: 3vh !important; font-size: 14px; overflow: hidden;">
+                                    <td>
                                       <?php echo $row['section'] ?>
                                     </td>
                                   </tr>
@@ -282,28 +281,9 @@ if (!isset($_SESSION['id'])) {
     <script>
       const printBtn = document.getElementById('print');
 
-      // Function to prepare the content to be printed
-      function preparePrintContent() {
-        const content = document.createElement('div');
-        content.innerHTML = '<html><head><title>Print</title></head><body>';
-        content.innerHTML += document.getElementById('print-content').innerHTML;
-        content.innerHTML += '</body></html>';
-        return content;
-      }
-
       printBtn.addEventListener('click', function () {
-        // Prepare the content to be printed
-        const printContent = preparePrintContent();
-
-        // Create a new window
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(printContent.innerHTML);
-
-        // Close the document and trigger printing
-        printWindow.document.close();
-        printWindow.print();
-        printWindow.close();
-      });
+        print();
+      })
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"

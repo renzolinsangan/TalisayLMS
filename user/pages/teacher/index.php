@@ -10,6 +10,15 @@ include("db_conn.php");
 $teacher_id = $_SESSION['user_id'];
 $user_id = $_SESSION['user_id'];
 
+$sqlClass_id = "SELECT class_id FROM section WHERE teacher_id = ?";
+$stmtClass_id = $conn->prepare($sqlClass_id);
+$stmtClass_id->bind_param("i", $user_id);
+$stmtClass_id->execute();
+$stmtClass_id->bind_result($class_id);
+$stmtClass_id->fetch();
+$stmtClass_id->close();
+
+
 $sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
@@ -130,10 +139,32 @@ $stmt_department->close();
                     </div>
                     <div class="preview-item-content">
                       <?php if (isset($notification['title']) && isset($notification['type'])): ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <?php
+                        $link = '';
+
+                        $currentDate = new DateTime();
+                        $endDate = new DateTime($notification['end_date']);
+                        if ($currentDate > $endDate) {
+                          $link = 'index.php';
+                        } else {
+                          if ($notification['type'] === 'announcement') {
+                            $link = 'view_announcement.php' . $notification['news_id'];
+                          } elseif ($notification['type'] === 'news') {
+                            $link = 'view_news.php?news_id=' . $notification['news_id'];
+                          }
+                        }
+                        ?>
+                        <h6 class="preview-subject font-weight-normal"
+                          onclick="window.location.href='<?php echo $link; ?>';">
                           <?php echo $notification['title']; ?> (
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted"
+                        onclick="window.location.href='<?php echo $link; ?>';">
+                          by
+                          <?php echo $notification['name']; ?> on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
                       <?php elseif (isset($notification['student_id'])): ?>
                         <?php
                         $sqlStudentName = "SELECT firstname FROM user_account WHERE user_id = :user_id";
@@ -142,12 +173,19 @@ $stmt_department->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal" 
+                        onclick="window.location.href='student.php'">
                           You added
                           <?php echo $studentName; ?> as student.
                         </h6>
+                        <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='student.php'">
+                          on
+                          <?php echo date('F j', strtotime($notification['date'])); ?>
+                        </p>
                       <?php elseif (isset($notification['class_name'])): ?>
-                        <div class="preview-item-content">
+                        <div class="preview-item-content"
+                          onclick="window.location.href='class_people.php?class_id=<?php echo $notification['tc_id'] ?>'">
                           <h6 class="preview-subject font-weight-normal">
                             <?php echo $notification['student_firstname']; ?> joined from
                             <?php echo $notification['class_name']; ?>
@@ -165,11 +203,13 @@ $stmt_department->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                          <h6 class="preview-subject font-weight-normal"
+                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['question_course_status']; ?>
                           <?php echo $notification['title']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -182,11 +222,13 @@ $stmt_department->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['assignment_course_status']; ?>
                           <?php echo $notification['title']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -199,11 +241,13 @@ $stmt_department->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['quiz_course_status']; ?>
                           <?php echo $notification['quizTitle']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -216,22 +260,17 @@ $stmt_department->close();
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal">
+                        <h6 class="preview-subject font-weight-normal"
+                        onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['exam_course_status']; ?>
                           <?php echo $notification['examTitle']; ?>
-                          <p class="font-weight-light small-text mb-0 text-muted">
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
                         </h6>
-                      <?php endif; ?>
-                      <?php if (isset($notification['name'])): ?>
-                        <p class="font-weight-light small-text mb-0 text-muted">
-                          by
-                          <?php echo $notification['name']; ?> on
-                          <?php echo date('F j', strtotime($notification['date'])); ?>
-                        </p>
                       <?php endif; ?>
                     </div>
                   </a>
@@ -416,7 +455,7 @@ $stmt_department->close();
                   } else {
                     while ($row = mysqli_fetch_assoc($result)) {
                       ?>
-                      <a href="view_announcement.php?news_id=<?php $row['news_id'] ?>">
+                      <a href="view_announcement.php?news_id=<?php echo $row['news_id'] ?>">
                         <h3 style="margin-top: 2vh;">
                           <?php echo $row['title'] ?>
                         </h3>
@@ -460,7 +499,7 @@ $stmt_department->close();
                   } else {
                     while ($row = mysqli_fetch_assoc($result)) {
                       ?>
-                      <a href="view_news.php?news_id=<?php $row['news_id'] ?>">
+                      <a href="view_news.php?news_id=<?php echo $row['news_id'] ?>">
                         <h3 style="margin-top: 2vh;">
                           <?php echo $row['title'] ?>
                         </h3>
