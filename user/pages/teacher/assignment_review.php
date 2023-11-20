@@ -595,11 +595,7 @@ if (isset($_POST['assignmentGrade'])) {
                                   ?>
                                   <button type="submit" name="assignmentGrade" class="btn btn-success">Submit</button>
                                   <?php
-                                } else {
-                                  ?>
-                                  <button type="button" name="editGrade" class="btn btn-success">Edit</button>
-                                  <?php
-                                }
+                                } 
                                 ?>
                               </div>
                             </div>

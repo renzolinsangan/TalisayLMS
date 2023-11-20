@@ -152,7 +152,7 @@ $stmt->closeCursor();
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
                         <p class="font-weight-light small-text mb-0 text-muted"
-                        onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
+                          onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
                           by
                           <?php echo $notification['name']; ?> on
                           <?php echo date('F j', strtotime($notification['date'])); ?>
@@ -192,44 +192,35 @@ $stmt->closeCursor();
                           </div>
                         <?php else: ?>
                           <?php if ($notification['notification_type'] === 'material'): ?>
-                            <div class="material-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="material-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a material in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'question'): ?>
-                            <div class="question-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="question-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a question in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                            <div class="assignment-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="assignment-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted an assignment in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                            <div class="quiz-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="quiz-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a quiz in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                            <div class="exam-notification clickable"
-                            onclick="window.location.href='course.php'">
+                            <div class="exam-notification clickable" onclick="window.location.href='course.php'">
                               <h6 class="preview-subject font-weight-normal">
                                 <?php echo $teacherName; ?> posted an exam in
                                 <?php echo $notification['class_name']; ?>.
@@ -242,16 +233,14 @@ $stmt->closeCursor();
                           </p>
                         <?php endif; ?>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='course.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -261,8 +250,7 @@ $stmt->closeCursor();
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -272,8 +260,7 @@ $stmt->closeCursor();
                           <?php echo $notification['quizTitle']; ?>
                           (quiz).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -283,8 +270,7 @@ $stmt->closeCursor();
                           <?php echo $notification['examTitle']; ?>
                           (exam).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -367,7 +353,7 @@ $stmt->closeCursor();
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="header-sticky">
+        <div class="header">
           <div class="header-links" style="overflow-y: auto; white-space: nowrap;">
             <?php
             if (isset($_GET['class_id'])) {
@@ -386,7 +372,7 @@ $stmt->closeCursor();
         </div>
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-12" style="margin-top: 10vh;">
+            <div class="col-12">
               <div class="row">
                 <?php
                 include("db_conn.php");
@@ -970,12 +956,7 @@ $stmt->closeCursor();
 
                                   <ul class="dropdown-menu">
                                     <li>
-                                      <a class="dropdown-item"
-                                        href="edit_quiz.php?updateid=<?php echo $quiz_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
-                                    </li>
-                                    <li>
-                                      <a class="dropdown-item"
-                                        href="delete_quiz.php?deleteid=<?php echo $quiz_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                      <a class="dropdown-item" href="">Copy Link</a>
                                     </li>
                                   </ul>
                                 </div>
@@ -1054,12 +1035,7 @@ $stmt->closeCursor();
 
                                   <ul class="dropdown-menu">
                                     <li>
-                                      <a class="dropdown-item"
-                                        href="edit_exam.php?updateid=<?php echo $exam_id ?>&class_id=<?php echo $class_id ?>">Edit</a>
-                                    </li>
-                                    <li>
-                                      <a class="dropdown-item"
-                                        href="delete_exam.php?deleteid=<?php echo $exam_id ?>&class_id=<?php echo $class_id ?>">Delete</a>
+                                      <a class="dropdown-item" href="">Copy Link</a>
                                     </li>
                                   </ul>
                                 </div>

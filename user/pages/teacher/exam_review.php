@@ -31,7 +31,6 @@ $result = $stmt_selectExam->fetchAll(PDO::FETCH_ASSOC);
 foreach ($result as $examRow) {
   $examTitle = $examRow['examTitle'];
   $examInstruction = $examRow['examInstruction'];
-  $examLink = $examRow['examLink'];
   $examPoint = $examRow['examPoint'];
   $date = $examRow['date'];
   $examStatus = $examRow['examStatus'];
@@ -546,10 +545,6 @@ if (isset($_POST['examGrade'])) {
                                 if (empty($examScoreResult)) {
                                   ?>
                                   <button type="submit" name="examGrade" class="btn btn-success">Submit</button>
-                                  <?php
-                                } else {
-                                  ?>
-                                  <button type="button" name="editGrade" class="btn btn-success">Edit</button>
                                   <?php
                                 }
                                 ?>

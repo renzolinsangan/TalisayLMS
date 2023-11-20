@@ -7,6 +7,10 @@ if (!isset($_SESSION['user_id'])) {
   exit();
 }
 
+if (isset($_GET['class_id'])) {
+  $class_id = $_GET['class_id'];
+}
+
 $user_id = $_SESSION['user_id'];
 
 $sql = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
@@ -17,8 +21,29 @@ $stmt->bind_result($profile);
 $stmt->fetch();
 $stmt->close();
 
-if (isset($_GET['class_id'])) {
-  $class_id = $_GET['class_id'];
+$sqlName = "SELECT firstname, lastname FROM user_account WHERE user_id = ?";
+$stmtName = $conn->prepare($sqlName);
+$stmtName->bind_param("i", $user_id);
+$stmtName->execute();
+$stmtName->bind_result($firstname, $lastname);
+$stmtName->fetch();
+$stmtName->close();
+
+$sqlTCid = "SELECT tc_id FROM class_enrolled WHERE class_id = ? AND student_id = ?";
+$stmtTCid = $conn->prepare($sqlTCid);
+$stmtTCid->bind_param("ii", $class_id, $user_id);
+$stmtTCid->execute();
+$stmtTCid->bind_result($tc_id);
+$stmtTCid->fetch();
+$stmtTCid->close();
+
+function calculatePoints($results, $pointPerItem)
+{
+  $totalPoints = 0;
+  foreach ($results as $row) {
+    $totalPoints += $row['score'];
+  }
+  return $totalPoints * $pointPerItem;
 }
 ?>
 <!DOCTYPE html>
@@ -140,7 +165,7 @@ if (isset($_GET['class_id'])) {
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
                         <p class="font-weight-light small-text mb-0 text-muted"
-                        onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
+                          onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
                           by
                           <?php echo $notification['name']; ?> on
                           <?php echo date('F j', strtotime($notification['date'])); ?>
@@ -180,44 +205,35 @@ if (isset($_GET['class_id'])) {
                           </div>
                         <?php else: ?>
                           <?php if ($notification['notification_type'] === 'material'): ?>
-                            <div class="material-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="material-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a material in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'question'): ?>
-                            <div class="question-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="question-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a question in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                            <div class="assignment-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="assignment-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted an assignment in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                            <div class="quiz-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="quiz-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a quiz in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                            <div class="exam-notification clickable"
-                            onclick="window.location.href='course.php'">
+                            <div class="exam-notification clickable" onclick="window.location.href='course.php'">
                               <h6 class="preview-subject font-weight-normal">
                                 <?php echo $teacherName; ?> posted an exam in
                                 <?php echo $notification['class_name']; ?>.
@@ -230,16 +246,14 @@ if (isset($_GET['class_id'])) {
                           </p>
                         <?php endif; ?>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='course.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -249,8 +263,7 @@ if (isset($_GET['class_id'])) {
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -260,8 +273,7 @@ if (isset($_GET['class_id'])) {
                           <?php echo $notification['quizTitle']; ?>
                           (quiz).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -271,8 +283,7 @@ if (isset($_GET['class_id'])) {
                           <?php echo $notification['examTitle']; ?>
                           (exam).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -365,6 +376,71 @@ if (isset($_GET['class_id'])) {
                 </a>
               </div>
             </div>
+            <div class="col-md-12 mb-3">
+              <div class="card" style="padding: 20px;">
+                <div class="col">
+                  <h2>Progress Points</h2>
+                  <p class="text-body-secondary">(1000 points = 1 level)</p>
+                  <h3 class="mt-2">
+                    <?php echo $firstname . ' ' . $lastname ?>
+                  </h3>
+                </div>
+                <?php
+                $questionPoint = 10;
+                $assignmentPoint = 20;
+                $quizPoint = 40;
+                $examPoint = 50;
+
+                $sqlQuestionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND class_id = ?";
+                $stmtQuestionScore = $db->prepare($sqlQuestionScore);
+                $stmtQuestionScore->execute([$user_id, $tc_id]);
+                $questionScore = $stmtQuestionScore->fetchALL(PDO::FETCH_ASSOC);
+
+                $sqlAssignmentScore = "SELECT score FROM assignmentgrade WHERE student_id = ? AND class_id = ?";
+                $stmtAssignmentScore = $db->prepare($sqlAssignmentScore);
+                $stmtAssignmentScore->execute([$user_id, $tc_id]);
+                $assignmentScore = $stmtAssignmentScore->fetchAll(PDO::FETCH_ASSOC);
+
+                $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? ANd class_id = ?";
+                $stmtQuizScore = $db->prepare($sqlQuizScore);
+                $stmtQuizScore->execute([$user_id, $tc_id]);
+                $quizScore = $stmtQuizScore->fetchAll(PDO::FETCH_ASSOC);
+
+                $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND class_id = ?";
+                $stmtExamScore = $db->prepare($sqlExamScore);
+                $stmtExamScore->execute([$user_id, $tc_id]);
+                $examScore = $stmtExamScore->fetchall(PDO::FETCH_ASSOC);
+
+                $questionPoints = calculatePoints($questionScore, $questionPoint);
+                $assignmentPoints = calculatePoints($assignmentScore, $assignmentPoint);
+                $quizPoints = calculatePoints($quizScore, $quizPoint);
+                $examPoints = calculatePoints($examScore, $examPoint);
+
+                $overallPoints = $questionPoints + $assignmentPoints + $quizPoints + $examPoints;
+
+                $level = 1;
+                $pointsPerLevel = 1000;
+                
+                while ($overallPoints >= $level * $pointsPerLevel) {
+                    $level++;
+                }
+
+                $pointsInCurrentLevel = $overallPoints - (($level - 1) * $pointsPerLevel);
+                $progressPercentage = min(100, ($pointsInCurrentLevel / $pointsPerLevel) * 100);
+                ?>
+               <div class="col mt-2 d-flex justify-content-between">
+                  <h3 style="color: green;">Level <?php echo $level; ?> <span class="text-body-secondary">(
+                          <?php echo $overallPoints ?> Points)
+                      </span></h3>
+              </div>
+              <div class="col">
+                  <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="<?php echo $progressPercentage; ?>"
+                      aria-valuemin="0" aria-valuemax="100">
+                      <div class="progress-bar bg-success" style="width: <?php echo $progressPercentage; ?>%"></div>
+                  </div>
+              </div>
+              </div>
+            </div>
             <div class="col-12 grid-margin stretch-card">
               <div class="card position-relative">
                 <div class="card-body">
@@ -373,40 +449,41 @@ if (isset($_GET['class_id'])) {
                       <i class="bi bi-patch-question" style="font-size: 10vw; color: green; margin-right: 50px;"></i>
                     </div>
                     <div class="col-md-7">
-                    <h2 style="color: green;">Question Leaderboard Points <i class="bi bi-award-fill"
-                      style="font-size: 40px; color: green;"></i></h2>
-                  <p class="text-body-secondary mb-3" style="font-size: 17px;">(1 score = 10 points)</p>
-                  <?php
-                  $sqlQuestionScoreToPoints = "SELECT questionTitle, score, questionPoint from questiongrade WHERE student_id = ?";
-                  $stmtQuestionScoreToPoints = $db->prepare($sqlQuestionScoreToPoints);
-                  $stmtQuestionScoreToPoints->execute([$user_id]);
-                  $questionResults = $stmtQuestionScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
-
-                  if ($questionResults) {
-                    foreach ($questionResults as $row) {
-                      $questionTitle = $row['questionTitle'];
-                      $questionScore = $row['score'];
-                      $questionPoint = $row['questionPoint'];
-
-                      $questionLeaderboardPoint = $questionScore * 10;
-                      ?>
-                      <h4 class="mb-3">
-                        <?php echo $questionTitle ?> (
-                        <?php echo $questionScore ?> /
-                        <?php echo $questionPoint ?> ) =
-                        <?php echo $questionLeaderboardPoint ?> Leaderboard Points
-                      </h4>
+                      <h2 style="color: green;">Question Leaderboard Points <i class="bi bi-award-fill"
+                          style="font-size: 40px; color: green;"></i></h2>
+                      <p class="text-body-secondary mb-3" style="font-size: 17px;">(1 score = 10 points)</p>
                       <?php
-                    }
-                  } else {
-                    ?>
-                    <h3>There is no available question score to compute.</h3>
-                    <?php
-                  }
-                  ?>
-                </div>
+                      $sqlQuestionScoreToPoints = "SELECT questionTitle, score, questionPoint from questiongrade WHERE student_id = ?
+                  AND class_id = ?";
+                      $stmtQuestionScoreToPoints = $db->prepare($sqlQuestionScoreToPoints);
+                      $stmtQuestionScoreToPoints->execute([$user_id, $tc_id]);
+                      $questionResults = $stmtQuestionScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
+
+                      if ($questionResults) {
+                        foreach ($questionResults as $row) {
+                          $questionTitle = $row['questionTitle'];
+                          $questionScore = $row['score'];
+                          $questionPoint = $row['questionPoint'];
+
+                          $questionLeaderboardPoint = $questionScore * 10;
+                          ?>
+                          <h4 class="mb-3">
+                            <?php echo $questionTitle ?> (
+                            <?php echo $questionScore ?> /
+                            <?php echo $questionPoint ?> ) =
+                            <?php echo $questionLeaderboardPoint ?> Leaderboard Points
+                          </h4>
+                          <?php
+                        }
+                      } else {
+                        ?>
+                        <h3>There is no available question score to compute.</h3>
+                        <?php
+                      }
+                      ?>
                     </div>
                   </div>
+                </div>
               </div>
             </div>
             <div class="col-12 grid-margin stretch-card">
@@ -417,37 +494,38 @@ if (isset($_GET['class_id'])) {
                       <i class="bi bi-book" style="font-size: 10vw; color: green; margin-right: 50px;"></i>
                     </div>
                     <div class="col-md-7">
-                    <h2 style="color: green;">Assignment Leaderboard Points <i class="bi bi-award-fill"
-                      style="font-size: 40px; color: green;"></i></h2>
-                  <p class="text-body-secondary mb-3" style="font-size: 17px;">(1 score = 20 points)</p>
-                  <?php
-                  $sqlAssignmentScoreToPoints = "SELECT assignmentTitle, score, assignmentPoint from assignmentgrade WHERE student_id = ?";
-                  $stmtAssignmentScoreToPoints = $db->prepare($sqlAssignmentScoreToPoints);
-                  $stmtAssignmentScoreToPoints->execute([$user_id]);
-                  $assignmentResults = $stmtAssignmentScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
-
-                  if ($assignmentResults) {
-                    foreach ($assignmentResults as $row) {
-                      $assignmentTitle = $row['assignmentTitle'];
-                      $assignmentScore = $row['score'];
-                      $assignmentPoint = $row['assignmentPoint'];
-
-                      $assignmentLeaderboardPoint = $assignmentScore * 20;
-                      ?>
-                      <h4 class="mb-3">
-                        <?php echo $assignmentTitle ?> (
-                        <?php echo $assignmentScore ?> /
-                        <?php echo $assignmentPoint ?> ) =
-                        <?php echo $assignmentLeaderboardPoint ?> Leaderboard Points
-                      </h4>
+                      <h2 style="color: green;">Assignment Leaderboard Points <i class="bi bi-award-fill"
+                          style="font-size: 40px; color: green;"></i></h2>
+                      <p class="text-body-secondary mb-3" style="font-size: 17px;">(1 score = 20 points)</p>
                       <?php
-                    }
-                  } else {
-                    ?>
-                    <h3>There is no available assignment score to compute.</h3>
-                    <?php
-                  }
-                  ?>
+                      $sqlAssignmentScoreToPoints = "SELECT assignmentTitle, score, assignmentPoint from assignmentgrade WHERE student_id = ?
+                  AND class_id = ?";
+                      $stmtAssignmentScoreToPoints = $db->prepare($sqlAssignmentScoreToPoints);
+                      $stmtAssignmentScoreToPoints->execute([$user_id, $tc_id]);
+                      $assignmentResults = $stmtAssignmentScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
+
+                      if ($assignmentResults) {
+                        foreach ($assignmentResults as $row) {
+                          $assignmentTitle = $row['assignmentTitle'];
+                          $assignmentScore = $row['score'];
+                          $assignmentPoint = $row['assignmentPoint'];
+
+                          $assignmentLeaderboardPoint = $assignmentScore * 20;
+                          ?>
+                          <h4 class="mb-3">
+                            <?php echo $assignmentTitle ?> (
+                            <?php echo $assignmentScore ?> /
+                            <?php echo $assignmentPoint ?> ) =
+                            <?php echo $assignmentLeaderboardPoint ?> Leaderboard Points
+                          </h4>
+                          <?php
+                        }
+                      } else {
+                        ?>
+                        <h3>There is no available assignment score to compute.</h3>
+                        <?php
+                      }
+                      ?>
                     </div>
                   </div>
                 </div>
@@ -465,9 +543,10 @@ if (isset($_GET['class_id'])) {
                           style="font-size: 40px; color: green;"></i></h2>
                       <p class="text-body-secondary mb-3" style="font-size: 17px;">(1 score = 40 points)</p>
                       <?php
-                      $sqlQuizScoreToPoints = "SELECT quizTitle, score, quizPoint from quizgrade WHERE student_id = ?";
+                      $sqlQuizScoreToPoints = "SELECT quizTitle, score, quizPoint from quizgrade WHERE student_id = ?
+                      AND class_id = ?";
                       $stmtQuizScoreToPoints = $db->prepare($sqlQuizScoreToPoints);
-                      $stmtQuizScoreToPoints->execute([$user_id]);
+                      $stmtQuizScoreToPoints->execute([$user_id, $tc_id]);
                       $quizResults = $stmtQuizScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
 
                       if ($quizResults) {
@@ -509,9 +588,10 @@ if (isset($_GET['class_id'])) {
                           style="font-size: 40px; color: green;"></i></h2>
                       <p class="text-body-secondary" style="font-size: 17px;">(1 score = 50 points)</p>
                       <?php
-                      $sqlExamScoreToPoints = "SELECT examTitle, score, examPoint from examgrade WHERE student_id = ?";
+                      $sqlExamScoreToPoints = "SELECT examTitle, score, examPoint from examgrade WHERE student_id = ? AND
+                      class_id = ?";
                       $stmtExamScoreToPoints = $db->prepare($sqlExamScoreToPoints);
-                      $stmtExamScoreToPoints->execute([$user_id]);
+                      $stmtExamScoreToPoints->execute([$user_id, $tc_id]);
                       $examResults = $stmtExamScoreToPoints->fetchAll(PDO::FETCH_ASSOC);
 
                       if ($examResults) {

@@ -381,7 +381,7 @@ $stmt->close();
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="header-sticky">
+        <div class="header">
           <div class="header-links" style="overflow-y: auto; white-space: nowrap;">
             <?php
             if (isset($_GET['class_id'])) {
@@ -400,7 +400,7 @@ $stmt->close();
         </div>
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-12 grid-margin stretch-card" style="margin-top: 10vh;">
+            <div class="col-12 grid-margin stretch-card">
               <div class="card">
                 <div class="row">
                   <div class="col">

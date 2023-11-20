@@ -143,12 +143,15 @@ $quizScore = $stmtQuizScore->fetchColumn();
         $new_status = ($quizStatus === "missing") ? "turned-in late" : "turned in";
 
         $sqlQuiz = "INSERT INTO student_quiz_course_answer (quiz_id, quizTitle, quizLink, quizPoint, date, user_id, class_id,
-        teacher_id, quiz_course_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        teacher_id, quiz_course_status) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)";
         $stmtQuiz = $db->prepare($sqlQuiz);
-        $stmtQuiz->execute([$quiz_id, $quizTitle, $quizLink, $quizPoint, $date, $user_id, $class_id, $teacher_id, $new_status]);
+        $stmtQuiz->execute([$quiz_id, $quizTitle, $quizLink, $quizPoint, $user_id, $class_id, $teacher_id, $new_status]);
+
+        header("Location: quiz_course.php?class_id=$class_id&quiz_id=$quiz_id&user_id=$user_id");
       }
       ?>
-      <form class="assignment" action="" method="post">
+      <form class="assignment" action=""
+      method="post">
         <div class="row justify-content-left align-items-center mb-5" id="submit-card">
           <div class="col-md-8"></div>
           <div class="col-md-4 mt-5">
@@ -181,8 +184,8 @@ $quizScore = $stmtQuizScore->fetchColumn();
               <div class="row justify-content-center align-items-center mb-5">
                 <div class="d-grid gap-2 col-11 mx-auto">
                   <?php if ($quizCourseStatus == 'turned in' || $quizCourseStatus == 'turned-in late'): ?>
-                    <button class="btn btn-success" id="unsubmitButton" name="unsubmit" type="submit">
-                      Unsubmit</button>
+                    <button class="btn btn-success" type="submit">
+                      Quiz Submitted</button>
                   <?php else: ?>
                     <button class="btn btn-success" id="turnInButton" name="mark_done" type="submit">Mark as Done</button>
                   <?php endif; ?>

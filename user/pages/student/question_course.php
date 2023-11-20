@@ -239,6 +239,7 @@ $questionScore = $stmtQuestionScore->fetchColumn();
           $date,
           $new_status
         ]);
+        header("Location: question_course.php?class_id=$class_id&question_id=$question_id&user_id=$user_id");
       }
 
       $sql = "SELECT question_answer FROM student_question_course_answer WHERE class_id=? AND question_id=?";

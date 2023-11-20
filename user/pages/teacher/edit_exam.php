@@ -13,7 +13,28 @@ if (isset($_GET['class_id'])) {
 include("config.php");
 $teacher_id = $_SESSION['user_id'];
 
+$_SESSION['id'] = $_GET['updateid'];
+$id = $_SESSION['id'];
+
+$sql = "SELECT * FROM classwork_exam WHERE exam_id = ? AND class_id = ?";
+$stmt = $db->prepare($sql);
+$stmt->execute([$id, $class_id]);
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$examTitle = $result['examTitle'];
+$examInstruction = $result['examInstruction'];
+$class_name = $result['class_name'];
+$student = $result['student'];
+$examPoint = $result['examPoint'];
+$date = $result['date'];
+$dueDate = $result['dueDate'];
+$time = $result['time'];
+$classTopic = $result['classTopic'];
+
 if (isset($_POST['setExam'])) {
+  $class_id = $_GET['class_id'];
+  $teacher_id = $_SESSION['user_id'];
+  $exam_id = $_SESSION['id'];
   $examTitle = $_POST['title'];
   $examInstruction = $_POST['instruction'];
   $class_name = $_POST['class_name'];
@@ -23,27 +44,41 @@ if (isset($_POST['setExam'])) {
   $dueDate = $_POST['due_date'];
   $time = $_POST['time'];
   $classTopic = $_POST['class_topic'];
-  $examStatus = "assigned";
 
-  $sqlSetQuiz = "INSERT INTO classwork_exam (examTitle, examInstruction, class_name, student, examPoint, 
-  date, dueDate, time, classTopic, class_id, teacher_id, examStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  $stmtSetQuiz = $db->prepare($sqlSetQuiz);
-  $stmtSetQuiz->execute([
-    $examTitle,
-    $examInstruction,
-    $class_name,
-    $student,
-    $examPoint,
-    $date,
-    $dueDate,
-    $time,
-    $classTopic,
-    $class_id,
-    $teacher_id,
-    $examStatus
-  ]);
-  header("Location: class_classwork.php?class_id=$class_id");
-  exit;
+  $sql = "UPDATE classwork_exam 
+          SET examTitle = ?,
+              examInstruction = ?,
+              class_name = ?,
+              student = ?,
+              examPoint = ?,
+              date = ?,
+              dueDate = ?,
+              time = ?,
+              classTopic = ?
+          WHERE teacher_id = ? 
+          AND class_id = ? 
+          AND exam_id = ?";
+  $stmtupdate = $db->prepare($sql);
+
+  if ($stmtupdate) {
+    $stmtupdate->execute([
+      $examTitle,
+      $examInstruction,
+      $class_name,
+      $student,
+      $examPoint,
+      $date,
+      $dueDate,
+      $time,
+      $classTopic,
+      $teacher_id,
+      $class_id,
+      $exam_id
+    ]);
+
+    header("Location: class_classwork.php?class_id=$class_id");
+    exit();
+  }
 }
 ?>
 <!doctype html>
@@ -73,7 +108,7 @@ if (isset($_POST['setExam'])) {
         <div>
           <div class="btn-group">
             <button type="submit" id="setExam" name="setExam" class="btn btn-success"
-              style="margin-right: 3px; width: 15vh; margin-bottom: 10px;">Create</button>
+              style="margin-right: 3px; width: 15vh; margin-bottom: 10px;">Update</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
               style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
@@ -103,7 +138,7 @@ if (isset($_POST['setExam'])) {
               <div class="col-md-7 mb-4" style="margin-left: 3px;">
                 <div class="form-floating">
                   <textarea name="title" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Exam Title"></textarea>
+                    placeholder="Exam Title"><?php echo $examTitle ?></textarea>
                   <label for="floatingInput">Exam Title</label>
                 </div>
               </div>
@@ -115,7 +150,7 @@ if (isset($_POST['setExam'])) {
               <div class="col-md-10">
                 <div class="form-floating">
                   <textarea name="instruction" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Instructions" style="height: 200px;"></textarea>
+                    placeholder="Instructions" style="height: 200px;"><?php echo $examInstruction ?></textarea>
                   <label for="floatingInput">Instructions</label>
                 </div>
               </div>
@@ -173,14 +208,14 @@ if (isset($_POST['setExam'])) {
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Points</label>
               <div class="col-md-6 mb-4">
-                <input type="text" name="point" class="form-control" style="padding: 10px;">
+                <input type="text" name="point" class="form-control" style="padding: 10px;" value="<?php echo $examPoint ?>">
               </div>
             </div>
             <div class="row">
               <label class="text-body-secondary mb-3" style="font-size: 20px;">Due-date</label>
               <div class="col-md-14 mb-4">
                 <input type="date" name="due_date" id="due_date" class="form-control"
-                  min="<?php echo date('Y-m-d'); ?>">
+                  min="<?php echo date('Y-m-d'); ?>"  value="<?php echo $dueDate ?>">
               </div>
             </div>
             <div class="row">
@@ -201,10 +236,27 @@ if (isset($_POST['setExam'])) {
 
                   $sql = "SELECT class_topic FROM topic WHERE teacher_id=$teacher_id AND class_id=$class_id";
                   $result = mysqli_query($conn, $sql);
+                  $matchingOptionFound = false;
 
                   while ($row = mysqli_fetch_assoc($result)) {
                     $class_topic = $row['class_topic'];
-                    echo '<option value="' . $class_topic . '">' . $class_topic . '</option>';
+
+                    $sqlExamTopic = "SELECT classTopic FROM classwork_exam WHERE exam_id = $id AND class_id = $class_id";
+                    $stmtResultExamTopic = mysqli_query($conn, $sqlExamTopic);
+
+                    while ($rowExamTopic = mysqli_fetch_assoc($stmtResultExamTopic)) {
+                      $classTopicExam = $rowExamTopic['classTopic'];
+                      $selected = ($classTopicExam == $class_topic) ? 'selected' : '';
+
+                      if ($selected) {
+                        $matchingOptionFound = true;
+                      }
+                      echo '<option value="' . $class_topic . '" ' . $selected . '>' . $class_topic . '</option>';
+                    }
+                  }
+
+                  if (!$matchingOptionFound) {
+                    echo '<option value="" selected>No Topic</option>';
                   }
                   ?>
                 </select>

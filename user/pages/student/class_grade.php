@@ -370,7 +370,7 @@ $stmt->closeCursor();
       </nav>
       <!-- partial -->
       <div class="main-panel">
-        <div class="header-sticky" style="overflow-y: auto; white-space: nowrap;">
+        <div class="header" style="overflow-y: auto; white-space: nowrap;">
           <div class="header-links">
             <?php
             if (isset($_GET['class_id'])) {
@@ -387,7 +387,7 @@ $stmt->closeCursor();
             ?>
           </div>
         </div>
-        <div class="content-wrapper" style="margin-top: 10vh;">
+        <div class="content-wrapper">
           <div id="print-content">
             <div class="row">
               <div class="col-12 grid-margin stretch-card mb-4">

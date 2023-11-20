@@ -50,10 +50,6 @@ $stmt->closeCursor();
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
-  <!-- endinject -->
-  <!-- Plugin css for this page -->
-  <!-- End plugin css for this page -->
-  <!-- inject:css -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/class_course.css">
@@ -63,7 +59,6 @@ $stmt->closeCursor();
 
 <body>
   <div class="container-scroller">
-    <!-- partial:../../partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
@@ -328,7 +323,6 @@ $stmt->closeCursor();
         </button>
       </div>
     </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -374,7 +368,7 @@ $stmt->closeCursor();
         </ul>
       </nav>
       <div class="main-panel">
-        <div class="header-sticky" style="overflow-y: auto;">
+        <div class="header" style="overflow-y: auto;">
           <div class="header-links">
             <?php
             if (isset($_GET['class_id'])) {
@@ -393,7 +387,7 @@ $stmt->closeCursor();
         </div>
         <div class="content-wrapper">
           <div class="row">
-            <div class="col-12 grid-margin stretch-card" style="margin-top: 10vh;">
+            <div class="col-12 grid-margin stretch-card">
               <div class="card">
                 <div class="row">
                   <div class="col">
@@ -727,6 +721,12 @@ $stmt->closeCursor();
       integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
       crossorigin="anonymous"></script>
     <script src="../../vendors/js/vendor.bundle.base.js"></script>
+  <script src="../../js/off-canvas.js"></script>
+  <script src="../../js/hoverable-collapse.js"></script>
+  <script src="../../js/template.js"></script>
+  <script src="../../js/settings.js"></script>
+  <script src="../../js/todolist.js"></script>
+  <!-- endinject -->
 </body>
 
 </html>

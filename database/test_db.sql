@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 19, 2023 at 04:35 PM
+-- Generation Time: Nov 20, 2023 at 06:13 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -81,7 +81,8 @@ INSERT INTO `assignment_course_upload` (`assignment_course_upload_id`, `link`, `
 (97, 'https://scopegurdoninstitute.co.uk/digital-toolkit-1-investigate-the-cell-3d-model', '', 52, 28, 27, 'submitted'),
 (99, 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 49, 38, 33, 'submitted'),
 (100, 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 52, 28, 33, 'submitted'),
-(101, 'https://getbootstrap.com/docs/5.3/components/modal/', '', 45, 28, 32, '');
+(101, 'https://getbootstrap.com/docs/5.3/components/modal/', '', 45, 28, 32, ''),
+(111, 'https://www.facebook.com/', '', 58, 28, 33, 'submitted');
 
 -- --------------------------------------------------------
 
@@ -141,7 +142,6 @@ CREATE TABLE `classwork_exam` (
   `exam_id` int(11) NOT NULL,
   `examTitle` varchar(64) NOT NULL,
   `examInstruction` varchar(1000) NOT NULL,
-  `examLink` varchar(1000) NOT NULL,
   `class_name` varchar(64) NOT NULL,
   `student` varchar(1000) NOT NULL,
   `examPoint` int(11) NOT NULL,
@@ -158,8 +158,8 @@ CREATE TABLE `classwork_exam` (
 -- Dumping data for table `classwork_exam`
 --
 
-INSERT INTO `classwork_exam` (`exam_id`, `examTitle`, `examInstruction`, `examLink`, `class_name`, `student`, `examPoint`, `date`, `dueDate`, `time`, `classTopic`, `class_id`, `teacher_id`, `examStatus`) VALUES
-(1, 'Final Exam in General Biology', 'No cheating, please answer honestly. Good Luck on your exam class!', 'https://docs.google.com/forms/d/e/1FAIpQLSc0jl5ypYrj5NU8E05cAnb5QFZv3IxCd6nMyIg-s850bTbSVA/viewform?usp=sf_link', 'STEM-Einstein - General Biology', 'R.J Liwag,Marco Luis Hernandez,Carl Justine Aala,Martin Clarence Guantes,John Renzo Linsangan', 50, '2023-11-10', '2023-11-10', '11:59 PM', 'Exams', 39, 33, 'missing');
+INSERT INTO `classwork_exam` (`exam_id`, `examTitle`, `examInstruction`, `class_name`, `student`, `examPoint`, `date`, `dueDate`, `time`, `classTopic`, `class_id`, `teacher_id`, `examStatus`) VALUES
+(1, 'Final Exam in General Biology', 'No cheating, please answer honestly. Good Luck on your exam class, I wish you the best!', 'STEM-Einstein - General Biology', 'John Renzo Linsangan,R.J. Liwag,Martin Clarence Guantes,Marco Luis Hernandez,Carl Justine Aala', 50, '2023-11-20', '2023-11-20', '11:59 PM', 'Exams', 39, 33, 'missing');
 
 -- --------------------------------------------------------
 
@@ -324,13 +324,23 @@ CREATE TABLE `class_enrolled` (
 INSERT INTO `class_enrolled` (`class_id`, `tc_id`, `class_name`, `section`, `subject`, `grade_level`, `strand`, `teacher_id`, `class_code`, `first_name`, `last_name`, `student_id`, `student_firstname`, `student_lastname`, `date`, `archive_status`) VALUES
 (43, 40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'Grade 11', 'STEM', 33, 'D6XDFLx', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-09-07', 'archive'),
 (44, 41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'Grade 11', 'STEM', 33, '3YzS3aC', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-09-07', 'archive'),
-(46, 43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'Grade 11', 'TVL', 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia', '2023-10-12', ''),
 (54, 45, 'STEM-Einstein - Oral Communication', 'Einstein', 'Oral Communication', 'Grade 11', 'STEM', 33, 'RchAh06', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-11-08', 'archive'),
 (58, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 28, 'John Renzo', 'Linsangan', '2023-11-19', ''),
 (60, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 36, 'R.J.', 'Liwag', '2023-11-19', ''),
 (61, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 38, 'Martin Clarence', 'Guantes', '2023-11-19', ''),
 (62, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 37, 'Marco Luis', 'Hernandez', '2023-11-19', ''),
-(64, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', '2023-11-19', '');
+(64, 39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'Grade 11', 'STEM', 33, 'ke1IPj7', 'Patrick', 'Star', 29, 'Carl Justine', 'Aala', '2023-11-19', ''),
+(65, 48, 'TVL-ShangriLa - Information and Communications Tec', 'ShangriLa', 'Information and Communications Technology', 'Grade 11', 'TVL', 32, 'KNBFQcc', 'Spongebob', 'Squarepants', 31, 'Marissa Margarette', 'Garcia', '2023-11-20', ''),
+(66, 48, 'TVL-ShangriLa - Information and Communications Tec', 'ShangriLa', 'Information and Communications Technology', 'Grade 11', 'TVL', 32, 'KNBFQcc', 'Spongebob', 'Squarepants', 69, 'Precious Alliyah', 'Ramos', '2023-11-20', ''),
+(67, 48, 'TVL-ShangriLa - Information and Communications Tec', 'ShangriLa', 'Information and Communications Technology', 'Grade 11', 'TVL', 32, 'KNBFQcc', 'Spongebob', 'Squarepants', 71, 'Mnica Kate', 'Diego', '2023-11-20', ''),
+(68, 48, 'TVL-ShangriLa - Information and Communications Tec', 'ShangriLa', 'Information and Communications Technology', 'Grade 11', 'TVL', 32, 'KNBFQcc', 'Spongebob', 'Squarepants', 72, 'Marianne Mae ', 'Alvarez', '2023-11-20', ''),
+(69, 48, 'TVL-ShangriLa - Information and Communications Tec', 'ShangriLa', 'Information and Communications Technology', 'Grade 11', 'TVL', 32, 'KNBFQcc', 'Spongebob', 'Squarepants', 70, 'Leila', 'Macasinag', '2023-11-20', ''),
+(70, 48, 'TVL-ShangriLa - Information and Communications Tec', 'ShangriLa', 'Information and Communications Technology', 'Grade 11', 'TVL', 32, 'KNBFQcc', 'Spongebob', 'Squarepants', 68, 'Irene', 'Llona', '2023-11-20', ''),
+(71, 49, 'TVL-Macchiato - Information and Communications Tec', 'Macchiato', 'Information and Communications Technology', 'Grade 12', 'TVL', 32, 'dUTZrWs', 'Spongebob', 'Squarepants', 77, 'Ron James', 'Barrion', '2023-11-20', ''),
+(72, 49, 'TVL-Macchiato - Information and Communications Tec', 'Macchiato', 'Information and Communications Technology', 'Grade 12', 'TVL', 32, 'dUTZrWs', 'Spongebob', 'Squarepants', 74, 'Justine', 'Mendoza', '2023-11-20', ''),
+(73, 49, 'TVL-Macchiato - Information and Communications Tec', 'Macchiato', 'Information and Communications Technology', 'Grade 12', 'TVL', 32, 'dUTZrWs', 'Spongebob', 'Squarepants', 76, 'Josh', 'Centeno', '2023-11-20', ''),
+(74, 49, 'TVL-Macchiato - Information and Communications Tec', 'Macchiato', 'Information and Communications Technology', 'Grade 12', 'TVL', 32, 'dUTZrWs', 'Spongebob', 'Squarepants', 75, 'Johnrey', 'Ramillo', '2023-11-20', ''),
+(75, 49, 'TVL-Macchiato - Information and Communications Tec', 'Macchiato', 'Information and Communications Technology', 'Grade 12', 'TVL', 32, 'dUTZrWs', 'Spongebob', 'Squarepants', 73, 'Jhonlloyd', 'Casaul', '2023-11-20', '');
 
 -- --------------------------------------------------------
 
@@ -356,13 +366,21 @@ INSERT INTO `class_theme` (`theme_id`, `theme`, `class_id`, `teacher_id`, `class
 (20, 'theme8.jpg', 40, 33, 'STEM-Einstein - Basic Calculus', 'old'),
 (21, 'theme7.jpg', 41, 33, 'STEM-Einstein - Art Appreciation', 'recent'),
 (22, 'theme7.jpg', 39, 33, 'STEM-Einstein - General Biology', 'old'),
-(23, 'theme4.jpg', 39, 33, 'STEM-Einstein - General Biology', 'recent'),
+(23, 'theme4.jpg', 39, 33, 'STEM-Einstein - General Biology', 'old'),
 (24, 'theme7.jpg', 43, 32, 'TVL-ShangriLa - Mechanics', 'recent'),
 (25, 'theme9.jpg', 40, 33, 'STEM-Einstein - Basic Calculus', 'recent'),
 (26, 'theme8.jpg', 45, 33, 'STEM-D - Oral Communication', 'old'),
 (27, 'theme8.jpg', 45, 33, 'STEM-Einstein - Oral Communication', 'recent'),
-(28, 'theme5.jpg', 46, 33, 'STEM-Newton - General Chemistry', 'recent'),
-(29, 'theme8.jpg', 47, 33, 'STEM Einstein - Science', 'recent');
+(28, 'theme5.jpg', 46, 33, 'STEM-Newton - General Chemistry', 'old'),
+(29, 'theme8.jpg', 47, 33, 'STEM Einstein - Science', 'recent'),
+(30, 'theme8.jpg', 48, 32, 'TVL-ShangriLa - Information and Communications Tec', 'recent'),
+(31, 'theme5.jpg', 49, 32, 'TVL-Macchiato - Information and Communications Tec', 'recent'),
+(32, 'theme7.jpg', 39, 33, 'STEM-Einstein - General Biology', 'old'),
+(33, 'theme5.jpg', 39, 33, 'STEM-Einstein - General Biology', 'old'),
+(34, 'theme6.jpg', 39, 33, 'STEM-Einstein - General Biology', 'old'),
+(35, 'theme5.jpg', 39, 33, 'STEM-Einstein - General Biology', 'old'),
+(36, 'theme8.jpg', 39, 33, 'STEM-Einstein - General Biology', 'recent'),
+(37, 'theme7.jpg', 46, 33, 'STEM-Newton - General Chemistry', 'recent');
 
 -- --------------------------------------------------------
 
@@ -497,7 +515,7 @@ INSERT INTO `questiongrade` (`questionGrade_id`, `questionTitle`, `studentFirstN
 (15, 'Cell Biology', 'Marco Luis', 'Hernandez', '2023-11-15', 'written', 40, 40, 37, 33, 39, 21),
 (16, 'Cell Evolution', 'Marco Luis', 'Hernandez', '2023-11-15', 'written', 20, 20, 37, 33, 39, 23),
 (19, 'Cell Evolution', 'Martin Clarence', 'Guantes', '2023-11-16', 'written', 15, 20, 38, 33, 39, 23),
-(20, 'Cell Biology', 'R.J.', 'Liwag', '2023-11-16', 'written', 30, 40, 36, 33, 39, 21),
+(20, 'Cell Biology', 'R.J.', 'Liwag', '2023-11-16', 'written', 10, 40, 36, 33, 39, 21),
 (21, 'Cell Evolution', 'R.J.', 'Liwag', '2023-11-16', 'written', 18, 20, 36, 33, 39, 23);
 
 -- --------------------------------------------------------
@@ -562,10 +580,11 @@ INSERT INTO `section` (`class_id`, `class_name`, `section`, `subject`, `strand`,
 (39, 'STEM-Einstein - General Biology', 'Einstein', 'General Biology', 'STEM', 25, 50, 25, 60, 33, 'ke1IPj7', 'Patrick', 'Star', ''),
 (40, 'STEM-Einstein - Basic Calculus', 'Einstein', 'Basic Calculus', 'STEM', 25, 50, 25, 60, 33, 'D6XDFLx', 'Patrick', 'Star', 'archive'),
 (41, 'STEM-Einstein - Art Appreciation', 'Einstein', 'Art Apprecitiation', 'STEM', 25, 50, 25, 60, 33, '3YzS3aC', 'Patrick', 'Star', 'archive'),
-(43, 'TVL-ShangriLa - Mechanics', 'ShangriLa', 'Mechanics', 'TVL', 25, 50, 25, 60, 32, 'C1Qjhqd', 'Spongebob', 'Squarepants', ''),
 (45, 'STEM-Einstein - Oral Communication', 'Einstein', 'Oral Communication', 'STEM', 25, 50, 25, 60, 33, 'RchAh06', 'Patrick', 'Star', 'archive'),
 (46, 'STEM-Newton - General Chemistry', 'Newton', 'General Chemistry', 'STEM', 25, 50, 25, 60, 33, 'yAY1qt9', 'Patrick', 'Star', ''),
-(47, 'STEM Einstein - Science', 'Einstein', 'Science', 'STEM', 25, 50, 25, 60, 33, 'mDnlUBK', 'Patrick', 'Star', '');
+(47, 'STEM Einstein - Science', 'Einstein', 'Science', 'STEM', 25, 50, 25, 60, 33, 'mDnlUBK', 'Patrick', 'Star', ''),
+(48, 'TVL-ShangriLa - Information and Communications Tec', 'ShangriLa', 'Information and Communications Technology', 'TVL', 20, 50, 30, 60, 32, 'KNBFQcc', 'Spongebob', 'Squarepants', ''),
+(49, 'TVL-Macchiato - Information and Communications Tec', 'Macchiato', 'Information and Communications Technology', 'TVL', 20, 50, 30, 60, 32, 'dUTZrWs', 'Spongebob', 'Squarepants', '');
 
 -- --------------------------------------------------------
 
@@ -615,7 +634,8 @@ CREATE TABLE `student_assignment_course_answer` (
 
 INSERT INTO `student_assignment_course_answer` (`answer_assignment_id`, `assignment_course_upload_id`, `assignment_id`, `title`, `date`, `assignment_link`, `assignment_file`, `user_id`, `class_id`, `teacher_id`, `assignment_course_status`) VALUES
 (154, 99, 33, 'Cell Energetics', '2023-10-15', 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 38, 49, 33, 'turned-in late'),
-(155, 100, 33, 'Cell Energetics', '2023-10-15', 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 28, 52, 33, 'turned-in late');
+(155, 100, 33, 'Cell Energetics', '2023-10-15', 'https://www.khanacademy.org/science/ap-biology/cellular-energetics', '', 28, 52, 33, 'turned-in late'),
+(163, 0, 32, 'Cell Model', '2023-10-16', NULL, NULL, 28, 58, 33, 'turned-in late');
 
 -- --------------------------------------------------------
 
@@ -669,7 +689,7 @@ CREATE TABLE `student_question_course_answer` (
 INSERT INTO `student_question_course_answer` (`answer_question_id`, `question_id`, `point`, `title`, `date`, `question_answer`, `user_id`, `class_id`, `teacher_id`, `question_course_status`) VALUES
 (25, 21, 30, 'Cell Biology', '2023-10-15', 'Cell biology is the scientific discipline that investigates the structure, function, and behavior of cells, which are the fundamental units of life. It encompasses the study of various cellular processes, interactions, and the molecular mechanisms that underlie the functions of cells within living organisms. Cell biology is integral to understanding how life is organized and how organisms function at the cellular level.', 28, 52, 33, 'turned-in late'),
 (27, 21, 40, 'Cell Biology', '2023-10-15', 'Cell biology is a branch of biology that focuses on the study of cells, which are the basic structural and functional units of living organisms. It encompasses a wide range of topics related to cells, including their structure, function, physiology, and interactions. Cell biology explores how cells are organized, how they communicate with each other, and how they carry out various biological processes.', 38, 49, 33, 'turned-in late'),
-(29, 23, 20, 'Cell Evolution', '2023-10-24', 'What happens from cell evolution is that, cell evolution traces the development and diversification of cells, the fundamental units of life, over billions of years. All life shares a common ancestry, and cells have evolved from simple, early forms to more complex prokaryotic and eukaryotic structures. Genetic variation, driven by mutations, has played a central role, with natural selection favoring advantageous traits that enhance an organism\'s fitness and adaptation to its environment. This ongoing process has led to the emergence of new species and the diverse cellular structures and functions seen today. Molecular biology has shed light on the genetic and molecular changes that underlie cell evolution, and the endosymbiotic theory explains the origins of some cellular structures. Cell evolution is an integral part of the broader theory of biological evolution, illustrating the interconnectedness of all life on Earth.', 28, 52, 33, 'turned in');
+(31, 23, 20, 'Cell Evolution', '2023-10-24', 'What happens from cell evolution is that, cell evolution traces the development and diversification of cells, the fundamental units of life, over billions of years. All life shares a common ancestry, and cells have evolved from simple, early forms to more complex prokaryotic and eukaryotic structures. Genetic variation, driven by mutations, has played a central role, with natural selection favoring advantageous traits that enhance an organism\'s fitness and adaptation to its environment. This ongoing process has led to the emergence of new species and the diverse cellular structures and functions seen today. Molecular biology has shed light on the genetic and molecular changes that underlie cell evolution, and the endosymbiotic theory explains the origins of some cellular structures. Cell evolution is an integral part of the broader theory of biological evolution, illustrating the interconnectedness of all life on Earth.', 28, 58, 33, 'turned-in late');
 
 -- --------------------------------------------------------
 
@@ -695,7 +715,7 @@ CREATE TABLE `student_quiz_course_answer` (
 --
 
 INSERT INTO `student_quiz_course_answer` (`answer_quiz_id`, `quiz_id`, `quizTitle`, `quizLink`, `quizPoint`, `date`, `user_id`, `class_id`, `teacher_id`, `quiz_course_status`) VALUES
-(2, 15, 'Cell Biology Quiz', 'https://forms.gle/Ln2Mf75r5EU62BDM6', 10, '2023-11-10', 28, 56, 33, 'turned in');
+(10, 15, 'Cell Biology Quiz', 'https://forms.gle/Ln2Mf75r5EU62BDM6', 10, '2023-11-20', 28, 58, 33, 'turned in');
 
 -- --------------------------------------------------------
 
@@ -804,7 +824,45 @@ INSERT INTO `user_account` (`user_id`, `username`, `password`, `email`, `address
 (37, 'marcoluis', '$2y$10$yXO0x1CyK/zWzgUU4XFr/.6KJcVqHQ8Vs.CGxcSMmxZVAh6vDkQnW', 'marcoluishernandez@gmail.com', 'San Luis, Batangas', '09543221548', 'Marco Luis', 'S', 'Hernandez', 'Grade 11', 'stem', 'Einstein', '', 'student', NULL, NULL),
 (38, 'martinclarence', '$2y$10$h2.Fn78znTIT.Vp.833hn.adR7e/reV.8rkpBa9GcIAxGm/rl.s56', 'martinclarensyo@gmail.com', 'San Miguel, Sto. Tomas, Batangas', '09485377283', 'Martin Clarence', 'O', 'Guantes', 'Grade 11', 'stem', 'Einstein', '', 'student', NULL, NULL),
 (39, 'rickylinsangan', '$2y$10$Iipff.OyvD2UR.BgjNpiWO0BCOyxAXW.ygsn7aqbxZ0zS.AhrsEZa', 'rickylinsangan18@yahoo.com', 'Block 3 Lot 44, Croatia St. Lynville Subdv. Purok 3, Latag, Lipa City, Batangas', '09352162476', 'Ricardo', 'Espino', 'Linsangan', '', '', '', 'John Renzo Linsangan', 'parent', NULL, NULL),
-(40, 'studentsample', '$2y$10$wy7J3anVvF3sN38SCPAwaeLhJCUsSQNQd4cio6I6R.POwFjTs0VmK', 'sample@gmail.com', 'sample', '09111111111', 'sample', 'sample', 'sample', 'Grade 11', 'stem', 'Einstein', '', 'student', NULL, NULL);
+(41, 'JMcacao', '$2y$10$4iUxyefCljlEuLA4NTpjZ.mI4XMw0LjPsxnLHClGoFWY0c7bpP3YC', 'jmcacao@gmail.com', 'Aya Talisay, Batangas', '09519226984', 'Jm Kerby', 'Doctora', 'Cacao', 'Grade 11', 'humss', 'Hemingway', '', 'student', NULL, NULL),
+(42, 'liwagarchiee', '$2y$10$b0gXV9ayfSmLE4Rc2AJ/EOKIq9L5uc0g6PjYoAlt3nrh3uKo1Y4eW', 'archieliwag09@gmail.com', 'Aya Talisay, Batangas', '09093251053', 'Archie', 'Caguicla', 'Liwag', 'Grade 12', 'humss', 'Herodotus', '', 'student', NULL, NULL),
+(43, 'arahbella', '$2y$10$oggP5TO2ccdlM.OAUAgJGOhHUq00IwMUJ6VemYHpOiiAZPsHjwtpy', 'arahbella_17@gmail.com', 'Aya Talisay, Batangas', '09485734003', 'Arah Bella', 'Castillo', 'Landicho', 'Grade 11', 'humss', 'Hemingway', '', 'student', NULL, NULL),
+(44, 'Rosemarie', '$2y$10$Chnqj5nmiEzU3mOKpPlQeu5RQJMfRZqtrwLHRjuGWjw0dkwd7S0tm', 'mendoza.rosemarie@gmail.com', 'Zone 7 Talisay, Batangas', '09094826732', 'Rosemarie', 'Santillan', 'Mendoza', 'Grade 11', 'humss', 'Hemingway', '', 'student', NULL, NULL),
+(45, 'johnjoshua', '$2y$10$RshMb84U.gtEaxOs3/noZu0Mf7dEnyuR22VAmDoj8Ri5O4.S7pHUS', 'joshua_lapade@gmail.com', 'Ambulong Tanauan City, Batangas', '09750023348', 'John Joshua', 'Arante', 'Lapade', 'Grade 11', 'humss', 'Hemingway', '', 'student', NULL, NULL),
+(46, 'nicoleanillo', '$2y$10$oC.f4xxlJZvnOeSyohVc7.VQ01KKsPTYf11zsQ/ukl.l.J0Trswq.', 'Trixnicole.anillo@gmail.com', 'Zone 3 Talisay, Batangas', '09097456633', 'Trixie Nicole', 'Anillo', 'Malabanan', 'Grade 11', 'humss', 'Hemingway', '', 'student', NULL, NULL),
+(47, 'Edward0', '$2y$10$BDDBrTEdA18Ygpzwz5DyauAfjJ5Rr.OwA8jdmscwoNVvtbVOCCDje', 'edwardjames@gmail.com', 'Aya Talisay, Batangas', '09245505823', 'James Edward', 'Dia', 'Anillo', 'Grade 12', 'humss', 'Herodotus', '', 'student', NULL, NULL),
+(48, 'kristelaaa', '$2y$10$fuiPjwPL9H3tRLaYUQH2iO/Z/4t1nQ4uMRZV1XrYrukiq9qCMEZPy', 'imkristel@gmail.com', 'Tumaway Talisay, Batangas', '09495280023', 'Kristel', 'Arante', 'Reyes', 'Grade 12', 'humss', 'Herodotus', '', 'student', NULL, NULL),
+(49, 'crizeldame', '$2y$10$SHAmqBNO7Bomxf8uDuSlfu7VONVXNjqVzP2FSp1iqyO82JdvJzFSW', 'criselda_atienza@gmail.com', 'Tumaway Talisay, Batangas', '09852745502', 'Criselda', 'Ishia', 'Atienza', 'Grade 12', 'humss', 'Herodotus', '', 'student', NULL, NULL),
+(50, 'sofieee', '$2y$10$EDtPMp6VHdAVWl2ve94hFehLwl/xYqSiXHE66wdqS3nb7./SHoTm2', 'sofia_smith18@gmail.com', 'Tumaway Talisay, Batangas', '09058452231', 'Sofia', 'Quiones', 'Smith', 'Grade 12', 'humss', 'Herodotus', '', 'student', NULL, NULL),
+(51, 'rhea.17', '$2y$10$Cdm9qzGxdGOkT824DRfsz.27Yd9Vf6W2pzq/GgcywmLIlnjZymSXK', 'panganibanrhea@gmail.com', 'Purok 4, Ambuong Tanauan City, Batangas', '09289500781', 'Rhea', 'Luciano', 'Panganiban', 'Grade 11', 'abm', 'Pacioli', '', 'student', NULL, NULL),
+(52, 'johnpaul', '$2y$10$YmaeQlu3vfPlvZa9uzmw0emaGoVrMU12nVejdSF.ammHWoFK5Hzyy', 'pauljohn@gmail.com', 'Aya Talisay, Batangas', '09054332502', 'JohnPaul', 'Aala', 'Carolino', 'Grade 12', 'abm', 'Fayol', '', 'student', NULL, NULL),
+(53, 'judyann', '$2y$10$nl6LICfI8TlFMdgf2dGtn.7IZb.noi1yzv9iSCa/L4PlX.yKcePfy', 'judy_ann@gmail.com', 'Tumaway Talisay, Batangas', '09858900471', 'Judyann', 'Castillo', 'Samiano', 'Grade 12', 'abm', 'Fayol', '', 'student', NULL, NULL),
+(54, 'Jamescarlo13', '$2y$10$DG0rqbGqHSjif8zZxOBjWO6fbNl80R0j4hXXDJYrR5tiBGfO3VvdG', 'jamescarlo_13@gmail.com', 'Aya Talisay, Batangas', '09106452235', 'James Carlo', 'Samiano', 'Velanzuela', 'Grade 11', 'abm', 'Pacioli', '', 'student', NULL, NULL),
+(55, 'Apriljoy', '$2y$10$xo0vUcEl3TYQg4.a.qLiMO5EVp6bz3OJ4llMhxPk6KuAtStkmXdH.', 'apriljoy_alvarez@gmail.com', 'Ambulong Tanauan City, Batangas', '09454334207', 'April Joy', 'Panal', 'Alvarez', 'Grade 12', 'abm', 'Fayol', '', 'student', NULL, NULL),
+(56, 'Ericamae16', '$2y$10$Fl3ZfKmb5Ek1Va4ArNQBhewCSrtCY9Ni9mFXSyX9mcEg4Pkd0QlSi', 'erica.mae16@gmail.com', 'Aya Talisay, Batangas', '09324875661', 'Erica Mae', 'Arante', 'Salioman', 'Grade 12', 'abm', 'Fayol', '', 'student', NULL, NULL),
+(57, 'Maryjane24', '$2y$10$7S1yyjo5RNUUCtwP7PrhROoJbi67EgjDX1yglCYu7glMW1tsnKkaO', 'maryjane_brazil@gmail.com', 'Tumaway Talisay, Batangas', '09076054169', 'Maryjane', 'Panganiban', 'Brazil', 'Grade 11', 'abm', 'Pacioli', '', 'student', NULL, NULL),
+(58, 'princessjasmine', '$2y$10$kuzYjxIu.JL5PqAf7o0h9eU3Zez71qaHBiMkolV4PFqpAnHzqf1di', 'princessjas.narvaez@gmail.com', 'Ambulong Tanauan City, Batangas', '09825440452', 'Princess Jasmine', 'Alonzo', 'Narvaez', 'Grade 12', 'abm', 'Fayol', '', 'student', NULL, NULL),
+(59, 'jelyanne', '$2y$10$UuWElaQPKs1LCXZ9tqkAAO4yOWtE1lyoKGBMXTy0JV2a/voGsQOkS', 'jelyanne@gmail.com', 'Zone 4 Talisay, Batangas', '09056524338', 'Jelly Anne', 'Salvador', 'Anciado', 'Grade 11', 'abm', 'Pacioli', '', 'student', NULL, NULL),
+(60, 'ayeishaaaa', '$2y$10$imNNKRbSOpRdLpnVhOYcLuTgkCgxt0qqvnOPbAQ7b4UPnRhtYOu4O', 'ayeisha.jane@gmail.com', 'Ambulong Tanauan City, Batangas', '09498255056', 'Ayeisha Jane', 'Genes', 'Perez', 'Grade 11', 'abm', 'Pacioli', '', 'student', NULL, NULL),
+(61, 'carlodizon', '$2y$10$1LYsA.a9oaVai.yfOoNAse1DEYkunvx/zsGu5uopY3ZLUXY32eTsy', 'Carlo_dizon@gmail.com', 'Tumaway Talisay, Batangas', '09185641284', 'John Carlo', 'Caguicla', 'Dizon', 'Grade 11', 'stem', 'Einstein', '', 'student', NULL, NULL),
+(62, 'jedrickliwanag', '$2y$10$UCeXyFzo.qvObvin.4SifuzGE4LxMKN4IPchfBqorLmm8/ZAOD1zS', 'Jeds.vil@gmail.com', 'Sta. Maria Talisay, Batangas', '09163365224', 'Jedrick', 'Liwanag', 'Villanueva', 'Grade 12', 'stem', 'Edison', '', 'student', NULL, NULL),
+(63, 'markgerochii', '$2y$10$gyYvv.CvKymk6mXM.gKvWenJU2wiVPZoquioz0KokrLfO0bgInATO', 'Markgerochii@gmail.com', 'Zone 4 Talisay, Batangas', '09504450122', 'Mark', 'Gil', 'Gerochi', 'Grade 12', 'stem', 'Edison', '', 'student', NULL, NULL),
+(64, 'angelaclan', '$2y$10$FRsb0mpGdLze2hhJ8n7Sqe9aOYZUMCSn6UlpTrllsjg7R/n94bNq6', 'Angelaclan33@gmail.com', 'Zone 6 Talisay, Batangas', '09173365289', 'Angel Jeremiah', 'Perez', 'Aclan', 'Grade 12', 'stem', 'Edison', '', 'student', NULL, NULL),
+(65, 'sherinemendoza', '$2y$10$o5GvkAqfGJIRhyVfqvQpWecikuBzvRcUn9CJmdEJWqQydZJjTTlqu', 'Sherine.Mendoza22@gmail.com', 'Banga Talisay, Batangas', '09196631258', 'Sherine', 'Laurel', 'Mendoza', 'Grade 12', 'stem', 'Edison', '', 'student', NULL, NULL),
+(66, 'jilmatibag', '$2y$10$k/ROclOPFdevL5KI3PTbq.Sco8Eu8j0.VPE2YydCRcX107giT1Uku', 'jilmatibag14@gmail.com', 'Zone 1 Talisay, Batangas', '09105647899', 'Jillian', 'Mutoc', 'MatibagHuerto', 'Grade 12', 'stem', 'Edison', '', 'student', NULL, NULL),
+(67, 'jusmendoza', '$2y$10$3Tzrs9ys0FUJLBSR58YuW.NwWQM4TsIuUlC/LsAlwgDnZSxtGv5N2', 'jusmendoza43@gmail.com', 'Quiling Talisay, Batangas', '09324416875', 'Eugine', 'Huerto', 'Marquez', 'Grade 12', 'stem', 'Edison', '', 'student', NULL, NULL),
+(68, 'irenellon', '$2y$10$L8sxnPKwNx29e3XttzS3bemfB.JSi9yFL6XJhc.n7FMobBtx7T4NS', 'Irenellon03@gmail.com', 'Tumaway Talisay, Batangas', '09395562254', 'Irene', 'Mendoza', 'Llona', 'Grade 11', 'tvl', 'ShangriLa', '', 'student', NULL, NULL),
+(69, 'alliramos', '$2y$10$opxISbDp8G75vUd550p5TuXpLr.UlGqVevpt1MTvd9qLA2PKqY7Qm', 'AlliRamos@gmail.com', 'Tanauan City, Batangas', '09201254458', 'Precious Alliyah', 'Marasigan', 'Ramos', 'Grade 11', 'tvl', 'ShangriLa', '', 'student', NULL, NULL),
+(70, 'leilei12', '$2y$10$ekwGsASjNRCUIHipql4q7Oo53uJnwd0rcA4N2pPz8pLfkcQqdsxRy', 'leilei12@gmail.com', 'Aya Talisay, Batangas', '09504450122', 'Leila', 'Enriquez', 'Macasinag', 'Grade 11', 'tvl', 'ShangriLa', '', 'student', NULL, NULL),
+(71, 'zebmonica', '$2y$10$9dAX.dbN4pc8d3WLZi1gbepL3jsiT6UJ4WJN7Jx.OOF/x50xxMYPW', 'zebmonica14@gmail.com', 'Zone 6 Talisay, Batangas', '09995546385', 'Mnica Kate', 'Amigo', 'Diego', 'Grade 11', 'tvl', 'ShangriLa', '', 'student', NULL, NULL),
+(72, 'maemae554', '$2y$10$gca9a0lEXZP1LdftxWzNjeu741vgTSoD053qnkZAGCRozcE1X9/xO', 'Maemae554@gmail.com', 'Banga Talisay, Batangas', '09195936421', 'Marianne Mae ', 'Marasigan', 'Alvarez', 'Grade 11', 'tvl', 'ShangriLa', '', 'student', NULL, NULL),
+(73, 'jhonlloydcasaul1', '$2y$10$EUWX2UAceGrkrxs4Jk18Bunocgh1ONDAYKGvM1k0p1GH0BLq8LDQO', 'jhonlloydcasaul1@gmail.com', 'Zone 1 Talisay, Batangas', '09103384215', 'Jhonlloyd', 'Encina', 'Casaul', 'Grade 12', 'tvl', 'Macchiato', '', 'student', NULL, NULL),
+(74, 'jusmendoza43', '$2y$10$gYni0Q2T0OFjTBiCwruQrO.7j2JTxiUA3TR56hNrvGB0.NRqS0AXi', 'jusmendoza42@gmail.com', 'Quiling Talisay, Batangas', '09324416875', 'Justine', 'Cacao', 'Mendoza', 'Grade 12', 'tvl', 'Macchiato', '', 'student', NULL, NULL),
+(75, 'jramillo11', '$2y$10$UALnXx4fXQBf6dAFJQfr9eV9mxJ9r8HRrJ5dybQc6Hltk8pXPKlGy', 'jramillo11@gmail.com', 'Quiling Talisay, Batangas', '09301886423', 'Johnrey', 'Tenorio', 'Ramillo', 'Grade 12', 'tvl', 'Macchiato', '', 'student', NULL, NULL),
+(76, 'joshmvp123', '$2y$10$izKOh4EZoEixu2bOc32DeupdcdQnXLBqnJ877kb19d9lIWSXmCoKu', 'joshmvp123@gmail.com', 'Aya Talisay, Batangas', '09296397215', 'Josh', 'Barrion', 'Centeno', 'Grade 12', 'tvl', 'Macchiato', '', 'student', NULL, NULL),
+(77, 'RonJames44', '$2y$10$WaldwfnvqqDn2TMmGQuMou22slBrdAQqVRhaytWOFpEHrTaQPh8oy', 'RonJames44@gmail.com', 'Sta. Maria Talisay, Batangas', '09294458775', 'Ron James', 'Gil', 'Barrion', 'Grade 12', 'tvl', 'Macchiato', '', 'student', NULL, NULL),
+(78, 'squidward', '$2y$10$xr3uSShC32ioWbiSq8y65.5fFXdeIeIaci99qwvejQ7Z6jDGiGTza', 'squidwardtentacles@gmail.com', 'Bikini Bottom', '09452325481', 'Squidward', 'Many', 'Tentacles', '', 'abm', '', '', 'teacher', NULL, NULL),
+(79, 'eugenekrabs', '$2y$10$KRDvnmvgp8ipXOJ78DRAzuLHX9S7j9FXooBFcZXBh.EnV9C6jiMfK', 'eugenekrabs@gmail.com', 'Bikini Bottom', '09884512575', 'Eugene', 'Mr', 'Krabs', '', 'humss', '', '', 'teacher', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1032,7 +1090,7 @@ ALTER TABLE `assignmentgrade`
 -- AUTO_INCREMENT for table `assignment_course_upload`
 --
 ALTER TABLE `assignment_course_upload`
-  MODIFY `assignment_course_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `assignment_course_upload_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
 
 --
 -- AUTO_INCREMENT for table `classwork_assignment`
@@ -1086,13 +1144,13 @@ ALTER TABLE `classwork_quiz`
 -- AUTO_INCREMENT for table `class_enrolled`
 --
 ALTER TABLE `class_enrolled`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `class_theme`
 --
 ALTER TABLE `class_theme`
-  MODIFY `theme_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `theme_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `examgrade`
@@ -1134,7 +1192,7 @@ ALTER TABLE `quizgrade`
 -- AUTO_INCREMENT for table `section`
 --
 ALTER TABLE `section`
-  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `student`
@@ -1146,25 +1204,25 @@ ALTER TABLE `student`
 -- AUTO_INCREMENT for table `student_assignment_course_answer`
 --
 ALTER TABLE `student_assignment_course_answer`
-  MODIFY `answer_assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
+  MODIFY `answer_assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=164;
 
 --
 -- AUTO_INCREMENT for table `student_exam_course_answer`
 --
 ALTER TABLE `student_exam_course_answer`
-  MODIFY `answer_exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `answer_exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `student_question_course_answer`
 --
 ALTER TABLE `student_question_course_answer`
-  MODIFY `answer_question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `answer_question_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `student_quiz_course_answer`
 --
 ALTER TABLE `student_quiz_course_answer`
-  MODIFY `answer_quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `answer_quiz_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `teacher`
@@ -1188,7 +1246,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_account`
 --
 ALTER TABLE `user_account`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `user_profile`

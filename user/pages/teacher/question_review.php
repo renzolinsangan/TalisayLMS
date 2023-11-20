@@ -449,7 +449,6 @@ if (isset($_POST['submitGrade'])) {
           </div>
         </div>
       </div>
-      <!-- Modal for each student -->
       <?php foreach ($result as $studentRow): ?>
         <?php
         $student_id = $studentRow['student_id'];
@@ -457,14 +456,12 @@ if (isset($_POST['submitGrade'])) {
         $student_lastname = $studentRow['student_lastname'];
         $class_name = $studentRow['class_name'];
 
-        // Retrieve the profile for this student
         $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
         $stmt_selectProfile = $db->prepare($sql_selectProfile);
         $stmt_selectProfile->execute([$student_id]);
         $profileResult = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
         $otherProfile = $profileResult['profile'];
 
-        // Retrieve student's question answer
         $sqlQuestionAnswer = "SELECT * FROM student_question_course_answer WHERE user_id = ? AND question_id = ?";
         $stmtQuestionAnswer = $db->prepare($sqlQuestionAnswer);
         $stmtQuestionAnswer->execute([$student_id, $question_id]);
@@ -575,10 +572,6 @@ if (isset($_POST['submitGrade'])) {
                   if (empty($questionScoreResult)) {
                     ?>
                     <button type="submit" name="submitGrade" class="btn btn-success">Submit</button>
-                    <?php
-                  } else {
-                    ?>
-                    <button type="button" name="editGrade" class="btn btn-success">Edit</button>
                     <?php
                   }
                   ?>

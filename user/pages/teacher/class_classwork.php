@@ -719,7 +719,7 @@ $stmt->closeCursor();
                       $stmt_titles_quiz = $db->prepare($sql_quiz);
                       $stmt_titles_quiz->execute([$_SESSION['class_topic'], $class_id]);
 
-                      $sql_exam = "SELECT exam_id, examTitle, examInstruction, examLink, date, dueDate
+                      $sql_exam = "SELECT exam_id, examTitle, examInstruction, date, dueDate
                         FROM classwork_exam WHERE classTopic = ? AND class_id = ?";
                       $stmt_titles_exam = $db->prepare($sql_exam);
                       $stmt_titles_exam->execute([$_SESSION['class_topic'], $class_id]);

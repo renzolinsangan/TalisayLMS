@@ -100,13 +100,21 @@ if (isset($_POST['quizGrade'])) {
 
 <body>
   <div class="container-scroller">
-    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+  <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
             alt="logo" />Talisay LMS</a>
         <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/trace.svg" alt="logo" /></a>
       </div>
-      <?php
+      <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+        <ul class="navbar-nav navbar-nav-right">
+          <li class="nav-item dropdown">
+            <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
+              data-toggle="dropdown">
+              <i class="icon-bell mx-0"></i>
+              <span class="count"></span>
+            </a>
+            <?php
             include("config.php");
             include("notifications.php");
 
@@ -517,17 +525,17 @@ if (isset($_POST['quizGrade'])) {
                               <div class="modal-body" style="margin-top: -10px;">
                                 <?php foreach ($quizResult as $quizRow): ?>
                                   <?php
+                                  $quizLink = $quizRow['quizLink'];
                                   $quizCourseStatus = $quizRow['quiz_course_status'];
                                   $statusColor = ($quizCourseStatus === 'turned in') ? 'green' : 'red';
                                   ?>
                                   <span style="color: <?php echo $statusColor; ?>">
                                     <?php echo ucfirst($quizCourseStatus) ?>
                                   </span>
-                                  <p class="mt-1">Quiz are taken through Google Form. Please check the Google Form to review the quiz and
-                                    determine the score of the student.</p>
-                                  <span>Link: <a href="https://docs.google.com/forms/"
-                                      target="_blank">https://docs.google.com/forms/</a></span>
-                                  <p class="text-body-secondary">(make sure to open the link with your account)</p>
+                                  <p class="mt-1">This is the link that you provided in your student.
+                                    You can check and provide score in the submitted quiz of the student.
+                                  </p>
+                                  <a href="<?php echo $quizLink ?>" target="_blank"><?php echo $quizLink ?></a>
                                   <?php
                                   ?>
                                 <?php endforeach; ?>
@@ -538,10 +546,6 @@ if (isset($_POST['quizGrade'])) {
                                 if (empty($quizScoreResult)) {
                                   ?>
                                   <button type="submit" name="quizGrade" class="btn btn-success">Submit</button>
-                                  <?php
-                                } else {
-                                  ?>
-                                  <button type="button" name="editGrade" class="btn btn-success">Edit</button>
                                   <?php
                                 }
                                 ?>

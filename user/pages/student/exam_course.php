@@ -143,9 +143,11 @@ $examScore = $stmtExamScore->fetchColumn();
         $new_status = ($examStatus === "missing") ? "turned-in late" : "turned in";
 
         $sqlExam = "INSERT INTO student_exam_course_answer (exam_id, examTitle, examLink, examPoint, date, user_id, class_id,
-        teacher_id, exam_course_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        teacher_id, exam_course_status) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)";
         $stmtExam = $db->prepare($sqlExam);
-        $stmtExam->execute([$exam_id, $examTitle, $examLink, $examPoint, $date, $user_id, $class_id, $teacher_id, $new_status]);
+        $stmtExam->execute([$exam_id, $examTitle, $examLink, $examPoint, $user_id, $class_id, $teacher_id, $new_status]);
+
+        header("Location:exam_course.php?class_id=$class_id&exam_id=$exam_id&user_id=$user_id");
       }
       ?>
       <form class="assignment" action="" method="post">
@@ -171,18 +173,16 @@ $examScore = $stmtExamScore->fetchColumn();
               </div>
               <div class="row justify-content-center mb-2">
                 <div class="col-md-12 text-center">
-                  <p class="text-body-secondary">Exam Link:</p>
-                  <a href="<?php echo $examLink ?>" target="_blank">
-                    <?php echo $examLink ?>
-                  </a>
-                  <p class="text-body-secondary mt-3">make sure to open with correct google account in your browser.</p>
+                  <p class="text-body-secondary mt-3">
+                  Once you are done with your face-to-face exam, you can now turn 
+                  in so that the teacher can insert your score.</p>
                 </div>
               </div>
               <div class="row justify-content-center align-items-center mb-5">
                 <div class="d-grid gap-2 col-11 mx-auto">
                   <?php if ($examCourseStatus == 'turned in' || $examCourseStatus == 'turned-in late'): ?>
-                    <button class="btn btn-success" id="unsubmitButton" name="unsubmit" type="submit">
-                      Unsubmit</button>
+                    <button class="btn btn-success" type="button">
+                      Exam Submitted</button>
                   <?php else: ?>
                     <button class="btn btn-success" id="turnInButton" name="mark_done" type="submit">Mark as Done</button>
                   <?php endif; ?>
