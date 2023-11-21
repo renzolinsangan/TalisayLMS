@@ -79,6 +79,17 @@ if (isset($_POST['quizGrade'])) {
     $quiz_id
   ]);
 }
+
+if (isset($_POST['editGrade'])) {
+  $score = $_POST['score'];
+  $quiz_id = $_POST['quiz_id'];
+  $student_id = $_POST['student_id'];
+
+  $sqlEditPoint = "UPDATE quizgrade SET score = $score WHERE student_id = ? AND quiz_id = ?";
+  $stmtEditPoint = $db->prepare($sqlEditPoint);
+  $stmtEditPoint->execute([$student_id, $quiz_id]);
+  header("Location: quiz_review.php?class_id=$class_id&quiz_id=$quiz_id");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -100,7 +111,7 @@ if (isset($_POST['quizGrade'])) {
 
 <body>
   <div class="container-scroller">
-  <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
             alt="logo" />Talisay LMS</a>
@@ -200,7 +211,7 @@ if (isset($_POST['quizGrade'])) {
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
                         <p class="font-weight-light small-text mb-0 text-muted"
-                        onclick="window.location.href='<?php echo $link; ?>';">
+                          onclick="window.location.href='<?php echo $link; ?>';">
                           by
                           <?php echo $notification['name']; ?> on
                           <?php echo date('F j', strtotime($notification['date'])); ?>
@@ -213,8 +224,7 @@ if (isset($_POST['quizGrade'])) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal" 
-                        onclick="window.location.href='student.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='student.php'">
                           You added
                           <?php echo $studentName; ?> as student.
                         </h6>
@@ -243,13 +253,13 @@ if (isset($_POST['quizGrade'])) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                          <h6 class="preview-subject font-weight-normal"
+                        <h6 class="preview-subject font-weight-normal"
                           onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['question_course_status']; ?>
                           <?php echo $notification['title']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
+                            onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -263,12 +273,12 @@ if (isset($_POST['quizGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
+                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['assignment_course_status']; ?>
                           <?php echo $notification['title']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
+                            onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -282,12 +292,12 @@ if (isset($_POST['quizGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
+                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['quiz_course_status']; ?>
                           <?php echo $notification['quizTitle']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
+                            onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -301,12 +311,12 @@ if (isset($_POST['quizGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
+                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['exam_course_status']; ?>
                           <?php echo $notification['examTitle']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
+                            onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -380,204 +390,297 @@ if (isset($_POST['quizGrade'])) {
                 <li class="nav-item"> <a class="nav-link"
                     href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a>
                 </li>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item mb-3">
-            <a class="nav-link" href="feedback.php">
-              <i class="menu-icon"><i class="bi bi-chat-right-quote"></i></i>
-              <span class="menu-title">Feedbacks</span>
-            </a>
           </li>
         </ul>
-      </nav>
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row mb-4">
-            <div class="col">
-              <h2>
-                <?php echo $class_name ?>
-              </h2>
-              <p class="text-body-secondary">(Quiz Review)</p>
-              <a href="toreview.php?class_id=<?php echo $class_id ?>" style="text-decoration: none; color: green;">
-                Go back to to-review page.
-              </a>
-            </div>
+    </div>
+    </li>
+    <li class="nav-item mb-3">
+      <a class="nav-link" href="feedback.php">
+        <i class="menu-icon"><i class="bi bi-chat-right-quote"></i></i>
+        <span class="menu-title">Feedbacks</span>
+      </a>
+    </li>
+    </ul>
+    </nav>
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row mb-4">
+          <div class="col">
+            <h2>
+              <?php echo $class_name ?>
+            </h2>
+            <p class="text-body-secondary">(Quiz Review)</p>
+            <a href="toreview.php?class_id=<?php echo $class_id ?>" style="text-decoration: none; color: green;">
+              Go back to to-review page.
+            </a>
           </div>
-          <div class="row mb-2">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="ml-4 mt-3 mb-3" s>
-                  <h2>
-                    <?php echo $quizTitle ?>
-                  </h2>
-                  <p class="text-body-secondary">Instructions:
-                    <?php echo $quizInstruction ?>
-                  </p>
-                </div>
-                <div class="row">
-                  <?php
-                  foreach ($result as $studentRow) {
-                    $student_id = $studentRow['student_id'];
-                    $student_firstname = $studentRow['student_firstname'];
-                    $student_lastname = $studentRow['student_lastname'];
-                    $class_name = $studentRow['class_name'];
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="ml-4 mt-3 mb-3" s>
+                <h2>
+                  <?php echo $quizTitle ?>
+                </h2>
+                <p class="text-body-secondary">Instructions:
+                  <?php echo $quizInstruction ?>
+                </p>
+              </div>
+              <div class="row">
+                <?php
+                foreach ($result as $studentRow) {
+                  $student_id = $studentRow['student_id'];
+                  $student_firstname = $studentRow['student_firstname'];
+                  $student_lastname = $studentRow['student_lastname'];
+                  $class_name = $studentRow['class_name'];
 
-                    $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                    $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                    $stmt_selectProfile->execute([$student_id]);
-                    $profileResult = $stmt_selectProfile->fetchAll(PDO::FETCH_ASSOC);
+                  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                  $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                  $stmt_selectProfile->execute([$student_id]);
+                  $profileResult = $stmt_selectProfile->fetchAll(PDO::FETCH_ASSOC);
 
-                    $sqlQuizAnswer = "SELECT * FROM student_quiz_course_answer WHERE user_id = ? AND quiz_id = ?";
-                    $stmtQuizAnswer = $db->prepare($sqlQuizAnswer);
-                    $stmtQuizAnswer->execute([$student_id, $quiz_id]);
-                    $quizResult = $stmtQuizAnswer->fetchAll(PDO::FETCH_ASSOC);
+                  $sqlQuizAnswer = "SELECT * FROM student_quiz_course_answer WHERE user_id = ? AND quiz_id = ?";
+                  $stmtQuizAnswer = $db->prepare($sqlQuizAnswer);
+                  $stmtQuizAnswer->execute([$student_id, $quiz_id]);
+                  $quizResult = $stmtQuizAnswer->fetchAll(PDO::FETCH_ASSOC);
 
-                    $hasTurnedInStatus = false;
+                  $hasTurnedInStatus = false;
 
-                    foreach ($quizResult as $quizRow) {
-                      $quizCourseStatus = $quizRow['quiz_course_status'];
-                      if ($quizCourseStatus === 'turned in' || $quizCourseStatus === 'turned-in late') {
-                        $hasTurnedInStatus = true;
-                        break;
-                      }
+                  foreach ($quizResult as $quizRow) {
+                    $quizCourseStatus = $quizRow['quiz_course_status'];
+                    if ($quizCourseStatus === 'turned in' || $quizCourseStatus === 'turned-in late') {
+                      $hasTurnedInStatus = true;
+                      break;
                     }
+                  }
 
-                    $statusColorClass = '';
+                  $statusColorClass = '';
 
-                    if (!$hasTurnedInStatus) {
-                      $statusColorClass = ($quizStatus === 'assigned') ? 'text-success' : 'text-danger';
-                    }
+                  if (!$hasTurnedInStatus) {
+                    $statusColorClass = ($quizStatus === 'assigned') ? 'text-success' : 'text-danger';
+                  }
 
-                    foreach ($profileResult as $profileRow) {
-                      $otherProfile = $profileRow['profile'];
-                      ?>
-                      <div class="col-md-3 mb-4">
-                        <div class="card card-tale justify-content-center align-items-center" data-bs-toggle="modal"
-                          data-bs-target="#staticBackdrop_<?php echo $student_id; ?>" style="cursor: pointer;">
-                          <div class="circle-image mt-4 mb-3">
-                            <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
-                          </div>
-                          <p class="text-body-secondary">
-                            <?php echo $student_firstname . ' ' . $student_lastname ?>
-                          </p>
+                  foreach ($profileResult as $profileRow) {
+                    $otherProfile = $profileRow['profile'];
+                    ?>
+                    <div class="col-md-3 mb-4">
+                      <div class="card card-tale justify-content-center align-items-center" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop_<?php echo $student_id; ?>" style="cursor: pointer;">
+                        <div class="circle-image mt-4 mb-3">
+                          <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
                         </div>
+                        <p class="text-body-secondary">
+                          <?php echo $student_firstname . ' ' . $student_lastname ?>
+                        </p>
                       </div>
-                      <div class="modal fade" id="staticBackdrop_<?php echo $student_id; ?>" data-bs-backdrop="static"
-                        data-bs-keyboard="false" tabindex="-1"
-                        aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <form action="" method="post">
-                            <div class="modal-content">
-                              <div class="modal-header" style="border: none; margin-bottom: -40px;">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
-                                  <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
-                                  <?php echo $quizTitle ?> (
-                                  <?php echo $date ?>)
-                                  <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
-                                  <p class="text-body-secondary">by
-                                    <?php echo $student_firstname . ' ' . $student_lastname ?>
-                                    <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
-                                    <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
-                                  </p>
-                                  <?php
-                                  if (!$hasTurnedInStatus) {
-                                    ?>
-                                    <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
-                                      <?php echo ucfirst($quizStatus) ?>
-                                    </p>
-                                    <?php
-                                  }
-                                  ?>
-                                  <?php
-                                  $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quiz_id = ?";
-                                  $stmtQuizScore = $db->prepare($sqlQuizScore);
-                                  $stmtQuizScore->execute([$student_id, $quiz_id]);
-                                  $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+                    </div>
+                    <div class="modal fade" id="staticBackdrop_<?php echo $student_id; ?>" data-bs-backdrop="static"
+                      data-bs-keyboard="false" tabindex="-1"
+                      aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <?php
+                        $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quiz_id = ?";
+                        $stmtQuizScore = $db->prepare($sqlQuizScore);
+                        $stmtQuizScore->execute([$student_id, $quiz_id]);
+                        $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
 
-                                  if (empty($quizScoreResult)) {
-                                    ?>
-                                    <p>
-                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
-                                      /
-                                      <?php echo $quizPoint; ?>
-                                      <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
-                                    </p>
-                                    <?php
-                                  } else {
-                                    $quizScore = $quizScoreResult['score'];
-                                    ?>
-                                    <p>
-                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
-                                        value="<?php echo $quizScore; ?>" readonly>
-                                      /
-                                      <?php echo $quizPoint; ?>
-                                      <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
-                                    </p>
-                                    <?php
-                                  }
-                                  ?>
-                                </h1>
-                              </div>
-                              <div class="modal-body" style="margin-top: -10px;">
-                                <?php foreach ($quizResult as $quizRow): ?>
-                                  <?php
-                                  $quizLink = $quizRow['quizLink'];
-                                  $quizCourseStatus = $quizRow['quiz_course_status'];
-                                  $statusColor = ($quizCourseStatus === 'turned in') ? 'green' : 'red';
-                                  ?>
-                                  <span style="color: <?php echo $statusColor; ?>">
-                                    <?php echo ucfirst($quizCourseStatus) ?>
-                                  </span>
-                                  <p class="mt-1">This is the link that you provided in your student.
-                                    You can check and provide score in the submitted quiz of the student.
-                                  </p>
-                                  <a href="<?php echo $quizLink ?>" target="_blank"><?php echo $quizLink ?></a>
-                                  <?php
-                                  ?>
-                                <?php endforeach; ?>
-                              </div>
-                              <div class="modal-footer" style="border: none;">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        if (empty($quizScoreResult)) {
+?>
+                        <form action="" method="post">
+                          <div class="modal-content">
+                            <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                              <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                <?php echo $quizTitle ?> (
+                                <?php echo $date ?>)
+                                <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
+                                <p class="text-body-secondary">by
+                                  <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                  <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                                  <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
+                                </p>
                                 <?php
-                                if (empty($quizScoreResult)) {
+                                if (!$hasTurnedInStatus) {
                                   ?>
-                                  <button type="submit" name="quizGrade" class="btn btn-success">Submit</button>
+                                  <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                    <?php echo ucfirst($quizStatus) ?>
+                                  </p>
                                   <?php
                                 }
                                 ?>
-                              </div>
+                                <?php
+                                $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quiz_id = ?";
+                                $stmtQuizScore = $db->prepare($sqlQuizScore);
+                                $stmtQuizScore->execute([$student_id, $quiz_id]);
+                                $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+
+                                if (empty($quizScoreResult)) {
+                                  ?>
+                                  <p>
+                                    <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
+                                    /
+                                    <?php echo $quizPoint; ?>
+                                    <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
+                                  </p>
+                                  <?php
+                                } else {
+                                  $quizScore = $quizScoreResult['score'];
+                                  ?>
+                                  <p>
+                                    <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
+                                      value="<?php echo $quizScore; ?>" readonly>
+                                    /
+                                    <?php echo $quizPoint; ?>
+                                    <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
+                                  </p>
+                                  <?php
+                                }
+                                ?>
+                              </h1>
                             </div>
-                          </form>
-                        </div>
+                            <div class="modal-body" style="margin-top: -10px;">
+                              <?php foreach ($quizResult as $quizRow): ?>
+                                <?php
+                                $quizLink = $quizRow['quizLink'];
+                                $quizCourseStatus = $quizRow['quiz_course_status'];
+                                $statusColor = ($quizCourseStatus === 'turned in') ? 'green' : 'red';
+                                ?>
+                                <span style="color: <?php echo $statusColor; ?>">
+                                  <?php echo ucfirst($quizCourseStatus) ?>
+                                </span>
+                                <p class="mt-1">This is the link that you provided in your student.
+                                  You can check and provide score in the submitted quiz of the student.
+                                </p>
+                                <a href="<?php echo $quizLink ?>" target="_blank">
+                                  <?php echo $quizLink ?>
+                                </a>
+                                <?php
+                                ?>
+                              <?php endforeach; ?>
+                            </div>
+                            <div class="modal-footer" style="border: none;">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                              <?php
+                              if (empty($quizScoreResult)) {
+                                ?>
+                                <button type="submit" name="quizGrade" class="btn btn-success">Submit</button>
+                                <?php
+                              }
+                              ?>
+                            </div>
+                          </div>
+                        </form>
+<?php
+                        } else {
+                          ?>
+                        <form action="" method="post">
+                          <div class="modal-content">
+                            <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                              <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                <?php echo $quizTitle ?> (
+                                <?php echo $date ?>)
+                                <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
+                                <p class="text-body-secondary">by
+                                  <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                  <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                                  <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
+                                </p>
+                                <?php
+                                if (!$hasTurnedInStatus) {
+                                  ?>
+                                  <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                    <?php echo ucfirst($quizStatus) ?>
+                                  </p>
+                                  <?php
+                                }
+                                ?>
+                                <?php
+                                $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quiz_id = ?";
+                                $stmtQuizScore = $db->prepare($sqlQuizScore);
+                                $stmtQuizScore->execute([$student_id, $quiz_id]);
+                                $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+
+                                if (!empty($quizScoreResult)) {
+                                  $quiz_id = $_GET['quiz_id'];
+                                  $score = $quizScoreResult['score'];
+                                  ?>
+                                  <p>
+                                    <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $score ?>">
+                                    /
+                                    <?php echo $quizPoint; ?>
+                                    <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                        <input type="hidden" name="quiz_id" value="<?php echo $quiz_id ?>">
+                                  </p>
+                                  <?php
+                                }
+                                ?>
+                              </h1>
+                            </div>
+                            <div class="modal-body" style="margin-top: -10px;">
+                              <?php foreach ($quizResult as $quizRow): ?>
+                                <?php
+                                $quizLink = $quizRow['quizLink'];
+                                $quizCourseStatus = $quizRow['quiz_course_status'];
+                                $statusColor = ($quizCourseStatus === 'turned in') ? 'green' : 'red';
+                                ?>
+                                <span style="color: <?php echo $statusColor; ?>">
+                                  <?php echo ucfirst($quizCourseStatus) ?>
+                                </span>
+                                <p class="mt-1">This is the link that you provided in your student.
+                                  You can check and provide score in the submitted quiz of the student.
+                                </p>
+                                <a href="<?php echo $quizLink ?>" target="_blank">
+                                  <?php echo $quizLink ?>
+                                </a>
+                                <?php
+                                ?>
+                              <?php endforeach; ?>
+                            </div>
+                            <div class="modal-footer" style="border: none;">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                              <?php
+                              if (!empty($quizScoreResult)) {
+                                ?>
+                                <button type="submit" name="editGrade" class="btn btn-success">Edit</button>
+                                <?php
+                              }
+                              ?>
+                            </div>
+                          </div>
+                        </form>
+                          <?php
+                        }
+                        ?>
                       </div>
-                      <?php
-                    }
+                    </div>
+                    <?php
                   }
-                  ?>
-                </div>
+                }
+                ?>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-      crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-      crossorigin="anonymous"></script>
-    <script src="../../vendors/js/vendor.bundle.base.js"></script>
-    <script src="../../js/off-canvas.js"></script>
-    <script src="../../js/hoverable-collapse.js"></script>
-    <script src="../../js/template.js"></script>
-    <script src="../../js/settings.js"></script>
-    <script src="../../js/todolist.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+    crossorigin="anonymous"></script>
+  <script src="../../vendors/js/vendor.bundle.base.js"></script>
+  <script src="../../js/off-canvas.js"></script>
+  <script src="../../js/hoverable-collapse.js"></script>
+  <script src="../../js/template.js"></script>
+  <script src="../../js/settings.js"></script>
+  <script src="../../js/todolist.js"></script>
 </body>
 
 </html>

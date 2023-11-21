@@ -80,6 +80,17 @@ if (isset($_POST['submitGrade'])) {
     $question_id
   ]);
 }
+
+if (isset($_POST['editGrade'])) {
+  $score = $_POST['score'];
+  $question_id = $_POST['question_id'];
+  $student_id = $_POST['student_id'];
+
+  $sqlEditPoint = "UPDATE questiongrade SET score = $score WHERE student_id = ? AND question_id = ?";
+  $stmtEditPoint = $db->prepare($sqlEditPoint);
+  $stmtEditPoint->execute([$student_id, $question_id]);
+  header("Location: question_review.php?class_id=$class_id&question_id=$question_id");
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -201,7 +212,7 @@ if (isset($_POST['submitGrade'])) {
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
                         <p class="font-weight-light small-text mb-0 text-muted"
-                        onclick="window.location.href='<?php echo $link; ?>';">
+                          onclick="window.location.href='<?php echo $link; ?>';">
                           by
                           <?php echo $notification['name']; ?> on
                           <?php echo date('F j', strtotime($notification['date'])); ?>
@@ -214,8 +225,7 @@ if (isset($_POST['submitGrade'])) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal" 
-                        onclick="window.location.href='student.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='student.php'">
                           You added
                           <?php echo $studentName; ?> as student.
                         </h6>
@@ -244,13 +254,13 @@ if (isset($_POST['submitGrade'])) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                          <h6 class="preview-subject font-weight-normal"
+                        <h6 class="preview-subject font-weight-normal"
                           onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['question_course_status']; ?>
                           <?php echo $notification['title']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
+                            onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -264,12 +274,12 @@ if (isset($_POST['submitGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
+                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['assignment_course_status']; ?>
                           <?php echo $notification['title']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
+                            onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -283,12 +293,12 @@ if (isset($_POST['submitGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
+                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['quiz_course_status']; ?>
                           <?php echo $notification['quizTitle']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
+                            onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -302,12 +312,12 @@ if (isset($_POST['submitGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
+                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['exam_course_status']; ?>
                           <?php echo $notification['examTitle']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
+                            onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -381,113 +391,121 @@ if (isset($_POST['submitGrade'])) {
                 <li class="nav-item"> <a class="nav-link"
                     href="student_report.php?user_id=<?php echo $teacher_id ?>">Student Reports</a>
                 </li>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li class="nav-item mb-3">
-            <a class="nav-link" href="feedback.php">
-              <i class="menu-icon"><i class="bi bi-chat-right-quote"></i></i>
-              <span class="menu-title">Feedbacks</span>
-            </a>
           </li>
         </ul>
-      </nav>
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <div class="row mb-4">
-            <div class="col">
-              <h2>
-                <?php echo $class_name ?>
-              </h2>
-              <p class="text-body-secondary">(Question Review)</p>
-              <a href="toreview.php?class_id=<?php echo $class_id ?>" style="text-decoration: none; color: green;">
-                Go back to to-review page.
-              </a>
-            </div>
+    </div>
+    </li>
+    <li class="nav-item mb-3">
+      <a class="nav-link" href="feedback.php">
+        <i class="menu-icon"><i class="bi bi-chat-right-quote"></i></i>
+        <span class="menu-title">Feedbacks</span>
+      </a>
+    </li>
+    </ul>
+    </nav>
+    <div class="main-panel">
+      <div class="content-wrapper">
+        <div class="row mb-4">
+          <div class="col">
+            <h2>
+              <?php echo $class_name ?>
+            </h2>
+            <p class="text-body-secondary">(Question Review)</p>
+            <a href="toreview.php?class_id=<?php echo $class_id ?>" style="text-decoration: none; color: green;">
+              Go back to to-review page.
+            </a>
           </div>
-          <div class="row mb-2">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="ml-4 mt-3 mb-3">
-                  <h2>
-                    <?php echo $title ?>
-                  </h2>
-                  <p class="text-body-secondary">Instructions:
-                    <?php echo $instruction ?>
-                  </p>
-                </div>
-                <div class="row">
-                  <?php foreach ($result as $studentRow): ?>
-                    <?php
-                    $student_id = $studentRow['student_id'];
-                    $student_firstname = $studentRow['student_firstname'];
-                    $student_lastname = $studentRow['student_lastname'];
-                    $class_name = $studentRow['class_name'];
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-12 grid-margin stretch-card">
+            <div class="card">
+              <div class="ml-4 mt-3 mb-3">
+                <h2>
+                  <?php echo $title ?>
+                </h2>
+                <p class="text-body-secondary">Instructions:
+                  <?php echo $instruction ?>
+                </p>
+              </div>
+              <div class="row">
+                <?php foreach ($result as $studentRow): ?>
+                  <?php
+                  $student_id = $studentRow['student_id'];
+                  $student_firstname = $studentRow['student_firstname'];
+                  $student_lastname = $studentRow['student_lastname'];
+                  $class_name = $studentRow['class_name'];
 
-                    $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-                    $stmt_selectProfile = $db->prepare($sql_selectProfile);
-                    $stmt_selectProfile->execute([$student_id]);
-                    $profileResult = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-                    $otherProfile = $profileResult['profile'];
-                    ?>
-                    <div class="col-md-3 mb-4">
-                      <div class="card card-tale justify-content-center align-items-center" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop_<?php echo $student_id; ?>" style="cursor: pointer;">
-                        <div class="circle-image mt-4 mb-3">
-                          <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
-                        </div>
-                        <p class="text-body-secondary">
-                          <?php echo $student_firstname . ' ' . $student_lastname ?>
-                        </p>
+                  $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+                  $stmt_selectProfile = $db->prepare($sql_selectProfile);
+                  $stmt_selectProfile->execute([$student_id]);
+                  $profileResult = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+                  $otherProfile = $profileResult['profile'];
+                  ?>
+                  <div class="col-md-3 mb-4">
+                    <div class="card card-tale justify-content-center align-items-center" data-bs-toggle="modal"
+                      data-bs-target="#staticBackdrop_<?php echo $student_id; ?>" style="cursor: pointer;">
+                      <div class="circle-image mt-4 mb-3">
+                        <img src="../student/assets/image/<?php echo $otherProfile; ?>" alt="Circular Image">
                       </div>
+                      <p class="text-body-secondary">
+                        <?php echo $student_firstname . ' ' . $student_lastname ?>
+                      </p>
                     </div>
-                  <?php endforeach; ?>
-                </div>
+                  </div>
+                <?php endforeach; ?>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <?php foreach ($result as $studentRow): ?>
-        <?php
-        $student_id = $studentRow['student_id'];
-        $student_firstname = $studentRow['student_firstname'];
-        $student_lastname = $studentRow['student_lastname'];
-        $class_name = $studentRow['class_name'];
+    </div>
+    <?php foreach ($result as $studentRow): ?>
+      <?php
+      $student_id = $studentRow['student_id'];
+      $student_firstname = $studentRow['student_firstname'];
+      $student_lastname = $studentRow['student_lastname'];
+      $class_name = $studentRow['class_name'];
 
-        $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
-        $stmt_selectProfile = $db->prepare($sql_selectProfile);
-        $stmt_selectProfile->execute([$student_id]);
-        $profileResult = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
-        $otherProfile = $profileResult['profile'];
+      $sql_selectProfile = "SELECT profile FROM user_profile WHERE user_id = ? AND profile_status = 'recent'";
+      $stmt_selectProfile = $db->prepare($sql_selectProfile);
+      $stmt_selectProfile->execute([$student_id]);
+      $profileResult = $stmt_selectProfile->fetch(PDO::FETCH_ASSOC);
+      $otherProfile = $profileResult['profile'];
 
-        $sqlQuestionAnswer = "SELECT * FROM student_question_course_answer WHERE user_id = ? AND question_id = ?";
-        $stmtQuestionAnswer = $db->prepare($sqlQuestionAnswer);
-        $stmtQuestionAnswer->execute([$student_id, $question_id]);
-        $questionResult = $stmtQuestionAnswer->fetchAll(PDO::FETCH_ASSOC);
+      $sqlQuestionAnswer = "SELECT * FROM student_question_course_answer WHERE user_id = ? AND question_id = ?";
+      $stmtQuestionAnswer = $db->prepare($sqlQuestionAnswer);
+      $stmtQuestionAnswer->execute([$student_id, $question_id]);
+      $questionResult = $stmtQuestionAnswer->fetchAll(PDO::FETCH_ASSOC);
 
-        $hasTurnedInStatus = false;
+      $hasTurnedInStatus = false;
 
-        foreach ($questionResult as $questionRow) {
-          $questionCourseStatus = $questionRow['question_course_status'];
-          if ($questionCourseStatus === 'turned in' || $questionCourseStatus === 'turned-in late') {
-            $hasTurnedInStatus = true;
-            break;
-          }
+      foreach ($questionResult as $questionRow) {
+        $questionCourseStatus = $questionRow['question_course_status'];
+        if ($questionCourseStatus === 'turned in' || $questionCourseStatus === 'turned-in late') {
+          $hasTurnedInStatus = true;
+          break;
         }
+      }
 
-        $statusColorClass = '';
+      $statusColorClass = '';
 
-        if (!$hasTurnedInStatus) {
-          $statusColorClass = ($questionStatus === 'assigned') ? 'text-success' : 'text-danger';
-        }
+      if (!$hasTurnedInStatus) {
+        $statusColorClass = ($questionStatus === 'assigned') ? 'text-success' : 'text-danger';
+      }
 
-        ?>
-        <div class="modal fade" id="staticBackdrop_<?php echo $student_id; ?>" data-bs-backdrop="static"
-          data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>"
-          aria-hidden="true">
-          <div class="modal-dialog">
+      ?>
+      <div class="modal fade" id="staticBackdrop_<?php echo $student_id; ?>" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>"
+        aria-hidden="true">
+        <div class="modal-dialog">
+          <?php
+          $sql_questionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND question_id = ?";
+          $stmt_questionScore = $db->prepare($sql_questionScore);
+          $stmt_questionScore->execute([$student_id, $question_id]);
+          $questionScoreResult = $stmt_questionScore->fetch(PDO::FETCH_ASSOC);
+
+          if (empty($questionScoreResult)) {
+            ?>
             <form action="" method="post">
               <div class="modal-content">
                 <div class="modal-header" style="border: none; margin-bottom: -40px;">
@@ -529,8 +547,8 @@ if (isset($_POST['submitGrade'])) {
                       ?>
                       <p>
                         <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                      border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $questionScore; ?>"
-                          readonly>
+                      border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
+                          value="<?php echo $questionScore; ?>" readonly>
                         /
                         <?php echo $point; ?>
                         <input type="hidden" name="questionPoint" value="<?php echo $point; ?>">
@@ -578,23 +596,111 @@ if (isset($_POST['submitGrade'])) {
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
+            <?php
+          } else {
+            ?>
+            <form action="" method="post">
+              <div class="modal-content">
+                <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                  <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                    <?php echo $title ?> (
+                    <?php echo $date ?>)
+                    <p class="text-body-secondary">by
+                      <?php echo $student_firstname . ' ' . $student_lastname ?>
+                      <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                      <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
+                    </p>
+                    <?php
+                    if (!$hasTurnedInStatus) {
+                      ?>
+                      <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                        <?php echo ucfirst($questionStatus) ?>
+                      </p>
+                      <?php
+                    }
+                    ?>
+                    <?php
+                    $sql_questionScore = "SELECT score FROM questiongrade WHERE student_id = ? AND question_id = ?";
+                    $stmt_questionScore = $db->prepare($sql_questionScore);
+                    $stmt_questionScore->execute([$student_id, $question_id]);
+                    $questionScoreResult = $stmt_questionScore->fetch(PDO::FETCH_ASSOC);
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-      crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
-      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
-      crossorigin="anonymous"></script>
-    <script src="../../vendors/js/vendor.bundle.base.js"></script>
-    <script src="../../js/off-canvas.js"></script>
-    <script src="../../js/hoverable-collapse.js"></script>
-    <script src="../../js/template.js"></script>
-    <script src="../../js/settings.js"></script>
-    <script src="../../js/todolist.js"></script>
+                    if (!empty($questionScoreResult)) {
+                      $question_id = $_GET['question_id'];
+                      $score = $questionScoreResult['score'];
+                      ?>
+                      <p>
+                        <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
+                          value="<?php echo $score ?>">
+                        /
+                        <?php echo $point; ?>
+                        <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                        <input type="hidden" name="question_id" value="<?php echo $question_id ?>">
+                      </p>
+                      <?php
+                    }
+                    ?>
+
+                  </h1>
+                </div>
+                <div class="modal-body">
+                  <?php foreach ($questionResult as $questionRow): ?>
+                    <?php
+                    $question_answer = $questionRow['question_answer'];
+                    $questionCourseStatus = $questionRow['question_course_status'];
+                    $statusColor = ($questionCourseStatus === 'turned in') ? 'green' : 'red';
+                    ?>
+                    <span style="color: <?php echo $statusColor; ?>">
+                      <?php echo ucfirst($questionCourseStatus) ?>
+                    </span>
+                    <p class="text-body-secondary mt-1">
+                      Question:
+                    </p>
+                    <p style="margin-top: -6px;">
+                      <?php echo $question ?>
+                    </p>
+                    <p class="text-body-secondary">Question Answer:</p>
+                    <p style="margin-top: -6px;">
+                      <?php echo $question_answer; ?>
+                    </p>
+                  <?php endforeach; ?>
+
+                  <input type="hidden" name="questionTitle" value="<?php echo $title; ?>">
+                  <input type="hidden" name="student_id" value="<?php echo $student_id; ?>">
+                </div>
+                <div class="modal-footer" style="border: none;">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <?php
+                  if (!empty($questionScoreResult)) {
+                    ?>
+                    <button type="submit" name="editGrade" class="btn btn-success">Edit</button>
+                    <?php
+                  }
+                  ?>
+                </div>
+              </div>
+            </form>
+            <?php
+          }
+          ?>
+        </div>
+      </div>
+    <?php endforeach; ?>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+    integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+    crossorigin="anonymous"></script>
+  <script src="../../vendors/js/vendor.bundle.base.js"></script>
+  <script src="../../js/off-canvas.js"></script>
+  <script src="../../js/hoverable-collapse.js"></script>
+  <script src="../../js/template.js"></script>
+  <script src="../../js/settings.js"></script>
+  <script src="../../js/todolist.js"></script>
 </body>
 
 </html>
