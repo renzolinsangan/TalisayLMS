@@ -134,29 +134,40 @@ $stmt->closeCursor();
                       <?php endif; ?>
                     </div>
                     <div class="preview-item-content">
-                      <?php if (isset($notification['title'])): ?>
+                    <?php if (isset($notification['title'])): ?>
                         <?php
                         $link = ($notification['type'] === 'news') ? 'news.php' : 'announcement.php';
 
                         $end_date = $notification['end_date'];
-                        $current_date = date('Y-m-d H:i:s');
 
-                        if ($current_date > $end_date) {
-                          header('Location: index.php');
-                          exit();
-                        }
+                        // Check if the end_date has passed
+                        $current_date = date('Y-m-d H:i:s');
+                        $end_date_passed = ($current_date > $end_date);
                         ?>
-                        <h6 class="preview-subject font-weight-normal"
-                          onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
-                          <?php echo $notification['title']; ?> (
-                          <?php echo ucfirst($notification['type']); ?>)
-                        </h6>
-                        <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
-                          by
-                          <?php echo $notification['name']; ?> on
-                          <?php echo date('F j', strtotime($notification['date'])); ?>
-                        </p>
+
+                        <?php if ($end_date_passed): ?>
+                          <h6 class="preview-subject font-weight-normal">
+                            <?php echo $notification['title']; ?> (
+                            <?php echo ucfirst($notification['type']); ?>)
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted">
+                            by
+                            <?php echo $notification['name']; ?> on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php else: ?>
+                          <h6 class="preview-subject font-weight-normal"
+                            onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
+                            <?php echo $notification['title']; ?> (
+                            <?php echo ucfirst($notification['type']); ?>)
+                          </h6>
+                          <p class="font-weight-light small-text mb-0 text-muted"
+                            onclick="window.location.href='view_<?php echo $link ?>?news_id=<?php echo $notification['news_id'] ?>'">
+                            by
+                            <?php echo $notification['name']; ?> on
+                            <?php echo date('F j', strtotime($notification['date'])); ?>
+                          </p>
+                        <?php endif; ?>
                       <?php elseif (isset($notification['friend_id'])): ?>
                         <?php
                         $friendNameParts = explode(' ', $notification['name']);
@@ -427,7 +438,7 @@ $stmt->closeCursor();
                         $stmt_titles_quiz = $db->prepare($sql_quiz);
                         $stmt_titles_quiz->execute([$_SESSION['class_topic'], $teacher_id, $class_name]);
 
-                        $sql_exam = "SELECT exam_id, examTitle, examInstruction, examLink, date, dueDate
+                        $sql_exam = "SELECT exam_id, examTitle, examInstruction, date, dueDate
                         FROM classwork_exam WHERE classTopic = ? AND teacher_id=? AND class_name=?";
                         $stmt_titles_exam = $db->prepare($sql_exam);
                         $stmt_titles_exam->execute([$_SESSION['class_topic'], $teacher_id, $class_name]);

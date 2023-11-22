@@ -27,7 +27,7 @@ if ($teacher_id) {
     $first_name = $class_info['first_name'];
     $last_name = $class_info['last_name'];
 
-    $sql_get_exam_info = "SELECT examTitle, examInstruction, examLink, examPoint, date, dueDate, time, examStatus 
+    $sql_get_exam_info = "SELECT examTitle, examInstruction, examPoint, date, dueDate, time, examStatus 
     FROM classwork_exam WHERE teacher_id=? AND exam_id=?";
     $stmt_get_exam_info = $db->prepare($sql_get_exam_info);
     $stmt_get_exam_info->execute([$teacher_id, $exam_id]);
@@ -36,7 +36,6 @@ if ($teacher_id) {
     if ($exam_data) {
       $examTitle = $exam_data['examTitle'];
       $examInstruction = $exam_data['examInstruction'];
-      $examLink = $exam_data['examLink'];
       $examPoint = $exam_data['examPoint'];
       $date = $exam_data['date'];
       $dueDate = $exam_data['dueDate'];
@@ -142,10 +141,10 @@ $examScore = $stmtExamScore->fetchColumn();
       if (isset($_POST['mark_done'])) {
         $new_status = ($examStatus === "missing") ? "turned-in late" : "turned in";
 
-        $sqlExam = "INSERT INTO student_exam_course_answer (exam_id, examTitle, examLink, examPoint, date, user_id, class_id,
+        $sqlExam = "INSERT INTO student_exam_course_answer (exam_id, examTitle, examPoint, date, user_id, class_id,
         teacher_id, exam_course_status) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)";
         $stmtExam = $db->prepare($sqlExam);
-        $stmtExam->execute([$exam_id, $examTitle, $examLink, $examPoint, $user_id, $class_id, $teacher_id, $new_status]);
+        $stmtExam->execute([$exam_id, $examTitle, $examPoint, $user_id, $class_id, $teacher_id, $new_status]);
 
         header("Location:exam_course.php?class_id=$class_id&exam_id=$exam_id&user_id=$user_id");
       }

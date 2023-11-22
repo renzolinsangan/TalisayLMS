@@ -80,12 +80,7 @@ $stmt_department->close();
                 $type = $news['type'];
                 $date = date('M d', strtotime($news['date']));
                 $end_date = $news['end_date'];
-                $current_date = date('Y-m-d H:i:s');
-
-                if ($current_date > $end_date) {
-                  header('Location: index.php');
-                  exit();
-                }
+                
                 $link = ($type === 'news') ? 'news.php' : 'announcement.php';
 
                 echo '<a href="view_' . $link . '?news_id='. $news_id .'" class="dropdown-item preview-item">';

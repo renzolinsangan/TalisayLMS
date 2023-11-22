@@ -1,6 +1,6 @@
 <?php
 session_start();
-include "db_conn.php";
+include("db_conn.php");
 
 if (isset($_POST['username']) && isset($_POST['password'])) {
 
@@ -79,13 +79,11 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 }
                 exit();
             } else {
-                // Passwords don't match, handle login failure
                 $_SESSION['entered_username'] = $name; // Store the entered username
                 header("Location: user_login.php?error=Incorrect Password!");
                 exit();
             }
         } else {
-            // User not found, handle login failure
             header("Location: user_login.php?error=Incorrect Username or Password!");
             exit();
         }
