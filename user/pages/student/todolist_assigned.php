@@ -7,6 +7,7 @@ if (!isset($_SESSION['user_id'])) {
   exit();
 }
 
+$tc_id = $_GET['tc_id'];
 $user_id = $_SESSION['user_id'];
 
 $sql = "SELECT profile FROM user_profile WHERE user_id = :user_id AND profile_status = 'recent'";
@@ -79,12 +80,8 @@ if ($teacher_id) {
             $resultMaterialNotif = getMaterialNotifications($db, $studentFullName);
             $resultQuestionNotif = getQuestionNotification($db, $studentFullName);
             $resultAssignmentNotif = getAssignmentNotification($db, $studentFullName);
-            $resultQuizNotif = getQuizNotification($db, $studentFullName);
-            $resultExamNotif = getExamNotification($db, $studentFullName);
             $resultQuestionGradeNotif = getQuestionScoreNotification($db, $user_id);
             $resultAssignmentGradeNotif = getAssignmentScoreNotification($db, $user_id);
-            $resultQuizGradeNotif = getQuizScoreNotification($db, $user_id);
-            $resultExamGradeNotif = getExamScoreNotification($db, $user_id);
 
             $allNotifications = array_merge(
               $resultNewsNotif,
@@ -93,12 +90,8 @@ if ($teacher_id) {
               $resultMaterialNotif,
               $resultQuestionNotif,
               $resultAssignmentNotif,
-              $resultQuizNotif,
-              $resultExamNotif,
               $resultQuestionGradeNotif,
               $resultAssignmentGradeNotif,
-              $resultQuizGradeNotif,
-              $resultExamGradeNotif
             );
             usort($allNotifications, function ($a, $b) {
               return strtotime($b['date']) - strtotime($a['date']);
@@ -130,7 +123,7 @@ if ($teacher_id) {
                       <?php endif; ?>
                     </div>
                     <div class="preview-item-content">
-                    <?php if (isset($notification['title'])): ?>
+                      <?php if (isset($notification['title'])): ?>
                         <?php
                         $link = ($notification['type'] === 'news') ? 'news.php' : 'announcement.php';
 
@@ -199,46 +192,23 @@ if ($teacher_id) {
                           </div>
                         <?php else: ?>
                           <?php if ($notification['notification_type'] === 'material'): ?>
-                            <div class="material-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="material-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a material in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'question'): ?>
-                            <div class="question-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="question-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a question in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                            <div class="assignment-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="assignment-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted an assignment in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                            <div class="quiz-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
-                                <?php echo $teacherName; ?> posted a quiz in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                            <div class="exam-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal">
-                                <?php echo $teacherName; ?> posted an exam in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
@@ -249,16 +219,14 @@ if ($teacher_id) {
                           </p>
                         <?php endif; ?>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='course.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -268,30 +236,7 @@ if ($teacher_id) {
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'quizGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['quizTitle']; ?>
-                          (quiz).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'examGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['examTitle']; ?>
-                          (exam).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -376,13 +321,13 @@ if ($teacher_id) {
       <div class="main-panel">
         <div class="header-sticky">
           <div class="header-links">
-            <a class="btn-success" href="class_course.php?class_id=<?php echo $class_id ?>"><i
+            <a class="btn-success" href="class_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>"><i
                 class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-            <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+            <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&user_id=<?php echo $user_id ?>"
               class="nav-link active" style="margin-left: 2vh;">Assigned</a>
-            <a href="todolist_missing.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+            <a href="todolist_missing.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&user_id=<?php echo $user_id ?>"
               class="people">Missing</a>
-            <a href="todolist_done.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+            <a href="todolist_done.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&user_id=<?php echo $user_id ?>"
               class="people">Done</a>
           </div>
         </div>
@@ -429,24 +374,24 @@ if ($teacher_id) {
 
               $sql_quiz = "SELECT q.quiz_id, q.quizTitle AS title, q.date 
               FROM classwork_quiz q
-              LEFT JOIN student_quiz_course_answer sq
-              ON q.quiz_id = sq.quiz_id AND sq.user_id = ?
-              WHERE q.teacher_id = ? AND q.class_name = ? 
-              AND q.quizStatus = 'assigned'
+              LEFT JOIN quizgrade sq
+              ON q.quiz_id = sq.quiz_id AND sq.student_id = ?
+              WHERE q.teacher_id = ? AND q.class_id = ? 
+              AND q.quiz_status = 'assigned'
               AND sq.quiz_id IS NULL";
               $stmt_quiz = $db->prepare($sql_quiz);
-              $stmt_quiz->execute([$user_id, $teacher_id, $class_name]);
+              $stmt_quiz->execute([$user_id, $teacher_id, $tc_id]);
               $quiz_results = $stmt_quiz->fetchAll();
 
               $sql_exam = "SELECT e.exam_id, e.examTitle AS title, e.date 
               FROM classwork_exam e
-              LEFT JOIN student_exam_course_answer se
-              ON e.exam_id = se.exam_id AND se.user_id = ?
-              WHERE e.teacher_id = ? AND e.class_name = ? 
-              AND e.examStatus = 'assigned'
+              LEFT JOIN examgrade se
+              ON e.exam_id = se.exam_id AND se.student_id = ?
+              WHERE e.teacher_id = ? AND e.class_id = ? 
+              AND e.exam_status = 'assigned'
               AND se.exam_id IS NULL";
               $stmt_exam = $db->prepare($sql_exam);
-              $stmt_exam->execute([$user_id, $teacher_id, $class_name]);
+              $stmt_exam->execute([$user_id, $teacher_id, $tc_id]);
               $exam_results = $stmt_exam->fetchAll();
 
               $combined_results = array_merge($assignment_results, $question_results, $quiz_results, $exam_results);
@@ -524,7 +469,7 @@ if ($teacher_id) {
                   ?>
                   <div class="d-grid gap-2 col-10 mx-auto mb-4">
                     <a class="announce" type="button"
-                      href="quiz_course.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $quiz_id ?>&user_id=<?php echo $user_id ?>"
+                      href="quiz_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&quiz_id=<?php echo $quiz_id ?>&teacher_id=<?php echo $teacher_id ?>"
                       style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                       <div
                         style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
@@ -554,7 +499,7 @@ if ($teacher_id) {
                   ?>
                   <div class="d-grid gap-2 col-10 mx-auto mb-4">
                     <a class="announce" type="button"
-                      href="exam_course.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $exam_id ?>&user_id=<?php echo $user_id ?>"
+                      href="exam_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&exam_id=<?php echo $exam_id ?>&teacher_id=<?php echo $teacher_id ?>"
                       style="text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                       <div
                         style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">

@@ -31,11 +31,10 @@ $result = $stmt_selectQuiz->fetchAll(PDO::FETCH_ASSOC);
 foreach ($result as $quizRow) {
   $quizTitle = $quizRow['quizTitle'];
   $quizInstruction = $quizRow['quizInstruction'];
-  $quizLink = $quizRow['quizLink'];
-  $quizPoint = $quizRow['quizPoint'];
+  $quizPoint = $quizRow['totalPoint'];
   $date = $quizRow['date'];
   $type = $quizRow['type'];
-  $quizStatus = $quizRow['quizStatus'];
+  $quizStatus = $quizRow['quiz_status'];
 }
 
 $sql_getStudents = "SELECT * FROM class_enrolled WHERE tc_id = ? AND teacher_id = ? ORDER BY student_firstname ASC";
@@ -53,42 +52,6 @@ foreach ($result as $studentRow) {
   $stmt_selectProfile = $db->prepare($sql_selectProfile);
   $stmt_selectProfile->execute([$student_id]);
   $otherProfile = $stmt_selectProfile->fetchColumn();
-}
-
-if (isset($_POST['quizGrade'])) {
-  $quizTitle = $_POST['quizTitle'];
-  $studentFirstName = $_POST['studentFirstName'];
-  $studentLastName = $_POST['studentLastName'];
-  $score = $_POST['score'];
-  $quizPoint = $_POST['quizPoint'];
-  $student_id = $_POST['student_id'];
-
-  $sql_assignmentGrade = "INSERT INTO quizgrade (quizTitle, studentFirstName, studentLastname, date, gradeType, score, 
-  quizPoint, student_id, teacher_id, class_id, quiz_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?)";
-  $stmt_assignmentGrade = $db->prepare($sql_assignmentGrade);
-  $assignmentGradeResult = $stmt_assignmentGrade->execute([
-    $quizTitle,
-    $studentFirstName,
-    $studentLastName,
-    $type,
-    $score,
-    $quizPoint,
-    $student_id,
-    $teacher_id,
-    $class_id,
-    $quiz_id
-  ]);
-}
-
-if (isset($_POST['editGrade'])) {
-  $score = $_POST['score'];
-  $quiz_id = $_POST['quiz_id'];
-  $student_id = $_POST['student_id'];
-
-  $sqlEditPoint = "UPDATE quizgrade SET score = $score WHERE student_id = ? AND quiz_id = ?";
-  $stmtEditPoint = $db->prepare($sqlEditPoint);
-  $stmtEditPoint->execute([$student_id, $quiz_id]);
-  header("Location: quiz_review.php?class_id=$class_id&quiz_id=$quiz_id");
 }
 ?>
 <!DOCTYPE html>
@@ -485,173 +448,167 @@ if (isset($_POST['editGrade'])) {
                         $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
 
                         if (empty($quizScoreResult)) {
-?>
-                        <form action="" method="post">
-                          <div class="modal-content">
-                            <div class="modal-header" style="border: none; margin-bottom: -40px;">
-                              <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
-                                <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
-                                <?php echo $quizTitle ?> (
-                                <?php echo $date ?>)
-                                <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
-                                <p class="text-body-secondary">by
-                                  <?php echo $student_firstname . ' ' . $student_lastname ?>
-                                  <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
-                                  <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
-                                </p>
-                                <?php
-                                if (!$hasTurnedInStatus) {
-                                  ?>
-                                  <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
-                                    <?php echo ucfirst($quizStatus) ?>
+                          ?>
+                          <form action="" method="post">
+                            <div class="modal-content">
+                              <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                  <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                  <?php echo $quizTitle ?> (
+                                  <?php echo $date ?>)
+                                  <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
+                                  <p class="text-body-secondary">by
+                                    <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                    <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                                    <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
                                   </p>
                                   <?php
-                                }
-                                ?>
-                                <?php
-                                $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quiz_id = ?";
-                                $stmtQuizScore = $db->prepare($sqlQuizScore);
-                                $stmtQuizScore->execute([$student_id, $quiz_id]);
-                                $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+                                  if (!$hasTurnedInStatus) {
+                                    ?>
+                                    <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                      <?php echo ucfirst($quizStatus) ?>
+                                    </p>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php
+                                  $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quiz_id = ?";
+                                  $stmtQuizScore = $db->prepare($sqlQuizScore);
+                                  $stmtQuizScore->execute([$student_id, $quiz_id]);
+                                  $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
 
-                                if (empty($quizScoreResult)) {
-                                  ?>
-                                  <p>
-                                    <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
-                                    /
-                                    <?php echo $quizPoint; ?>
-                                    <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
-                                  </p>
-                                  <?php
-                                } else {
-                                  $quizScore = $quizScoreResult['score'];
-                                  ?>
-                                  <p>
-                                    <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                                  if (empty($quizScoreResult)) {
+                                    ?>
+                                    <p>
+                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" readonly>
+                                      /
+                                      <?php echo $quizPoint; ?>
+                                      <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
+                                    </p>
+                                    <?php
+                                  } else {
+                                    $quizScore = $quizScoreResult['score'];
+                                    ?>
+                                    <p>
+                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
                         border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
-                                      value="<?php echo $quizScore; ?>" readonly>
-                                    /
-                                    <?php echo $quizPoint; ?>
-                                    <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
-                                  </p>
+                                        value="<?php echo $quizScore; ?>" readonly>
+                                      /
+                                      <?php echo $quizPoint; ?>
+                                      <input type="hidden" name="quizPoint" value="<?php echo $quizPoint; ?>">
+                                    </p>
+                                    <?php
+                                  }
+                                  ?>
+                                </h1>
+                              </div>
+                              <div class="modal-body" style="margin-top: -10px;">
+                                <?php foreach ($quizResult as $quizRow): ?>
                                   <?php
-                                }
-                                ?>
-                              </h1>
+                                  $quizLink = $quizRow['quizLink'];
+                                  $quizCourseStatus = $quizRow['quiz_course_status'];
+                                  $statusColor = ($quizCourseStatus === 'turned in') ? 'green' : 'red';
+                                  ?>
+                                  <span style="color: <?php echo $statusColor; ?>">
+                                    <?php echo ucfirst($quizCourseStatus) ?>
+                                  </span>
+                                  <p class="mt-1">This is the link that you provided in your student.
+                                    You can check and provide score in the submitted quiz of the student.
+                                  </p>
+                                  <a href="<?php echo $quizLink ?>" target="_blank">
+                                    <?php echo $quizLink ?>
+                                  </a>
+                                  <?php
+                                  ?>
+                                <?php endforeach; ?>
+                              </div>
+                              <div class="modal-footer" style="border: none;">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                              </div>
                             </div>
-                            <div class="modal-body" style="margin-top: -10px;">
-                              <?php foreach ($quizResult as $quizRow): ?>
-                                <?php
-                                $quizLink = $quizRow['quizLink'];
-                                $quizCourseStatus = $quizRow['quiz_course_status'];
-                                $statusColor = ($quizCourseStatus === 'turned in') ? 'green' : 'red';
-                                ?>
-                                <span style="color: <?php echo $statusColor; ?>">
-                                  <?php echo ucfirst($quizCourseStatus) ?>
-                                </span>
-                                <p class="mt-1">This is the link that you provided in your student.
-                                  You can check and provide score in the submitted quiz of the student.
-                                </p>
-                                <a href="<?php echo $quizLink ?>" target="_blank">
-                                  <?php echo $quizLink ?>
-                                </a>
-                                <?php
-                                ?>
-                              <?php endforeach; ?>
-                            </div>
-                            <div class="modal-footer" style="border: none;">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                              <?php
-                              if (empty($quizScoreResult)) {
-                                ?>
-                                <button type="submit" name="quizGrade" class="btn btn-success">Submit</button>
-                                <?php
-                              }
-                              ?>
-                            </div>
-                          </div>
-                        </form>
-<?php
+                          </form>
+                          <?php
                         } else {
                           ?>
-                        <form action="" method="post">
-                          <div class="modal-content">
-                            <div class="modal-header" style="border: none; margin-bottom: -40px;">
-                              <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
-                                <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
-                                <?php echo $quizTitle ?> (
-                                <?php echo $date ?>)
-                                <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
-                                <p class="text-body-secondary">by
-                                  <?php echo $student_firstname . ' ' . $student_lastname ?>
-                                  <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
-                                  <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
-                                </p>
-                                <?php
-                                if (!$hasTurnedInStatus) {
-                                  ?>
-                                  <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
-                                    <?php echo ucfirst($quizStatus) ?>
+                          <form action="" method="post">
+                            <div class="modal-content">
+                              <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                  <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                  <?php echo $quizTitle ?> (
+                                  <?php echo $date ?>)
+                                  <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
+                                  <p class="text-body-secondary">by
+                                    <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                    <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                                    <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
                                   </p>
                                   <?php
-                                }
-                                ?>
-                                <?php
-                                $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quiz_id = ?";
-                                $stmtQuizScore = $db->prepare($sqlQuizScore);
-                                $stmtQuizScore->execute([$student_id, $quiz_id]);
-                                $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
+                                  if (!$hasTurnedInStatus) {
+                                    ?>
+                                    <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                      <?php echo ucfirst($quizStatus) ?>
+                                    </p>
+                                    <?php
+                                  }
+                                  ?>
+                                  <?php
+                                  $sqlQuizScore = "SELECT score FROM quizgrade WHERE student_id = ? AND quiz_id = ?";
+                                  $stmtQuizScore = $db->prepare($sqlQuizScore);
+                                  $stmtQuizScore->execute([$student_id, $quiz_id]);
+                                  $quizScoreResult = $stmtQuizScore->fetch(PDO::FETCH_ASSOC);
 
-                                if (!empty($quizScoreResult)) {
-                                  $quiz_id = $_GET['quiz_id'];
-                                  $score = $quizScoreResult['score'];
+                                  if (!empty($quizScoreResult)) {
+                                    $quiz_id = $_GET['quiz_id'];
+                                    $score = $quizScoreResult['score'];
+                                    ?>
+                                    <p>
+                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
+                                        value="<?php echo $score ?>">
+                                      /
+                                      <?php echo $quizPoint; ?>
+                                      <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                      <input type="hidden" name="quiz_id" value="<?php echo $quiz_id ?>">
+                                    </p>
+                                    <?php
+                                  }
                                   ?>
-                                  <p>
-                                    <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $score ?>">
-                                    /
-                                    <?php echo $quizPoint; ?>
-                                    <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
-                        <input type="hidden" name="quiz_id" value="<?php echo $quiz_id ?>">
+                                </h1>
+                              </div>
+                              <div class="modal-body" style="margin-top: -10px;">
+                                <?php foreach ($quizResult as $quizRow): ?>
+                                  <?php
+                                  $quizLink = $quizRow['quizLink'];
+                                  $quizCourseStatus = $quizRow['quiz_course_status'];
+                                  $statusColor = ($quizCourseStatus === 'turned in') ? 'green' : 'red';
+                                  ?>
+                                  <span style="color: <?php echo $statusColor; ?>">
+                                    <?php echo ucfirst($quizCourseStatus) ?>
+                                  </span>
+                                  <p class="mt-1">This is the link that you provided in your student.
+                                    You can check and provide score in the submitted quiz of the student.
                                   </p>
+                                  <a href="<?php echo $quizLink ?>" target="_blank">
+                                    <?php echo $quizLink ?>
+                                  </a>
+                                  <?php
+                                  ?>
+                                <?php endforeach; ?>
+                              </div>
+                              <div class="modal-footer" style="border: none;">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <?php
+                                if (!empty($quizScoreResult)) {
+                                  ?>
+                                  <button type="submit" name="editGrade" class="btn btn-success">Edit</button>
                                   <?php
                                 }
                                 ?>
-                              </h1>
+                              </div>
                             </div>
-                            <div class="modal-body" style="margin-top: -10px;">
-                              <?php foreach ($quizResult as $quizRow): ?>
-                                <?php
-                                $quizLink = $quizRow['quizLink'];
-                                $quizCourseStatus = $quizRow['quiz_course_status'];
-                                $statusColor = ($quizCourseStatus === 'turned in') ? 'green' : 'red';
-                                ?>
-                                <span style="color: <?php echo $statusColor; ?>">
-                                  <?php echo ucfirst($quizCourseStatus) ?>
-                                </span>
-                                <p class="mt-1">This is the link that you provided in your student.
-                                  You can check and provide score in the submitted quiz of the student.
-                                </p>
-                                <a href="<?php echo $quizLink ?>" target="_blank">
-                                  <?php echo $quizLink ?>
-                                </a>
-                                <?php
-                                ?>
-                              <?php endforeach; ?>
-                            </div>
-                            <div class="modal-footer" style="border: none;">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                              <?php
-                              if (!empty($quizScoreResult)) {
-                                ?>
-                                <button type="submit" name="editGrade" class="btn btn-success">Edit</button>
-                                <?php
-                              }
-                              ?>
-                            </div>
-                          </div>
-                        </form>
+                          </form>
                           <?php
                         }
                         ?>

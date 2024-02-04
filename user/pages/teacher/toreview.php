@@ -371,22 +371,22 @@ if ($teacher_id) {
               $quiz_results = [];
               $exam_results = [];
 
-              $sql_assignment = "SELECT assignment_id, title, class_name, due_date FROM classwork_assignment WHERE class_id = ?";
+              $sql_assignment = "SELECT assignment_id, title, due_date FROM classwork_assignment WHERE class_id = ?";
               $stmt_assignment = $db->prepare($sql_assignment);
               $stmt_assignment->execute([$class_id]);
               $assignment_results = $stmt_assignment->fetchAll();
 
-              $sql_question = "SELECT question_id, title, class_name, due_date FROM classwork_question WHERE class_id = ?";
+              $sql_question = "SELECT question_id, title, due_date FROM classwork_question WHERE class_id = ?";
               $stmt_question = $db->prepare($sql_question);
               $stmt_question->execute([$class_id]);
               $question_results = $stmt_question->fetchall();
 
-              $sql_quiz = "SELECT quiz_id, quizTitle, class_name, dueDate FROM classwork_quiz WHERE class_id = ?";
+              $sql_quiz = "SELECT quiz_id, quizTitle, due_date FROM classwork_quiz WHERE class_id = ?";
               $stmt_quiz = $db->prepare($sql_quiz);
               $stmt_quiz->execute([$class_id]);
               $quiz_results = $stmt_quiz->fetchAll();
 
-              $sql_exam = "SELECT exam_id, examTitle, class_name, dueDate FROM classwork_exam WHERE class_id = ?";
+              $sql_exam = "SELECT exam_id, examTitle, due_date FROM classwork_exam WHERE class_id = ?";
               $stmt_exam = $db->prepare($sql_exam);
               $stmt_exam->execute([$class_id]);
               $exam_results = $stmt_exam->fetchAll();
@@ -413,7 +413,6 @@ if ($teacher_id) {
                   if (isset($row['assignment_id'])) {
                     $assignment_id = $row['assignment_id'];
                     $title = $row['title'];
-                    $class_name = $row['class_name'];
                     $due_date = $row['due_date'];
                     $timestamp = strtotime($due_date);
                     $formatted_date = date("F d", $timestamp);
@@ -433,7 +432,6 @@ if ($teacher_id) {
                         <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                           <p class="text-body-secondary"
                             style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                            <?php echo $class_name ?> -
                             <span>
                               Due
                               <?php echo $formatted_date ?>
@@ -446,7 +444,6 @@ if ($teacher_id) {
                   } elseif (isset($row['question_id'])) {
                     $question_id = $row['question_id'];
                     $title = $row['title'];
-                    $class_name = $row['class_name'];
                     $due_date = $row['due_date'];
                     $timestamp = strtotime($due_date);
                     $formatted_date = date("F d", $timestamp);
@@ -466,7 +463,6 @@ if ($teacher_id) {
                         <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                           <p class="text-body-secondary"
                             style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                            <?php echo $class_name ?> -
                             <span>
                               Due
                               <?php echo $formatted_date ?>
@@ -479,8 +475,7 @@ if ($teacher_id) {
                   } elseif(isset($row['quiz_id'])) {
                     $quiz_id = $row['quiz_id'];
                     $quizTitle = $row['quizTitle'];
-                    $class_name = $row['class_name'];
-                    $dueDate = $row['dueDate'];
+                    $dueDate = $row['due_date'];
                     $timestamp = strtotime($dueDate);
                     $formatted_date = date("F d", $timestamp);
                     ?>
@@ -499,7 +494,6 @@ if ($teacher_id) {
                         <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                           <p class="text-body-secondary"
                             style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                            <?php echo $class_name ?> -
                             <span>
                               Due
                               <?php echo $formatted_date ?>
@@ -512,8 +506,7 @@ if ($teacher_id) {
                   } elseif(isset($row['exam_id'])) {
                     $exam_id = $row['exam_id'];
                     $examTitle = $row['examTitle'];
-                    $class_name = $row['class_name'];
-                    $dueDate = $row['dueDate'];
+                    $dueDate = $row['due_date'];
                     $timestamp = strtotime($dueDate);
                     $formatted_date = date("F d", $timestamp);
                     ?>
@@ -532,7 +525,6 @@ if ($teacher_id) {
                         <div style="margin-left: 45px; margin-top: 10px; margin-bottom: -10px; font-size: 14px;">
                           <p class="text-body-secondary"
                             style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">
-                            <?php echo $class_name ?> -
                             <span>
                               Due
                               <?php echo $formatted_date ?>

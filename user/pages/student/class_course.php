@@ -86,12 +86,8 @@ $stmt->closeCursor();
             $resultMaterialNotif = getMaterialNotifications($db, $studentFullName);
             $resultQuestionNotif = getQuestionNotification($db, $studentFullName);
             $resultAssignmentNotif = getAssignmentNotification($db, $studentFullName);
-            $resultQuizNotif = getQuizNotification($db, $studentFullName);
-            $resultExamNotif = getExamNotification($db, $studentFullName);
             $resultQuestionGradeNotif = getQuestionScoreNotification($db, $user_id);
             $resultAssignmentGradeNotif = getAssignmentScoreNotification($db, $user_id);
-            $resultQuizGradeNotif = getQuizScoreNotification($db, $user_id);
-            $resultExamGradeNotif = getExamScoreNotification($db, $user_id);
 
             $allNotifications = array_merge(
               $resultNewsNotif,
@@ -100,12 +96,8 @@ $stmt->closeCursor();
               $resultMaterialNotif,
               $resultQuestionNotif,
               $resultAssignmentNotif,
-              $resultQuizNotif,
-              $resultExamNotif,
               $resultQuestionGradeNotif,
               $resultAssignmentGradeNotif,
-              $resultQuizGradeNotif,
-              $resultExamGradeNotif
             );
             usort($allNotifications, function ($a, $b) {
               return strtotime($b['date']) - strtotime($a['date']);
@@ -137,7 +129,7 @@ $stmt->closeCursor();
                       <?php endif; ?>
                     </div>
                     <div class="preview-item-content">
-                    <?php if (isset($notification['title'])): ?>
+                      <?php if (isset($notification['title'])): ?>
                         <?php
                         $link = ($notification['type'] === 'news') ? 'news.php' : 'announcement.php';
 
@@ -206,46 +198,23 @@ $stmt->closeCursor();
                           </div>
                         <?php else: ?>
                           <?php if ($notification['notification_type'] === 'material'): ?>
-                            <div class="material-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="material-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a material in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'question'): ?>
-                            <div class="question-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="question-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a question in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                            <div class="assignment-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="assignment-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted an assignment in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                            <div class="quiz-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
-                                <?php echo $teacherName; ?> posted a quiz in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                            <div class="exam-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal">
-                                <?php echo $teacherName; ?> posted an exam in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
@@ -256,16 +225,14 @@ $stmt->closeCursor();
                           </p>
                         <?php endif; ?>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='course.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -275,30 +242,7 @@ $stmt->closeCursor();
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'quizGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['quizTitle']; ?>
-                          (quiz).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'examGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['examTitle']; ?>
-                          (exam).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -384,13 +328,14 @@ $stmt->closeCursor();
             <?php
             if (isset($_GET['class_id'])) {
               $class_id = $_GET['class_id'];
+              $tc_id = $_GET['tc_id'];
               ?>
               <a class="btn-success" href="course.php"><i class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-              <a href="class_course.php?class_id=<?php echo $class_id ?>" class="nav-link active"
+              <a href="class_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>" class="nav-link active"
                 style="margin-left: 2vh;">Stream</a>
-              <a href="class_classwork.php?class_id=<?php echo $class_id ?>" class="people">Classwork</a>
-              <a href="class_people.php?class_id=<?php echo $class_id ?>" class="people">People</a>
-              <a href="class_grade.php?class_id=<?php echo $class_id ?>" class="people">Grade</a>
+              <a href="class_classwork.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>" class="people">Classwork</a>
+              <a href="class_people.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>" class="people">People</a>
+              <a href="class_grade.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>" class="people">Grade</a>
               <?php
             }
             ?>
@@ -450,21 +395,21 @@ $stmt->closeCursor();
                     style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
                     <h4>To-do List</h4>
                     <p class="text-body-secondary mt-3">Check the works assigned to you.</p>
-                    <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+                    <a href="todolist_assigned.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&user_id=<?php echo $user_id ?>"
                       class="create mt-2" style="margin-left: auto; color: green;">View to-do list</a>
                   </div>
                   <div class="card mt-3"
                     style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
                     <h4>Leaderboard Points</h4>
                     <p class="text-body-secondary mt-3">Check your points in class leaderboard points.</p>
-                    <a href="class_leaderboard.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+                    <a href="class_leaderboard.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&user_id=<?php echo $user_id ?>"
                     class="create mt-2" style="margin-left: auto; color: green;">View Points</a>
                   </div>
                   <div class="card mt-3"
                     style="background-color: white; border-radius: 5; padding: 20px; border: 1px solid rgba(128, 128, 128, 0.5);">
                     <h4>Leaderboard</h4>
                     <p class="text-body-secondary mt-3">Check your position in class leaderboard.</p>
-                    <a href="class_leaderboardTable.php?class_id=<?php echo $class_id ?>&user_id=<?php echo $user_id ?>"
+                    <a href="class_leaderboardTable.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&user_id=<?php echo $user_id ?>"
                     class="create mt-2" style="margin-left: auto; color: green;">View Leaderboard</a>
                   </div>
                 </div>
@@ -475,6 +420,8 @@ $stmt->closeCursor();
                   $assignment_results = [];
                   $quiz_results = [];
                   $exam_results = [];
+
+                  $tc_id = $_GET['tc_id'];
 
                   $sql_material = "SELECT material_id, title, date FROM classwork_material WHERE teacher_id=? AND class_name=?";
                   $stmt_titles_material = $db->prepare($sql_material);
@@ -491,14 +438,14 @@ $stmt->closeCursor();
                   $stmt_titles_assignment->execute([$teacher_id, $class_name]);
                   $assignment_results = $stmt_titles_assignment->fetchAll();
 
-                  $sql_quiz = "SELECT quiz_id, quizTitle, date FROM classwork_quiz WHERE teacher_id = ? and class_name = ?";
+                  $sql_quiz = "SELECT quiz_id, quizTitle, date FROM classwork_quiz WHERE teacher_id = ? and class_id = ?";
                   $stmt_titles_quiz = $db->prepare($sql_quiz);
-                  $stmt_titles_quiz->execute([$teacher_id, $class_name]);
+                  $stmt_titles_quiz->execute([$teacher_id, $tc_id]);
                   $quiz_results = $stmt_titles_quiz->fetchAll();
 
-                  $sql_exam = "SELECT exam_id, examTitle, date FROM classwork_exam WHERE teacher_id = ? AND class_name = ?";
+                  $sql_exam = "SELECT exam_id, examTitle, date FROM classwork_exam WHERE teacher_id = ? AND class_id = ?";
                   $stmt_titles_exam = $db->prepare($sql_exam);
-                  $stmt_titles_exam->execute([$teacher_id, $class_name]);
+                  $stmt_titles_exam->execute([$teacher_id, $tc_id]);
                   $exam_results = $stmt_titles_exam->fetchAll();
 
                   $combined_results = array_merge($material_results, $question_results, $assignment_results, $quiz_results, $exam_results);
@@ -532,7 +479,7 @@ $stmt->closeCursor();
                         ?>
                         <div class="d-grid gap-2 col-13 mx-auto mb-4">
                           <a class="announce" type="button"
-                            href="material_course.php?class_id=<?php echo $class_id ?>&material_id=<?php echo $material_id ?>"
+                            href="material_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&material_id=<?php echo $material_id ?>"
                             style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             <div
                               style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
@@ -566,7 +513,7 @@ $stmt->closeCursor();
                         ?>
                         <div class="d-grid gap-2 col-13 mx-auto mb-4">
                           <a class="announce" type="button"
-                            href="question_course.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $question_id ?>&user_id=<?php echo $user_id ?>"
+                            href="question_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&question_id=<?php echo $question_id ?>&user_id=<?php echo $user_id ?>"
                             style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             <div
                               style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
@@ -601,7 +548,7 @@ $stmt->closeCursor();
                         ?>
                         <div class="d-grid gap-2 col-13 mx-auto mb-4">
                           <a class="announce" type="button"
-                            href="assignment_course.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $assignment_id ?>&user_id=<?php echo $user_id ?>"
+                            href="assignment_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&assignment_id=<?php echo $assignment_id ?>&user_id=<?php echo $user_id ?>"
                             style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             <div
                               style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
@@ -636,7 +583,7 @@ $stmt->closeCursor();
                         ?>
                         <div class="d-grid gap-2 col-13 mx-auto mb-4">
                           <a class="announce" type="button"
-                            href="quiz_course.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $quiz_id ?>&user_id=<?php echo $user_id ?>"
+                            href="quiz_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&quiz_id=<?php echo $quiz_id ?>&teacher_id=<?php echo $teacher_id ?>"
                             style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             <div
                               style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">
@@ -671,7 +618,7 @@ $stmt->closeCursor();
                         ?>
                         <div class="d-grid gap-2 col-13 mx-auto mb-4">
                           <a class="announce" type="button"
-                            href="exam_course.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $exam_id ?>&user_id=<?php echo $user_id ?>"
+                            href="exam_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>&exam_id=<?php echo $exam_id ?>&teacher_id=<?php echo $teacher_id ?>"
                             style="text-decoration: none; height: 11vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                             <div
                               style="display: inline-block; background-color: green; border-radius: 50%; width: 40px; height: 40px; text-align: center; margin-left: -10px; margin-right: 10px; margin-top: -10px;">

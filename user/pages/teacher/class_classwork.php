@@ -714,13 +714,13 @@ $stmt->closeCursor();
                       $stmt_titles_question = $db->prepare($sql_question);
                       $stmt_titles_question->execute([$_SESSION['class_topic'], $class_id]);
 
-                      $sql_quiz = "SELECT quiz_id, quizTitle, quizInstruction, quizLink, date, dueDate 
-                        FROM classwork_quiz WHERE classTopic=? AND class_id=?";
+                      $sql_quiz = "SELECT quiz_id, quizTitle, quizInstruction, date, due_date 
+                        FROM classwork_quiz WHERE class_topic=? AND class_id=?";
                       $stmt_titles_quiz = $db->prepare($sql_quiz);
                       $stmt_titles_quiz->execute([$_SESSION['class_topic'], $class_id]);
 
-                      $sql_exam = "SELECT exam_id, examTitle, examInstruction, date, dueDate
-                        FROM classwork_exam WHERE classTopic = ? AND class_id = ?";
+                      $sql_exam = "SELECT exam_id, examTitle, examInstruction, date, due_date
+                        FROM classwork_exam WHERE class_topic = ? AND class_id = ?";
                       $stmt_titles_exam = $db->prepare($sql_exam);
                       $stmt_titles_exam->execute([$_SESSION['class_topic'], $class_id]);
 
@@ -1216,7 +1216,7 @@ $stmt->closeCursor();
                         $quizInstruction = $rowQuiz['quizInstruction'];
                         $date = $rowQuiz['date'];
                         $formattedDate = date('F j', strtotime($date));
-                        $dueDate = $rowQuiz['dueDate'];
+                        $dueDate = $rowQuiz['due_date'];
                         $formattedDueDate = date("F j", strtotime($dueDate));
                         $words = explode(' ', $quizTitle);
                         $maxWords = 4;
@@ -1300,7 +1300,7 @@ $stmt->closeCursor();
                         $examInstruction = $rowExam['examInstruction'];
                         $date = $rowExam['date'];
                         $formattedDate = date('F j', strtotime($date));
-                        $dueDate = $rowExam['dueDate'];
+                        $dueDate = $rowExam['due_date'];
                         $formattedDueDate = date("F j", strtotime($dueDate));
                         $words = explode(' ', $examTitle);
                         $maxWords = 4;

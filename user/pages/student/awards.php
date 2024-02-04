@@ -67,12 +67,8 @@ $stmt->close();
             $resultMaterialNotif = getMaterialNotifications($db, $studentFullName);
             $resultQuestionNotif = getQuestionNotification($db, $studentFullName);
             $resultAssignmentNotif = getAssignmentNotification($db, $studentFullName);
-            $resultQuizNotif = getQuizNotification($db, $studentFullName);
-            $resultExamNotif = getExamNotification($db, $studentFullName);
             $resultQuestionGradeNotif = getQuestionScoreNotification($db, $user_id);
             $resultAssignmentGradeNotif = getAssignmentScoreNotification($db, $user_id);
-            $resultQuizGradeNotif = getQuizScoreNotification($db, $user_id);
-            $resultExamGradeNotif = getExamScoreNotification($db, $user_id);
 
             $allNotifications = array_merge(
               $resultNewsNotif,
@@ -81,12 +77,8 @@ $stmt->close();
               $resultMaterialNotif,
               $resultQuestionNotif,
               $resultAssignmentNotif,
-              $resultQuizNotif,
-              $resultExamNotif,
               $resultQuestionGradeNotif,
               $resultAssignmentGradeNotif,
-              $resultQuizGradeNotif,
-              $resultExamGradeNotif
             );
             usort($allNotifications, function ($a, $b) {
               return strtotime($b['date']) - strtotime($a['date']);
@@ -118,7 +110,7 @@ $stmt->close();
                       <?php endif; ?>
                     </div>
                     <div class="preview-item-content">
-                    <?php if (isset($notification['title'])): ?>
+                      <?php if (isset($notification['title'])): ?>
                         <?php
                         $link = ($notification['type'] === 'news') ? 'news.php' : 'announcement.php';
 
@@ -187,46 +179,23 @@ $stmt->close();
                           </div>
                         <?php else: ?>
                           <?php if ($notification['notification_type'] === 'material'): ?>
-                            <div class="material-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="material-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a material in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'question'): ?>
-                            <div class="question-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="question-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a question in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                            <div class="assignment-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="assignment-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted an assignment in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                            <div class="quiz-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
-                                <?php echo $teacherName; ?> posted a quiz in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                            <div class="exam-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal">
-                                <?php echo $teacherName; ?> posted an exam in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
@@ -237,16 +206,14 @@ $stmt->close();
                           </p>
                         <?php endif; ?>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='course.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -256,30 +223,7 @@ $stmt->close();
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'quizGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['quizTitle']; ?>
-                          (quiz).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'examGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['examTitle']; ?>
-                          (exam).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -372,167 +316,41 @@ $stmt->close();
               </div>
             </div>
           </div>
+
           <div class="row">
-            <div class="col-md-4">
-              <div class="card align-items-center justify-content-center">
-                <div class="card-body">
+            <?php
+            // Iterate through each award type
+            $awardTypes = ['question', 'assignment', 'quiz', 'exam'];
+            foreach ($awardTypes as $awardType):
+              $sqlScore = "SELECT {$awardType}Title, score, {$awardType}Point FROM {$awardType}grade WHERE student_id = ?";
+              $stmtScore = $conn->prepare($sqlScore);
+              $stmtScore->bind_param("i", $user_id);
+              $stmtScore->execute();
+              $stmtScore->bind_result($title, $score, $point);
+
+              while ($stmtScore->fetch()):
+                // Check if the score is a perfect score
+                if ($score == $point):
+                  ?>
+                  <div class="col-md-4 mb-3">
+                    <div class="card align-items-center justify-content-center">
+                      <div class="card-body">
+                        <h2 class="text-body-secondary" style="text-align: center;">
+                          <?php echo $title; ?>
+                        </h2>
+                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
+                        <p style="text-align: center;">
+                          You got a perfect score in
+                          <?php echo $awardType; ?>! Congratulations, keep it up!
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                   <?php
-                  $sqlQuestionScore = "SELECT questionTitle, score, questionPoint FROM questiongrade
-                    WHERE student_id = ?";
-                  $stmtQuestionScore = $conn->prepare($sqlQuestionScore);
-                  $stmtQuestionScore->bind_param("i", $user_id);
-                  $stmtQuestionScore->execute();
-                  $stmtQuestionScore->bind_result($questionTitle, $score, $questionPoint);
-
-                  $stmtQuestionScore->fetch();
-                  if ($score == $questionPoint) {
-                    ?>
-                    <div class="col mb-3 align-items-center justify-content-center">
-                      <h2 class="text-body-secondary" style="text-align: center;">
-                        <?php echo $questionTitle; ?>
-                      </h2>
-                      <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                      <p style="text-align: center;">You got a perfect score in question! Congratulations, keep it up!</p>
-                    </div>
-                    <?php
-                  }
-                  while ($stmtQuestionScore->fetch()) {
-                    if ($score == $questionPoint) {
-                      ?>
-                      <div class="col mb-3 align-items-center justify-content-center">
-                        <h2 class="text-body-secondary" style="text-align: center;">
-                          <?php echo $questionTitle; ?>
-                        </h2>
-                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                        <p style="text-align: center;">You got a perfect score in question! Congratulations, keep it up!</p>
-                      </div>
-                      <?php
-                    }
-                  }
-                  ?>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card align-items-center justify-content-center">
-                <div class="card-body">
-                <?php
-                  $sqlAssignmentScore = "SELECT assignmentTitle, score, assignmentPoint FROM assignmentgrade
-                    WHERE student_id = ?";
-                  $stmtAssignmentScore = $conn->prepare($sqlAssignmentScore);
-                  $stmtAssignmentScore->bind_param("i", $user_id);
-                  $stmtAssignmentScore->execute();
-                  $stmtAssignmentScore->bind_result($assignmentTitle, $score, $assignmentPoint);
-
-                  $stmtAssignmentScore->fetch();
-                  if ($score == $assignmentPoint) {
-                    ?>
-                    <div class="col mb-3 align-items-center justify-content-center">
-                      <h2 class="text-body-secondary" style="text-align: center;">
-                        <?php echo $assignmentTitle; ?>
-                      </h2>
-                      <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                      <p style="text-align: center;">You got a perfect score in assignment! Congratulations, keep it up!</p>
-                    </div>
-                    <?php
-                  }
-                  while ($stmtAssignmentScore->fetch()) {
-                    if ($score == $assignmentPoint) {
-                      ?>
-                      <div class="col mb-3 align-items-center justify-content-center">
-                        <h2 class="text-body-secondary" style="text-align: center;">
-                          <?php echo $assignmentTitle; ?>
-                        </h2>
-                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                        <p style="text-align: center;">You got a perfect score in assignment! Congratulations, keep it up!</p>
-                      </div>
-                      <?php
-                    }
-                  }
-                  ?>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card align-items-center justify-content-center">
-                <div class="card-body">
-                <?php
-                  $sqlQuizScore = "SELECT quizTitle, score, quizPoint FROM quizgrade
-                    WHERE student_id = ?";
-                  $stmtQuizScore = $conn->prepare($sqlQuizScore);
-                  $stmtQuizScore->bind_param("i", $user_id);
-                  $stmtQuizScore->execute();
-                  $stmtQuizScore->bind_result($quizTitle, $score, $quizPoint);
-
-                  $stmtQuizScore->fetch();
-                  if ($score == $quizPoint) {
-                    ?>
-                    <div class="col mb-3 align-items-center justify-content-center">
-                      <h2 class="text-body-secondary" style="text-align: center;">
-                        <?php echo $quizTitle; ?>
-                      </h2>
-                      <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                      <p style="text-align: center;">You got a perfect score in quiz! Congratulations, keep it up!</p>
-                    </div>
-                    <?php
-                  }
-                  while ($stmtQuizScore->fetch()) {
-                    if ($score == $quizPoint) {
-                      ?>
-                      <div class="col mb-3 align-items-center justify-content-center">
-                        <h2 class="text-body-secondary" style="text-align: center;">
-                          <?php echo $quizTitle; ?>
-                        </h2>
-                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                        <p style="text-align: center;">You got a perfect score in quiz! Congratulations, keep it up!</p>
-                      </div>
-                      <?php
-                    }
-                  }
-                  ?>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card align-items-center justify-content-center">
-                <div class="card-body">
-                <?php
-                  $sqlExamScore = "SELECT examTitle, score, examPoint FROM examgrade
-                    WHERE student_id = ?";
-                  $stmtExamScore = $conn->prepare($sqlExamScore);
-                  $stmtExamScore->bind_param("i", $user_id);
-                  $stmtExamScore->execute();
-                  $stmtExamScore->bind_result($examTitle, $score, $examPoint);
-
-                  $stmtExamScore->fetch();
-                  if ($score == $examPoint) {
-                    ?>
-                    <div class="col mb-3 align-items-center justify-content-center">
-                      <h2 class="text-body-secondary" style="text-align: center;">
-                        <?php echo $examTitle; ?>
-                      </h2>
-                      <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                      <p style="text-align: center;">You got a perfect score in quiz! Congratulations, keep it up!</p>
-                    </div>
-                    <?php
-                  }
-                  while ($stmtExamScore->fetch()) {
-                    if ($score == $examPoint) {
-                      ?>
-                      <div class="col mb-3 align-items-center justify-content-center">
-                        <h2 class="text-body-secondary" style="text-align: center;">
-                          <?php echo $examTitle; ?>
-                        </h2>
-                        <img src="assets/image/perfect.png" style="height: 200px; width: 250px;">
-                        <p style="text-align: center;">You got a perfect score in quiz! Congratulations, keep it up!</p>
-                      </div>
-                      <?php
-                    }
-                  }
-                  ?>
-                </div>
-              </div>
-            </div>
+                endif;
+              endwhile;
+            endforeach;
+            ?>
           </div>
         </div>
       </div>

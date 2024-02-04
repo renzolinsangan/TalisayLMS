@@ -127,8 +127,9 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
   <nav class="navbar navbar-light fs-3 mb-5">
     <div class="d-flex align-items-center justify-content-between w-100">
       <div class="d-flex align-items-center" style="margin-top: -3px;">
-        <button type="button" class="go-back" onclick="goToClasswork('<?php echo $class_id; ?>')"><i
-            class="bi bi-arrow-bar-left" style="color: white;"></i></button>
+        <button type="button" class="go-back" onclick="goBack()">
+          <i class="bi bi-arrow-bar-left" style="color: white;"></i>
+        </button>
         <p class="name" style="margin-top: 6px; font-size: 22px; pointer-events: none; color: white;">
           Assignment
         </p>
@@ -320,14 +321,12 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
 
                 $stmt_assignment_answer->execute([$class_id, $assignment_id]);
                 $assignment_answer_data = $stmt_assignment_answer->fetch(PDO::FETCH_ASSOC);
-                header("Location:assignment_course.php?class_id=$class_id&assignment_id=$assignment_id");
 
                 if ($assignment_answer_data) {
                   $sql_update = "UPDATE assignment_course_upload SET status = 'submitted' 
                   WHERE class_id = ? AND assignment_id = ?";
                   $stmt_update = $db->prepare($sql_update);
                   $update_result = $stmt_update->execute([$class_id, $assignment_id]);
-                  header("Location:assignment_course.php?class_id=$class_id&assignment_id=$assignment_id");
                 }
               }
               ?>
@@ -495,8 +494,8 @@ $assignmentScore = $stmtAssignmentScore->fetchColumn();
   </form>
 
   <script>
-    function goToClasswork(classId) {
-      window.location.href = `class_course.php?class_id=${classId}`;
+    function goBack() {
+      window.history.back();
     }
   </script>
   <script>

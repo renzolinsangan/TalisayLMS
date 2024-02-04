@@ -537,7 +537,7 @@ if (isset($_POST['youtube_submit'])) {
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      var askButton = document.getElementById("ask_button"); // Get the "Ask" button
+      var askButton = document.getElementById("ask_button");
       var form = document.querySelector('form');
 
       askButton.addEventListener('click', function (event) {

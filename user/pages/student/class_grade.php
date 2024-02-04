@@ -12,6 +12,7 @@ if (isset($_GET['class_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $class_id = $_GET['class_id'];
+$tc_id = $_GET['tc_id'];
 
 $sql_get_teacher_id = "SELECT teacher_id FROM class_enrolled WHERE class_id = ?";
 $stmt_get_teacher_id = $db->prepare($sql_get_teacher_id);
@@ -86,12 +87,8 @@ $stmt->closeCursor();
             $resultMaterialNotif = getMaterialNotifications($db, $studentFullName);
             $resultQuestionNotif = getQuestionNotification($db, $studentFullName);
             $resultAssignmentNotif = getAssignmentNotification($db, $studentFullName);
-            $resultQuizNotif = getQuizNotification($db, $studentFullName);
-            $resultExamNotif = getExamNotification($db, $studentFullName);
             $resultQuestionGradeNotif = getQuestionScoreNotification($db, $user_id);
             $resultAssignmentGradeNotif = getAssignmentScoreNotification($db, $user_id);
-            $resultQuizGradeNotif = getQuizScoreNotification($db, $user_id);
-            $resultExamGradeNotif = getExamScoreNotification($db, $user_id);
 
             $allNotifications = array_merge(
               $resultNewsNotif,
@@ -100,12 +97,8 @@ $stmt->closeCursor();
               $resultMaterialNotif,
               $resultQuestionNotif,
               $resultAssignmentNotif,
-              $resultQuizNotif,
-              $resultExamNotif,
               $resultQuestionGradeNotif,
               $resultAssignmentGradeNotif,
-              $resultQuizGradeNotif,
-              $resultExamGradeNotif
             );
             usort($allNotifications, function ($a, $b) {
               return strtotime($b['date']) - strtotime($a['date']);
@@ -137,7 +130,7 @@ $stmt->closeCursor();
                       <?php endif; ?>
                     </div>
                     <div class="preview-item-content">
-                    <?php if (isset($notification['title'])): ?>
+                      <?php if (isset($notification['title'])): ?>
                         <?php
                         $link = ($notification['type'] === 'news') ? 'news.php' : 'announcement.php';
 
@@ -206,46 +199,23 @@ $stmt->closeCursor();
                           </div>
                         <?php else: ?>
                           <?php if ($notification['notification_type'] === 'material'): ?>
-                            <div class="material-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="material-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a material in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'question'): ?>
-                            <div class="question-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="question-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a question in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                            <div class="assignment-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="assignment-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted an assignment in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                            <div class="quiz-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
-                                <?php echo $teacherName; ?> posted a quiz in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                            <div class="exam-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal">
-                                <?php echo $teacherName; ?> posted an exam in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
@@ -256,16 +226,14 @@ $stmt->closeCursor();
                           </p>
                         <?php endif; ?>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='course.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -275,30 +243,7 @@ $stmt->closeCursor();
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'quizGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['quizTitle']; ?>
-                          (quiz).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'examGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['examTitle']; ?>
-                          (exam).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -379,7 +324,6 @@ $stmt->closeCursor();
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
         <div class="header" style="overflow-y: auto; white-space: nowrap;">
           <div class="header-links">
@@ -388,11 +332,14 @@ $stmt->closeCursor();
               $class_id = $_GET['class_id'];
               ?>
               <a class="btn-success" href="course.php"><i class="bi bi-arrow-bar-left" style="color: white;"></i></a>
-              <a href="class_course.php?class_id=<?php echo $class_id ?>" class="people"
+              <a href="class_course.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>" class="people"
                 style="margin-left: 2vh;">Stream</a>
-              <a href="class_classwork.php?class_id=<?php echo $class_id ?>" class="people">Classwork</a>
-              <a href="class_people.php?class_id=<?php echo $class_id ?>" class="people">People</a>
-              <a href="class_grade.php?class_id=<?php echo $class_id ?>" class="nav-link active">Grade</a>
+              <a href="class_classwork.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>"
+                class="people">Classwork</a>
+              <a href="class_people.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>"
+                class="people">People</a>
+              <a href="class_grade.php?class_id=<?php echo $class_id ?>&tc_id=<?php echo $tc_id ?>"
+                class="nav-link active">Grade</a>
               <?php
             }
             ?>
@@ -471,8 +418,7 @@ $stmt->closeCursor();
                       <div class="col-md-12">
                         <div class="card-body">
                           <div class="table-responsive">
-                            <table id="example" class="table table-bordered table-hover text-center"
-                              style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                            <table id="example" class="table table-bordered table-hover text-center">
                               <thead class="table" style="background-color: #4BB543; color: white;">
                                 <th scope="col" style="overflow: hidden;">Student Name</th>
                                 <?php
@@ -491,13 +437,13 @@ $stmt->closeCursor();
                                 $stmtAssignment->execute([$tc_id, $teacher_id]);
                                 $assignmentTitles = $stmtAssignment->fetchAll(PDO::FETCH_ASSOC);
 
-                                $sqlQuiz = "SELECT quizTitle as title, date, quizPoint as point, 'Quiz' as type FROM classwork_quiz 
+                                $sqlQuiz = "SELECT quizTitle as title, date, totalPoint as point, 'Quiz' as type FROM classwork_quiz 
                                 WHERE class_id = ? AND teacher_id = ?";
                                 $stmtQuiz = $db->prepare($sqlQuiz);
                                 $stmtQuiz->execute([$tc_id, $teacher_id]);
                                 $quizTitles = $stmtQuiz->fetchAll(PDO::FETCH_ASSOC);
 
-                                $sqlExam = "SELECT examTitle as title, date, examPoint as point, 'Exam' as type FROM classwork_exam 
+                                $sqlExam = "SELECT examTitle as title, date, totalPoint as point, 'Exam' as type FROM classwork_exam 
                                 WHERE class_id = ? AND teacher_id = ?";
                                 $stmtExam = $db->prepare($sqlExam);
                                 $stmtExam->execute([$tc_id, $teacher_id]);
@@ -520,7 +466,7 @@ $stmt->closeCursor();
                                       style="border-bottom: 1px solid white; color: black; width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
                                       <?php echo $title['title']; ?>
                                     </p>
-                                    <p style="color: white;">out of
+                                    <p style="color: white;">HPS -
                                       <?php echo $title['point']; ?>
                                     </p>
                                   </th>
@@ -598,25 +544,55 @@ $stmt->closeCursor();
                                       $examTitle = $title['title'];
 
                                       $sqlTotalScores = "
-                                      (SELECT score, questionPoint AS point FROM questiongrade WHERE student_id = ?)
+                                      (SELECT score, gradeType, questionPoint AS point FROM questiongrade WHERE student_id = ? AND gradeType = 'written')
                                       UNION ALL
-                                      (SELECT score, assignmentPoint AS point FROM assignmentgrade WHERE student_id = ?)
+                                      (SELECT score, gradeType, assignmentPoint AS point FROM assignmentgrade WHERE student_id = ? AND gradeType = 'written')
                                       UNION ALL
-                                      (SELECT score, quizPoint AS point FROM quizgrade WHERE student_id = ?)
+                                      (SELECT score, gradeType, quizPoint AS point FROM quizgrade WHERE student_id = ? AND gradeType = 'written')
                                       UNION ALL
-                                      (SELECT score, examPoint AS point FROM examgrade WHERE student_id = ?)
+                                      (SELECT score, gradeType, questionPoint AS point FROM questiongrade WHERE student_id = ? AND gradeType = 'performance')
+                                      UNION ALL
+                                      (SELECT score, gradeType, assignmentPoint AS point FROM assignmentgrade WHERE student_id = ? AND gradeType = 'performance')
+                                      UNION ALL
+                                      (SELECT score, gradeType, quizPoint AS point FROM quizgrade WHERE student_id = ? AND gradeType = 'performance')
+                                      UNION ALL
+                                      (SELECT score, 'exam' as gradeType, examPoint AS point FROM examgrade WHERE student_id = ?)
                                       ";
+
                                       $stmtTotalScores = $db->prepare($sqlTotalScores);
-                                      $stmtTotalScores->execute([$student_id, $student_id, $student_id, $student_id]);
+                                      $stmtTotalScores->execute([$student_id, $student_id, $student_id, $student_id, $student_id, $student_id, $student_id]);
+
                                       $totalScores = $stmtTotalScores->fetchAll(PDO::FETCH_ASSOC);
 
-                                      $totalScore = 0;
-                                      $totalPoints = 0;
+                                      $totalWrittenScore = 0;
+                                      $totalPerformanceScore = 0;
+                                      $totalExamsScore = 0;
+
+                                      $writtenScores = array_filter($totalScores, function ($score) {
+                                        return $score['gradeType'] === 'written';
+                                      });
+
+                                      $performanceScores = array_filter($totalScores, function ($score) {
+                                        return $score['gradeType'] === 'performance';
+                                      });
+
+                                      $examScores = array_filter($totalScores, function ($score) {
+                                        return $score['gradeType'] === 'exam';
+                                      });
+
+                                      foreach ($writtenScores as $writtenscore) {
+                                        $totalWrittenScore += $writtenscore['score'];
+                                      }
+
+                                      foreach ($performanceScores as $performancescore) {
+                                        $totalPerformanceScore += $performancescore['score'];
+                                      }
+
+                                      foreach ($examScores as $examscore) {
+                                        $totalExamsScore += $examscore['score'];
+                                      }
 
                                       foreach ($totalScores as $score) {
-                                        $totalScore += $score['score'];
-                                        $totalPoints += $score['point'];
-
                                         $sqlGradePercentage = "SELECT written, performance, exam, basegrade FROM section
                                         WHERE class_id = ? AND teacher_id = ?";
                                         $stmtGradePercentage = $db->prepare($sqlGradePercentage);
@@ -634,21 +610,81 @@ $stmt->closeCursor();
 
                                         $basegrade = $result['basegrade'];
                                         $basegradeMinus = 100 - $basegrade;
+                                        
+                                        $sqlQuestionWrittenTotal = "SELECT point FROM classwork_question WHERE 
+                                        class_id = ? AND teacher_id = ? AND type = 'written'";
+                                        $stmtQuestionWrittenTotal = $db->prepare($sqlQuestionWrittenTotal);
+                                        $stmtQuestionWrittenTotal->execute([$tc_id, $teacher_id]);
+                                        $questionTotalPointsW = $stmtQuestionWrittenTotal->fetchAll(PDO::FETCH_COLUMN);
 
-                                        $firstResult = ($basegradeMinus * $totalScore) / $totalPoints;
-                                        $finalResult = $firstResult + $basegrade;
+                                        $sqlAssignmentWrittenTotal = "SELECT point FROM classwork_assignment WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'written'";
+                                        $stmtAssignmentWrittenTotal = $db->prepare($sqlAssignmentWrittenTotal);
+                                        $stmtAssignmentWrittenTotal->execute([$tc_id, $teacher_id]);
+                                        $assignmentTotalPointsW = $stmtAssignmentWrittenTotal->fetchAll(PDO::FETCH_COLUMN);
 
-                                        $writtenResult = $finalResult * $writtenPercentage;
-                                        $performanceResult = $finalResult * $performancePercentage;
-                                        $examResult = $finalResult * $examPercentage;
+                                        $sqlQuizWrittenTotal = "SELECT totalPoint FROM classwork_quiz WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'written'";
+                                        $stmtQuizWrittenTotal = $db->prepare($sqlQuizWrittenTotal);
+                                        $stmtQuizWrittenTotal->execute([$tc_id, $teacher_id]);
+                                        $quizTotalPointsW = $stmtQuizWrittenTotal->fetchAll(PDO::FETCH_COLUMN);
 
-                                        $finalGrade = $writtenResult + $performanceResult + $examResult;
+                                        $writtenQuestionTotalPoints = array_sum($questionTotalPointsW);
+                                        $writtenAssignmentTotalPoints = array_sum($assignmentTotalPointsW);
+                                        $writtenQuizTotalPoints = array_sum($quizTotalPointsW);
+
+                                        $totalWrittenPoints = $writtenQuestionTotalPoints + $writtenAssignmentTotalPoints + $writtenQuizTotalPoints;
+
+                                        $sqlQuestionPerformanceTotal = "SELECT point FROM classwork_question WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'performance'";
+                                        $stmtQuestionPerformanceTotal = $db->prepare($sqlQuestionPerformanceTotal);
+                                        $stmtQuestionPerformanceTotal->execute([$tc_id, $teacher_id]);
+                                        $questionTotalPointsP = $stmtQuestionPerformanceTotal->fetchAll(PDO::FETCH_COLUMN);
+
+                                        $sqlAssignmentPerformanceTotal = "SELECT point FROM classwork_assignment WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'performance'";
+                                        $stmtAssignmentPerformanceTotal = $db->prepare($sqlAssignmentPerformanceTotal);
+                                        $stmtAssignmentPerformanceTotal->execute([$tc_id, $teacher_id]);
+                                        $assignmentTotalPointsP = $stmtAssignmentPerformanceTotal->fetchAll(PDO::FETCH_COLUMN);
+
+                                        $sqlQuizPerformanceTotal = "SELECT totalPoint FROM classwork_quiz WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'performance'";
+                                        $stmtQuizPerformanceTotal = $db->prepare($sqlQuizPerformanceTotal);
+                                        $stmtQuizPerformanceTotal->execute([$tc_id, $teacher_id]);
+                                        $quizTotalPointsP = $stmtQuizPerformanceTotal->fetchAll(PDO::FETCH_COLUMN);
+
+                                        $performanceQuestionTotalPoints = array_sum($questionTotalPointsP);
+                                        $performanceAssignmentTotalPoints = array_sum($assignmentTotalPointsP);
+                                        $performanceQuizTotalPoints = array_sum($quizTotalPointsP);
+
+                                        $totalPerformancePoints = $performanceQuestionTotalPoints + $performanceAssignmentTotalPoints + $performanceQuizTotalPoints;
+
+                                        $sqlExamTotal = "SELECT totalPoint FROM classwork_exam WHERE class_id = ? AND teacher_id = ?";
+                                        $stmtExamTotal = $db->prepare($sqlExamTotal);
+                                        $stmtExamTotal->execute([$tc_id, $teacher_id]);
+                                        $examTotalPoints = $stmtExamTotal->fetchAll(PDO::FETCH_COLUMN);
+
+                                        $totalExamPoints = array_sum($examTotalPoints);
+
+                                        $writtenFirstResult = round(($totalWrittenScore * $basegradeMinus) / $totalWrittenPoints, 2);
+                                        $performanceFirstResult = round(($totalPerformanceScore * $basegradeMinus) / $totalPerformancePoints, 2);
+                                        $examFirstResult = round(($totalExamsScore * $basegradeMinus) / $totalExamPoints, 2);
+
+                                        $writtenSecondResult = round($writtenFirstResult + $basegrade, 2);
+                                        $performanceSecondResult = round($performanceFirstResult + $basegrade, 2);
+                                        $examSecondResult = round($examFirstResult + $basegrade, 2);
+
+                                        $writtenFinalResult = round($writtenSecondResult * $writtenPercentage, 2);
+                                        $performanceFinalResult = round($performanceSecondResult * $performancePercentage, 2);
+                                        $examFinalResult = round($examSecondResult * $examPercentage, 2);
+
+                                        $finalGrade = $writtenFinalResult + $performanceFinalResult + $examFinalResult;
                                       }
                                     }
                                     if (!empty($totalScores)) {
                                       ?>
                                       <td style="color: <?php echo $finalGrade < 75 ? 'red' : 'green'; ?>">
-                                        <?php echo floor($finalGrade) == $finalGrade ? number_format($finalGrade, 0) : number_format($finalGrade, 2); ?>
+                                        <?php echo $finalGrade ?>
                                       </td>
                                       <?php
                                     }
@@ -672,6 +708,7 @@ $stmt->closeCursor();
       </div>
     </div>
 
+    <script type="text/javascript" src="js/table2excel.js"></script>
     <script src="../../vendors/js/vendor.bundle.base.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>

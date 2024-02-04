@@ -9,6 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_GET['user_id'];
 $class_id = $_GET['class_id'];
+$tc_id = $_GET['tc_id'];
 $question_id = $_GET['question_id'];
 
 $sql_get_teacher_id = "SELECT teacher_id FROM class_enrolled WHERE class_id=?";
@@ -81,8 +82,9 @@ $questionScore = $stmtQuestionScore->fetchColumn();
   <nav class="navbar navbar-light fs-3 mb-5">
     <div class="d-flex align-items-center justify-content-between w-100">
       <div class="d-flex align-items-center" style="margin-top: -3px;">
-        <button type="button" class="go-back" onclick="goToClasswork('<?php echo $class_id; ?>')"><i
-            class="bi bi-arrow-bar-left" style="color: white;"></i></button>
+        <button type="button" class="go-back" onclick="goBack()">
+          <i class="bi bi-arrow-bar-left" style="color: white;"></i>
+        </button>
         <p class="name" style="margin-top: 6px; font-size: 22px; pointer-events: none; color: white;">
           Question
         </p>
@@ -332,8 +334,8 @@ $questionScore = $stmtQuestionScore->fetchColumn();
   </div>
 
   <script>
-    function goToClasswork(classId) {
-      window.location.href = `class_course.php?class_id=${classId}`;
+    function goBack() {
+      window.history.back();
     }
     function resizeTextarea(textarea) {
       const initialHeight = textarea.scrollHeight + "px";

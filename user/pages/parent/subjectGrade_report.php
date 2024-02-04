@@ -114,7 +114,7 @@ if ($row) {
 
                 $link = ($type === 'news') ? 'news.php' : 'announcement.php';
 
-                echo '<a href="view_' . $link . '?news_id='. $news_id .'" class="dropdown-item preview-item">';
+                echo '<a href="view_' . $link . '?news_id=' . $news_id . '" class="dropdown-item preview-item">';
                 echo '<div class="preview-thumbnail">';
                 echo '<div class="preview-icon bg-success">';
                 echo '<i class="ti-info-alt mx-0"></i>';
@@ -232,64 +232,139 @@ if ($row) {
                 </h2>
               </div>
               <?php
-              $getClassID = $_GET['class_id'];
+              include("config.php");
 
-              $sqlUnion = "
-                  (SELECT score, questionPoint AS point FROM questiongrade WHERE student_id = ? AND class_id = ?)
-                  UNION ALL
-                  (SELECT score, assignmentPoint AS point FROM assignmentgrade WHERE student_id = ? AND class_id = ?)
-                  UNION ALL
-                  (SELECT score, quizPoint AS point FROM quizgrade WHERE student_id = ? AND class_id = ?)
-                  UNION ALL
-                  (SELECT score, examPoint AS point FROM examgrade WHERE student_id = ? AND class_id = ?)
-              ";
+              $classID = $_GET['class_id'];
+              $teacherID = $_GET['teacher_id'];
 
-              $stmtUnion = $db->prepare($sqlUnion);
-              $stmtUnion->execute([$childrenID, $getClassID, $childrenID, $getClassID, $childrenID, $getClassID, $childrenID, $getClassID]);
-              $unionResult = $stmtUnion->fetchAll(PDO::FETCH_ASSOC);
+              $sqlTotalScores = "
+    (SELECT score, gradeType, questionPoint AS point FROM questiongrade WHERE student_id = ? AND class_id = ? AND gradeType IN ('written', 'performance'))
+    UNION ALL
+    (SELECT score, gradeType, assignmentPoint AS point FROM assignmentgrade WHERE student_id = ? AND class_id = ? AND gradeType IN ('written', 'performance'))
+    UNION ALL
+    (SELECT score, gradeType, quizPoint AS point FROM quizgrade WHERE student_id = ? AND class_id = ? AND gradeType IN ('written', 'performance'))
+    UNION ALL
+    (SELECT score, 'exam' as gradeType, examPoint AS point FROM examgrade WHERE student_id = ? AND class_id = ?)
+";
 
-              $totalScore = 0;
-              $totalPoints = 0;
+              $stmtTotalScores = $db->prepare($sqlTotalScores);
+              $stmtTotalScores->execute([$childrenID, $classID, $childrenID, $classID, $childrenID, $classID, $childrenID, $classID]);
+              $totalScores = $stmtTotalScores->fetchAll(PDO::FETCH_ASSOC);
 
-              foreach ($unionResult as $row) {
-                $totalScore += $row['score'];
-                $totalPoints += $row['point'];
+              $totalWrittenScore = 0;
+              $totalPerformanceScore = 0;
+              $totalExamsScore = 0;
+
+              $writtenScores = array_filter($totalScores, function ($score) {
+                return $score['gradeType'] === 'written';
+              });
+
+              $performanceScores = array_filter($totalScores, function ($score) {
+                return $score['gradeType'] === 'performance';
+              });
+
+              $examScores = array_filter($totalScores, function ($score) {
+                return $score['gradeType'] === 'exam';
+              });
+
+              foreach ($writtenScores as $writtenscore) {
+                $totalWrittenScore += $writtenscore['score'];
               }
 
-              if ($totalPoints !== 0) {
-                $getTeacherID = $_GET['teacher_id'];
-
-                $sqlGradePercentage = "SELECT written, performance, exam, basegrade FROM section
-        WHERE class_id = ? AND teacher_id = ?";
-                $stmtGradePercentage = $db->prepare($sqlGradePercentage);
-                $stmtGradePercentage->execute([$getClassID, $getTeacherID]);
-                $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
-
-                $written = $result['written'];
-                $writtenPercentage = $written / 100;
-
-                $performance = $result['performance'];
-                $performancePercentage = $performance / 100;
-
-                $exam = $result['exam'];
-                $examPercentage = $exam / 100;
-
-                $basegrade = $result['basegrade'];
-                $basegradeMinus = 100 - $basegrade;
-
-                $firstResult = ($basegradeMinus * $totalScore) / $totalPoints;
-                $finalResult = $firstResult + $basegrade;
-
-                $writtenResult = $finalResult * $writtenPercentage;
-                $performanceResult = $finalResult * $performancePercentage;
-                $examResult = $finalResult * $examPercentage;
-
-                $finalGrade = $writtenResult + $performanceResult + $examResult;
-              } else {
-                $finalGrade = 0;
+              foreach ($performanceScores as $performancescore) {
+                $totalPerformanceScore += $performancescore['score'];
               }
+
+              foreach ($examScores as $examscore) {
+                $totalExamsScore += $examscore['score'];
+              }
+
+              $sqlGradePercentage = "SELECT written, performance, exam, basegrade FROM section WHERE class_id = ? AND teacher_id = ?";
+              $stmtGradePercentage = $db->prepare($sqlGradePercentage);
+              $stmtGradePercentage->execute([$classID, $teacherID]);
+              $result = $stmtGradePercentage->fetch(PDO::FETCH_ASSOC);
+
+              $written = $result['written'];
+              $writtenPercentage = $written / 100;
+
+              $performance = $result['performance'];
+              $performancePercentage = $performance / 100;
+
+              $exam = $result['exam'];
+              $examPercentage = $exam / 100;
+
+              $basegrade = $result['basegrade'];
+              $basegradeMinus = 100 - $basegrade;
+
+              $sqlQuestionWrittenTotal = "SELECT point FROM classwork_question WHERE 
+                                        class_id = ? AND teacher_id = ? AND type = 'written'";
+              $stmtQuestionWrittenTotal = $db->prepare($sqlQuestionWrittenTotal);
+              $stmtQuestionWrittenTotal->execute([$class_id, $teacher_id]);
+              $questionTotalPointsW = $stmtQuestionWrittenTotal->fetchAll(PDO::FETCH_COLUMN);
+
+              $sqlAssignmentWrittenTotal = "SELECT point FROM classwork_assignment WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'written'";
+              $stmtAssignmentWrittenTotal = $db->prepare($sqlAssignmentWrittenTotal);
+              $stmtAssignmentWrittenTotal->execute([$class_id, $teacher_id]);
+              $assignmentTotalPointsW = $stmtAssignmentWrittenTotal->fetchAll(PDO::FETCH_COLUMN);
+
+              $sqlQuizWrittenTotal = "SELECT totalPoint FROM classwork_quiz WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'written'";
+              $stmtQuizWrittenTotal = $db->prepare($sqlQuizWrittenTotal);
+              $stmtQuizWrittenTotal->execute([$class_id, $teacher_id]);
+              $quizTotalPointsW = $stmtQuizWrittenTotal->fetchAll(PDO::FETCH_COLUMN);
+
+              $writtenQuestionTotalPoints = array_sum($questionTotalPointsW);
+              $writtenAssignmentTotalPoints = array_sum($assignmentTotalPointsW);
+              $writtenQuizTotalPoints = array_sum($quizTotalPointsW);
+
+              $totalWrittenPoints = $writtenQuestionTotalPoints + $writtenAssignmentTotalPoints + $writtenQuizTotalPoints;
+
+              $sqlQuestionPerformanceTotal = "SELECT point FROM classwork_question WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'performance'";
+              $stmtQuestionPerformanceTotal = $db->prepare($sqlQuestionPerformanceTotal);
+              $stmtQuestionPerformanceTotal->execute([$class_id, $teacher_id]);
+              $questionTotalPointsP = $stmtQuestionPerformanceTotal->fetchAll(PDO::FETCH_COLUMN);
+
+              $sqlAssignmentPerformanceTotal = "SELECT point FROM classwork_assignment WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'performance'";
+              $stmtAssignmentPerformanceTotal = $db->prepare($sqlAssignmentPerformanceTotal);
+              $stmtAssignmentPerformanceTotal->execute([$class_id, $teacher_id]);
+              $assignmentTotalPointsP = $stmtAssignmentPerformanceTotal->fetchAll(PDO::FETCH_COLUMN);
+
+              $sqlQuizPerformanceTotal = "SELECT totalPoint FROM classwork_quiz WHERE
+                                        class_id = ? AND teacher_id = ? AND type = 'performance'";
+              $stmtQuizPerformanceTotal = $db->prepare($sqlQuizPerformanceTotal);
+              $stmtQuizPerformanceTotal->execute([$class_id, $teacher_id]);
+              $quizTotalPointsP = $stmtQuizPerformanceTotal->fetchAll(PDO::FETCH_COLUMN);
+
+              $performanceQuestionTotalPoints = array_sum($questionTotalPointsP);
+              $performanceAssignmentTotalPoints = array_sum($assignmentTotalPointsP);
+              $performanceQuizTotalPoints = array_sum($quizTotalPointsP);
+
+              $totalPerformancePoints = $performanceQuestionTotalPoints + $performanceAssignmentTotalPoints + $performanceQuizTotalPoints;
+
+              $sqlExamTotal = "SELECT totalPoint FROM classwork_exam WHERE class_id = ? AND teacher_id = ?";
+              $stmtExamTotal = $db->prepare($sqlExamTotal);
+              $stmtExamTotal->execute([$class_id, $teacher_id]);
+              $examTotalPoints = $stmtExamTotal->fetchAll(PDO::FETCH_COLUMN);
+
+              $totalExamPoints = array_sum($examTotalPoints);
+
+              $writtenFirstResult = round(($totalWrittenScore * $basegradeMinus) / $totalWrittenPoints, 2);
+              $performanceFirstResult = round(($totalPerformanceScore * $basegradeMinus) / $totalPerformancePoints, 2);
+              $examFirstResult = round(($totalExamsScore * $basegradeMinus) / $totalExamPoints, 2);
+
+              $writtenSecondResult = round($writtenFirstResult + $basegrade, 2);
+              $performanceSecondResult = round($performanceFirstResult + $basegrade, 2);
+              $examSecondResult = round($examFirstResult + $basegrade, 2);
+
+              $writtenFinalResult = round($writtenSecondResult * $writtenPercentage, 2);
+              $performanceFinalResult = round($performanceSecondResult * $performancePercentage, 2);
+              $examFinalResult = round($examSecondResult * $examPercentage, 2);
+
+              $finalGrade = $writtenFinalResult + $performanceFinalResult + $examFinalResult;
               ?>
-
               <div class="col text-end">
                 <h2 style="color: <?php echo $finalGrade < 75 ? 'red' : 'green'; ?>">
                   <?php echo floor($finalGrade) == $finalGrade ? number_format($finalGrade, 0) : number_format($finalGrade, 2); ?>%
@@ -335,13 +410,13 @@ WHERE class_id = ? AND teacher_id = ? ORDER BY date";
                         $stmtGetAssignmentDetail->execute([$getClass_id, $getTeacher_id]);
                         $assignmentDetail = $stmtGetAssignmentDetail->fetchAll(PDO::FETCH_ASSOC);
 
-                        $sqlGetQuizDetail = "SELECT quizTitle AS title, date, dueDate AS due_date, quizStatus FROM classwork_quiz
+                        $sqlGetQuizDetail = "SELECT quizTitle AS title, date, due_date, quiz_status FROM classwork_quiz
 WHERE class_id = ? AND teacher_id = ? ORDER BY date";
                         $stmtGetQuizDetail = $db->prepare($sqlGetQuizDetail);
                         $stmtGetQuizDetail->execute([$getClass_id, $getTeacher_id]);
                         $quizDetail = $stmtGetQuizDetail->fetchAll(PDO::FETCH_ASSOC);
 
-                        $sqlGetExamDetail = "SELECT examTitle AS title, date, dueDate AS due_date, examStatus FROM classwork_exam
+                        $sqlGetExamDetail = "SELECT examTitle AS title, date, due_date, exam_status FROM classwork_exam
 WHERE class_id = ? AND teacher_id = ? ORDER BY date";
                         $stmtGetExamDetail = $db->prepare($sqlGetExamDetail);
                         $stmtGetExamDetail->execute([$getClass_id, $getTeacher_id]);
@@ -365,12 +440,12 @@ WHERE class_id = ? AND teacher_id = ? ORDER BY date";
                           } elseif (isset($detail['assignment_status'])) {
                             $sqlGetAnswerStatus = "SELECT assignment_course_status AS status FROM student_assignment_course_answer
                              WHERE user_id = ? AND teacher_id = ? AND title = ?";
-                          } elseif (isset($detail['quizStatus'])) {
-                            $sqlGetAnswerStatus = "SELECT quiz_course_status AS status FROM student_quiz_course_answer
-                            WHERE user_id = ? AND teacher_id = ? AND quizTitle = ?";
-                          } elseif (isset($detail['examStatus'])) {
-                            $sqlGetAnswerStatus = "SELECT exam_course_status AS status FROM student_exam_course_answer
-                          WHERE user_id = ? AND teacher_id = ? AND examTitle = ?";
+                          } elseif (isset($detail['quiz_status'])) {
+                            $sqlGetAnswerStatus = "SELECT quizStatus AS status FROM quizgrade
+                            WHERE student_id = ? AND teacher_id = ? AND quizTitle = ?";
+                          } elseif (isset($detail['exam_status'])) {
+                            $sqlGetAnswerStatus = "SELECT examStatus AS status FROM examgrade
+                          WHERE student_id = ? AND teacher_id = ? AND examTitle = ?";
                           }
                           $stmtGetAnswerStatus = $db->prepare($sqlGetAnswerStatus);
                           $stmtGetAnswerStatus->execute([$childrenID, $getTeacher_id, $title]);
@@ -383,10 +458,10 @@ WHERE class_id = ? AND teacher_id = ? ORDER BY date";
                             $status = $detail['question_status'];
                           } elseif (isset($detail['assignment_status'])) {
                             $status = $detail['assignment_status'];
-                          } elseif (isset($detail['quizStatus'])) {
-                            $status = $detail['quizStatus'];
-                          } elseif (isset($detail['examStatus'])) {
-                            $status = $detail['examStatus'];
+                          } elseif (isset($detail['quiz_status'])) {
+                            $status = $detail['quiz_status'];
+                          } elseif (isset($detail['exam_status'])) {
+                            $status = $detail['exam_status'];
                           }
 
                           if (isset($detail['question_status'])) {
@@ -395,10 +470,10 @@ WHERE class_id = ? AND teacher_id = ? ORDER BY date";
                           } elseif (isset($detail['assignment_status'])) {
                             $sqlGetScore = "SELECT score, assignmentPoint FROM assignmentgrade 
                             WHERE student_id = ? AND teacher_id = ? AND assignmentTitle = ?";
-                          } elseif (isset($detail['quizStatus'])) {
+                          } elseif (isset($detail['quiz_status'])) {
                             $sqlGetScore = "SELECT score, quizPoint FROM quizgrade
                           WHERE student_id = ? AND teacher_id = ? AND quizTitle = ?";
-                          } elseif (isset($detail['examStatus'])) {
+                          } elseif (isset($detail['exam_status'])) {
                             $sqlGetScore = "SELECT score, examPoint FROM examgrade
                           WHERE student_id = ? AND teacher_id = ? AND examTitle = ?";
                           }

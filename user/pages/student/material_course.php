@@ -66,11 +66,12 @@ if ($teacher_id) {
   <nav class="navbar navbar-light fs-3 mb-5">
     <div class="d-flex align-items-center justify-content-between w-100">
       <div class="d-flex align-items-center" style="margin-top: -3px;">
-        <button type="button" class="go-back" onclick="goToClasswork('<?php echo $class_id; ?>')"><i
-            class="bi bi-arrow-bar-left" style="color: white;"></i></button>
-            <p class="name" style="margin-top: 6px; font-size: 22px; pointer-events: none; color: white;">
-              Material
-            </p>
+        <button type="button" class="go-back" onclick="goBack()">
+          <i class="bi bi-arrow-bar-left" style="color: white;"></i>
+        </button>
+        <p class="name" style="margin-top: 6px; font-size: 22px; pointer-events: none; color: white;">
+          Material
+        </p>
       </div>
     </div>
   </nav>
@@ -128,7 +129,7 @@ if ($teacher_id) {
               </a>
             </div>
           </div>
-        <?php
+          <?php
         }
         ?>
         <?php if (!empty($link) && $link != 'null') {
@@ -152,7 +153,7 @@ if ($teacher_id) {
               </a>
             </div>
           </div>
-        <?php
+          <?php
         }
         ?>
         <?php if (!empty($youtube) && $youtube != 'null') { ?>
@@ -175,7 +176,7 @@ if ($teacher_id) {
               </a>
             </div>
           </div>
-        <?php
+          <?php
         }
         ?>
       </div>
@@ -194,8 +195,8 @@ if ($teacher_id) {
   </div>
 
   <script>
-    function goToClasswork(classId) {
-      window.location.href = `class_course.php?class_id=${classId}`;
+    function goBack() {
+      window.history.back();
     }
   </script>
   <script type="text/javascript" src="js/virtual-select.min.js"></script>

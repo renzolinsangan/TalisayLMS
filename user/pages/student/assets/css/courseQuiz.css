@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    list-style: none;
+}
+
+.navbar {
+    height: 8vh;
+    border-bottom: 1px solid greenyellow;
+    background-color: green;
+}
+
+.go-back {
+    margin-bottom: 8px;
+    margin-left: 15px;
+    margin-right: 22px;
+    border: none;
+    background-color: transparent;
+    font-weight: normal;
+}
+
+.custom-icon {
+    color: darkslategrey;
+    font-size: 20px;
+    transform: scale(0.8);
+    font-weight: normal;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+#quizTitle {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    font-size: 30px;
+}
+
+#quizInstruction {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    font-size: 15px;
+    overflow: hidden;
+    resize: none;
+    height: 10px;
+}
+
+#essayAnswer {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    font-size: 15px;
+    overflow: hidden;
+    resize: none;
+    height: 10px;
+}
+
+.form-check-input {
+    font-size: 20px;
+}
+
+.form-check-input:checked {
+    background-color: green !important;
+    border-color: green !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    box-shadow: none !important;
+    border: none !important;
+    border-bottom: 1px solid #ccc !important;
+}

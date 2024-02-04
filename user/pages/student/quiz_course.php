@@ -9,55 +9,41 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $class_id = $_GET['class_id'];
+$tc_id = $_GET['tc_id'];
 $quiz_id = $_GET['quiz_id'];
+$teacher_id = $_GET['teacher_id'];
 
-$sql_get_teacher_id = "SELECT teacher_id FROM class_enrolled WHERE class_id=?";
-$stmt_get_teacher_id = $db->prepare($sql_get_teacher_id);
-$stmt_get_teacher_id->execute([$class_id]);
-$teacher_id = $stmt_get_teacher_id->fetchColumn();
+$sqlStudentName = "SELECT firstname, lastname FROM user_account WHERE user_id = ?";
+$stmtStudentName = $db->prepare($sqlStudentName);
+$stmtStudentName->execute([$user_id]);
+$studentNameResult = $stmtStudentName->fetch(PDO::FETCH_ASSOC);
 
-if ($teacher_id) {
-  $sql_get_class_info = "SELECT class_name, first_name, last_name FROM class_enrolled WHERE teacher_id=?";
-  $stmt_get_class_info = $db->prepare($sql_get_class_info);
-  $stmt_get_class_info->execute([$teacher_id]);
-  $class_info = $stmt_get_class_info->fetch(PDO::FETCH_ASSOC);
-
-  if ($class_info) {
-    $class_name = $class_info['class_name'];
-    $first_name = $class_info['first_name'];
-    $last_name = $class_info['last_name'];
-
-    $sql_get_quiz_info = "SELECT quizTitle, quizInstruction, quizLink, quizPoint, date, dueDate, time, quizStatus 
-    FROM classwork_quiz WHERE teacher_id=? AND quiz_id=?";
-    $stmt_get_quiz_info = $db->prepare($sql_get_quiz_info);
-    $stmt_get_quiz_info->execute([$teacher_id, $quiz_id]);
-    $quiz_data = $stmt_get_quiz_info->fetch(PDO::FETCH_ASSOC);
-
-    if ($quiz_data) {
-      $quizTitle = $quiz_data['quizTitle'];
-      $quizInstruction = $quiz_data['quizInstruction'];
-      $quizLink = $quiz_data['quizLink'];
-      $quizPoint = $quiz_data['quizPoint'];
-      $date = $quiz_data['date'];
-      $dueDate = $quiz_data['dueDate'];
-      $formatted_due_date = date("F j", strtotime($dueDate));
-      $time = $quiz_data['time'];
-      $quizStatus = $quiz_data['quizStatus'];
-    }
-  }
+if ($studentNameResult) {
+  $studentFirstName = $studentNameResult['firstname'];
+  $studentLastName = $studentNameResult['lastname'];
 }
 
-$sql_quizCourseStatus = "SELECT quiz_course_status FROM student_quiz_course_answer 
-WHERE class_id = ? AND quiz_id = ? AND user_id = ?";
-$stmt_quizCourseStatus = $db->prepare($sql_quizCourseStatus);
-$stmt_quizCourseStatus->execute([$class_id, $quiz_id, $user_id]);
-$quizCourseStatus = $stmt_quizCourseStatus->fetchColumn();
+$sqlQuizInfo = "SELECT * FROM classwork_quiz WHERE class_id = ? AND teacher_id = ? AND quiz_id = ?";
+$stmtQuizInfo = $db->prepare($sqlQuizInfo);
+$stmtQuizInfo->execute([$tc_id, $teacher_id, $quiz_id]);
+$quizInfoResult = $stmtQuizInfo->fetch(PDO::FETCH_ASSOC);
 
-$sqlQuizScore = "SELECT score FROM quizgrade 
-WHERE quizTitle = ? AND quiz_id = ? AND student_id = ?";
-$stmtQuizScore = $db->prepare($sqlQuizScore);
-$stmtQuizScore->execute([$quizTitle, $quiz_id, $user_id]);
-$quizScore = $stmtQuizScore->fetchColumn();
+if ($quizInfoResult) {
+  $quizTitle = $quizInfoResult['quizTitle'];
+  $quizInstruction = $quizInfoResult['quizInstruction'];
+  $quizType = $quizInfoResult['type'];
+  $quizStatus = $quizInfoResult['quiz_status'];
+  $totalPoint = $quizInfoResult['totalPoint'];
+  $questionIds = $quizInfoResult['questionIds'];
+
+  $questionIdsArray = json_decode($questionIds, true);
+  $questionIdsString = implode(',', $questionIdsArray);
+
+  $sqlQuizQuestions = "SELECT * FROM classwork_quizquestion WHERE quizQuestion_id IN ($questionIdsString)";
+  $stmtQuizQuestions = $db->prepare($sqlQuizQuestions);
+  $stmtQuizQuestions->execute();
+  $quizQuestions = $stmtQuizQuestions->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -67,7 +53,7 @@ $quizScore = $stmtQuizScore->fetchColumn();
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Talisay Senior High School LMS</title>
   <link rel="stylesheet" type="text/css" href="assets/css/virtual-select.min.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/quiz_course.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/courseQuiz.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -75,152 +61,341 @@ $quizScore = $stmtQuizScore->fetchColumn();
 </head>
 
 <body>
-
-  <nav class="navbar navbar fs-3 mb-5" style="background-color: green;">
+  <nav class="navbar navbar-light fs-3 mb-5">
     <div class="d-flex align-items-center justify-content-between w-100">
-      <div class="d-flex align-items-center" style="margin-top: -3px;">
-        <button type="button" class="go-back" onclick="goToClasswork('<?php echo $class_id; ?>')"><i
-            class="bi bi-arrow-bar-left" style="color: white;"></i></button>
-        <p class="name" style="margin-top: 6px; font-size: 22px; pointer-events: none; color: white;">
-          Quiz
-        </p>
+      <div class="d-flex align-items-center">
+        <button type="button" class="go-back" onclick="goBack()">
+          <i class="bi bi-arrow-bar-left" style="color: white;"></i>
+        </button>
+        <p style="margin-top: 6px; font-size: 22px; pointer-events: none; color: white;">Quiz</p>
       </div>
     </div>
   </nav>
+  <?php
+  if (isset($_POST['submitQuiz'])) {
+    $multipleTotalScore = 0;
+    $identificationTotalScore = 0;
+    $trueFalseTotalScore = 0;
 
+    foreach ($quizQuestions as $question) {
+      $questionType = $question['questionType'];
+      $questionAnswerKey = $question['questionAnswerKey'];
+
+      switch ($questionType) {
+        case 'multiple':
+          $selectedChoice = isset($_POST['flexRadioDefault_' . $question['quizQuestion_id']]) ? $_POST['flexRadioDefault_' . $question['quizQuestion_id']] : '';
+          if (!empty($selectedChoice) && $selectedChoice == $questionAnswerKey) {
+            $multipleTotalScore += $question['questionPoint'];
+          }
+          break;
+
+        case 'identification':
+          $userAnswer = isset($_POST['identificationAnswer_' . $question['quizQuestion_id']]) ? $_POST['identificationAnswer_' . $question['quizQuestion_id']] : '';
+          if (!empty($userAnswer) && $userAnswer == $questionAnswerKey) {
+            $identificationTotalScore += $question['questionPoint'];
+          }
+          break;
+
+        case 'truefalse':
+          $selectedValue = isset($_POST['trueFalseGroup_' . $question['quizQuestion_id']]) ? $_POST['trueFalseGroup_' . $question['quizQuestion_id']] : '';
+          if (!empty($selectedValue) && $selectedValue == $questionAnswerKey) {
+            $trueFalseTotalScore += $question['questionPoint'];
+          }
+          break;
+      }
+    }
+    $totalScore = $multipleTotalScore + $identificationTotalScore + $trueFalseTotalScore;
+    $quizTitle = $_POST['quizTitle'];
+    $studentFirstName = $_POST['studentFirstName'];
+    $studentLastName = $_POST['studentLastName'];
+    $gradeType = $_POST['gradeType'];
+    $quizPoint = $_POST['quizPoint'];
+    $quizStatus = ($quizStatus === 'assigned') ? 'turned-in' : 'turned-in late';
+    $student_id = $_SESSION['user_id'];
+    $teacher_id = $_GET['teacher_id'];
+    $class_id = $_GET['class_id'];
+    $quiz_id = $_GET['quiz_id'];
+
+    $sqlQuizSubmitted = "INSERT INTO quizgrade (quizTitle, studentFirstName, studentLastName, date, gradeType, score, quizPoint, 
+    quizStatus, student_id, teacher_id, class_id, quiz_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmtQuizSubmitted = $db->prepare($sqlQuizSubmitted);
+    $stmtQuizSubmitted->execute([
+      $quizTitle,
+      $studentFirstName,
+      $studentLastName,
+      $gradeType,
+      $totalScore,
+      $quizPoint,
+      $quizStatus,
+      $student_id,
+      $teacher_id,
+      $tc_id,
+      $quiz_id
+    ]);
+  }
+  ?>
   <div class="wrapper">
-    <div class="container">
-      <div class="row justify-content-left align-items-center">
-        <div class="col col-sm-12">
-          <div class="d-flex align-items-center justify-content-left">
-            <div
-              style="display: inline-block; background-color: green; border-radius: 50%; width: 48px; height: 48px; text-align: center; margin-right: 10px; margin-bottom: 70px;">
-              <i class="bi bi-card-list" style="color: white; line-height: 48px; font-size: 30px;"></i>
-            </div>
-            <div>
-              <h2>
-                <?php echo $quizTitle ?>
-              </h2>
-              <p class="text-body-secondary">
-                <?php echo $first_name . " " . $last_name ?>
-              </p>
-              <?php
-              if ($quizScore !== false) {
-                $score = $quizScore;
-                ?>
-                <p>
-                  <?php echo $score ?> /
-                  <?php echo $quizPoint ?>
+    <?php
+    $sqlQuiz = "SELECT * FROM quizgrade WHERE student_id = ? AND teacher_id = ? AND class_id = ? AND quiz_id = ?";
+    $stmtQuiz = $db->prepare($sqlQuiz);
+    $stmtQuiz->execute([$user_id, $teacher_id, $tc_id, $quiz_id]);
+    $quizResult = $stmtQuiz->fetch(PDO::FETCH_ASSOC);
+
+    if (empty($quizResult)) {
+      ?>
+      <form action="" method="post">
+        <div class="container">
+          <div class="row mb-5 d-flex align-items-center justify-content-center">
+            <div class="col-md-8">
+              <div class="card" style="padding: 30px; border-top: 20px solid green;">
+                <h2>
+                  <?php echo $quizTitle ?>
+                  <input type="hidden" name="quizTitle" value="<?php echo $quizTitle ?>">
+                </h2>
+                <input type="hidden" name="gradeType" value="<?php echo $quizType ?>">
+                <p class="text-body-secondary">
+                  <?php echo $quizInstruction ?>
+                  <input type="hidden" name="quizInstruction" value="<?php echo $quizInstruction ?>">
                 </p>
-                <?php
-              } else {
-                ?>
-                <p>
-                  <?php echo $quizPoint ?> points
-                </p>
-                <?php
-              }
-              ?>
+                <p>Total Points: <span>
+                    <?php echo $totalPoint ?>
+                    <input type="hidden" name="totalScore" value="<?php echo $totalScore ?>">
+                    <input type="hidden" name="quizPoint" value="<?php echo $totalPoint ?>">
+                  </span></p>
+                <p>Student Name: <span>
+                    <?php echo $studentFirstName . ' ' . $studentLastName ?>
+                  </span></p>
+                <input type="hidden" name="studentFirstName" value="<?php echo $studentFirstName ?>">
+                <input type="hidden" name="studentLastName" value="<?php echo $studentLastName ?>">
+              </div>
             </div>
           </div>
-        </div>
-        <div class="col-md-8 col-sm-12">
-          <p class="text-end text-body-secondary" style="margin-top: -40px;">Due
-            <?php echo $formatted_due_date . ", " . $time ?>
-          </p>
-        </div>
-        <div class="divider mb-3" id="divider"></div>
-      </div>
-      <div class="row justify-content-left align-items-center">
-        <div class="col-md-7">
-          <?php echo $quizInstruction ?>
-        </div>
-      </div>
-      <?php
-      include("config.php");
+          <?php
+          $multipleChoiceQuestions = [];
+          $identificationQuestions = [];
+          $trueFalseQuestions = [];
 
-      if (isset($_POST['mark_done'])) {
-        $new_status = ($quizStatus === "missing") ? "turned-in late" : "turned in";
-
-        $sqlQuiz = "INSERT INTO student_quiz_course_answer (quiz_id, quizTitle, quizLink, quizPoint, date, user_id, class_id,
-        teacher_id, quiz_course_status) VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)";
-        $stmtQuiz = $db->prepare($sqlQuiz);
-        $stmtQuiz->execute([$quiz_id, $quizTitle, $quizLink, $quizPoint, $user_id, $class_id, $teacher_id, $new_status]);
-
-        header("Location: quiz_course.php?class_id=$class_id&quiz_id=$quiz_id&user_id=$user_id");
-      }
-      ?>
-      <form class="assignment" action=""
-      method="post">
-        <div class="row justify-content-left align-items-center mb-5" id="submit-card">
-          <div class="col-md-8"></div>
-          <div class="col-md-4 mt-5">
-            <div class="card">
-              <div class="row justify-content-between">
-                <div class="col mt-4" style="margin-left: 25px;">
-                  <h5>Your Work</h5>
+          foreach ($quizQuestions as $question) {
+            $questionType = $question['questionType'];
+            $questionAnswerKey = $question['questionAnswerKey'];
+            switch ($questionType) {
+              case 'multiple':
+                $multipleChoiceQuestions[] = $question;
+                break;
+              case 'identification':
+                $identificationQuestions[] = $question;
+                break;
+              case 'truefalse':
+                $trueFalseQuestions[] = $question;
+                break;
+            }
+          }
+          function displayQuestions($questions)
+          {
+            foreach ($questions as $question) {
+              if ($question['questionType'] === 'multiple') {
+                ?>
+                <div class="row mb-5 d-flex align-items-center justify-content-center">
+                  <div class="col-md-8">
+                    <h2 style="color: green; margin-bottom: 10px;">Multiple Choice</h2>
+                    <div class="card" style="padding: 30px;">
+                      <div class="col mb-3 d-flex align-items-center justify-content-between">
+                        <div class="col-md-10">
+                        <h5>
+                          <?php echo $question['question']; ?>
+                        </h5>
+                        </div>
+                        <span style="color: green;">
+                          <?php echo $question['questionPoint']; ?> point
+                        </span>
+                      </div>
+                      <div class="col">
+                        <?php
+                        foreach (unserialize($question['questionChoices']) as $key => $value) {
+                          ?>
+                          <div class="form-check mb-3 d-flex align-items-center">
+                            <input class="form-check-input" type="radio"
+                              name="flexRadioDefault_<?php echo $question['quizQuestion_id']; ?>"
+                              id="flexRadioDefault_<?php echo $question['quizQuestion_id'] . '_' . $key; ?>"
+                              style="margin-right: 10px;" value="<?php echo $value ?>">
+                            <label class="form-check-label"
+                              for="flexRadioDefault<?php echo $question['quizQuestion_id'] . '_' . $key; ?>">
+                              <?php echo $value; ?>
+                            </label>
+                          </div>
+                          <?php
+                        }
+                        ?>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="col text-end mt-4" style="margin-right: 25px;">
-                  <p class="text-body-secondary">
-                    <?php
-                    if (!empty($quizCourseStatus)) {
-                      echo ucfirst($quizCourseStatus);
-                    } else {
-                      echo ucfirst($quizStatus);
-                    }
-                    ?>
-                  </p>
+                <?php
+              } elseif ($question['questionType'] === 'identification') {
+                ?>
+                <div class="row mb-5 d-flex align-items-center justify-content-center">
+                  <div class="col-md-8">
+                    <h2 style="margin-bottom: 10px; color: green;">Identification</h2>
+                    <div class="card" style="padding: 30px;">
+                      <div class="col d-flex align-items-center justify-content-between">
+                        <div class="col-md-10">
+                        <h5>
+                          <?php echo $question['question']; ?>
+                        </h5>
+                        </div>
+                        <span style="color: green;">
+                          <?php echo $question['questionPoint']; ?> point
+                        </span>
+                      </div>
+                      <div class="col-md-5">
+                        <input type="text" class="form-control" id="identificationAnswer"
+                          name="identificationAnswer_<?php echo $question['quizQuestion_id']; ?>"
+                          style="border-radius: 0; border: none; border-bottom: 1px solid #ccc; outline: none;">
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="row justify-content-center mb-2">
-                <div class="col-md-12 text-center">
-                  <p class="text-body-secondary">Quiz Link:</p>
-                  <a href="<?php echo $quizLink ?>" target="_blank">
-                    <?php echo $quizLink ?>
-                  </a>
-                  <p class="text-body-secondary mt-3">make sure to open with correct google account in your browser.</p>
+                <?php
+              } elseif ($question['questionType'] === 'truefalse') {
+                ?>
+                <div class="row mb-5 d-flex align-items-center justify-content-center">
+                  <div class="col-md-8">
+                    <h2 style="margin-bottom: 10px; color: green;">True or False</h2>
+                    <div class="card" style="padding: 30px;">
+                      <div class="col mb-3 d-flex align-items-center justify-content-between">
+                        <div class="col-md-10">
+                        <h5>
+                          <?php echo $question['question']; ?>
+                        </h5>
+                        </div>
+                        <span style="color: green;">
+                          <?php echo $question['questionPoint']; ?> point
+                        </span>
+                      </div>
+                      <div class="col">
+                        <div class="form-check mb-3 d-flex align-items-center">
+                          <input class="form-check-input" type="radio"
+                            name="trueFalseGroup_<?php echo $question['quizQuestion_id']; ?>"
+                            id="trueRadio<?php echo $question['quizQuestion_id']; ?>" value="true" style="margin-right: 10px;">
+                          <label class="form-check-label" for="trueRadio<?php echo $question['quizQuestion_id']; ?>"
+                            style="margin-top: 5px;">True</label>
+                        </div>
+                        <div class="form-check mb-3 d-flex align-items-center">
+                          <input class="form-check-input" type="radio"
+                            name="trueFalseGroup_<?php echo $question['quizQuestion_id']; ?>"
+                            id="falseRadio<?php echo $question['quizQuestion_id']; ?>" value="false"
+                            style="margin-right: 10px;">
+                          <label class="form-check-label" for="falseRadio<?php echo $question['quizQuestion_id']; ?>"
+                            style="margin-top: 5px;">False</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="row justify-content-center align-items-center mb-5">
-                <div class="d-grid gap-2 col-11 mx-auto">
-                  <?php if ($quizCourseStatus == 'turned in' || $quizCourseStatus == 'turned-in late'): ?>
-                    <button class="btn btn-success" type="submit">
-                      Quiz Submitted</button>
-                  <?php else: ?>
-                    <button class="btn btn-success" id="turnInButton" name="mark_done" type="submit">Mark as Done</button>
-                  <?php endif; ?>
-                </div>
-              </div>
+                <?php
+              }
+            }
+          }
+          displayQuestions($multipleChoiceQuestions);
+          displayQuestions($identificationQuestions);
+          displayQuestions($trueFalseQuestions);
+          ?>
+          <div class="row mb-5 d-flex align-items-center justify-content-center" style="margin-top: -20px;">
+            <div class="col-md-8">
+              <p class="text-body-secondary">Please make sure that you have an answer in every question before you
+                submit.
+              </p>
+            </div>
+            <div class="col-md-8">
+              <button type="submit" name="submitQuiz" class="btn btn-success">Submit</button>
             </div>
           </div>
         </div>
       </form>
-    </div>
-  </div>
-  <div class="footer">
-    <div class="container">
-      <div class="row">
-        <div class="col mt-2 text-center">
-          <p>
-            <?php echo $class_name ?>
-          </p>
+      <?php
+    } else {
+      $quizScore = $quizResult['score'];
+      $quizPoint = $quizResult['quizPoint'];
+      $gradeType = $quizResult['gradeType'];
+      ?>
+      <div class="container">
+        <div class="row align-items-center justify-content-center">
+          <div class="card" style="border-top: 10px solid green; border-bottom: 10px solid green;">
+            <div class="row mt-3">
+              <div class="col-md-12">
+                <p class="text-body-secondary" style="font-size: 20px;">You already answered this quiz, below is your quiz
+                  data.</p>
+              </div>
+            </div>
+            <div class="row align-items-center justify-content-center">
+              <div class="col-md-6 order-1 order-md-0">
+                <div class="align-items-center justify-content-center">
+                  <h1>Student Name:</h1>
+                  <p class="text-body-secondary" style="font-size: 30px;">
+                    <?php echo $studentFirstName . ' ' . $studentLastName ?>
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-6 order-0 order-md-1">
+                <div class="align-items-center justify-content-center">
+                  <h1>Quiz Title:</h1>
+                  <p class="text-body-secondary" style="font-size: 30px;">
+                    <?php echo $quizTitle ?>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row align-items-center justify-content-center mt-5 mb-4">
+              <div class="col-md-6 order-3 order-md-2">
+                <div class="align-items-center justify-content-center">
+                  <h1>Quiz Type:</h1>
+                  <p class="text-body-secondary" style="font-size: 30px;">
+                    <?php echo ucfirst($gradeType) ?>
+                  </p>
+                </div>
+              </div>
+              <div class="col-md-6 order-2 order-md-3">
+                <div class="align-items-center justify-content-center">
+                  <h1>Quiz Score:</h1>
+                  <p class="text-body-secondary" style="font-size: 30px;">
+                    <?php echo $quizScore ?> /
+                    <?php echo $quizPoint ?>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+      <?php
+    }
+    ?>
   </div>
 
   <script>
-    function goToClasswork(classId) {
-      window.location.href = `class_course.php?class_id=${classId}`;
+    function goBack() {
+      window.history.back();
     }
-  </script>
-  <script>
-    document.querySelector('button[name="unsubmit"]').addEventListener('click', function () {
-      document.querySelector('.assignment').style.display = 'none';
-      document.querySelector('.edited_assignment').style.display = 'block';
+
+    const textarea = document.querySelector(".auto-resize");
+    const initialHeight = textarea.scrollHeight + "px";
+
+    textarea.addEventListener("input", function () {
+      this.style.height = initialHeight;
+      this.style.height = (this.scrollHeight <= this.clientHeight) ? initialHeight : this.scrollHeight + "px";
+    });
+
+    const textareas = document.querySelectorAll(".auto-resize");
+
+    textareas.forEach((textarea) => {
+      const initialHeight = textarea.scrollHeight + "px";
+
+      textarea.addEventListener("input", function () {
+        this.style.height = initialHeight;
+        this.style.height = (this.scrollHeight <= this.clientHeight) ? initialHeight : this.scrollHeight + "px";
+      });
     });
   </script>
-  <script type="text/javascript" src="js/virtual-select.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     crossorigin="anonymous"></script>

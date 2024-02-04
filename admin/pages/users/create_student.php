@@ -190,10 +190,8 @@ if (isset($_POST['submit'])) {
         });
     </script>
     <script>
-        // Get the form element
         var form = document.querySelector('form');
 
-        // Get the alert element
         var validationAlert = document.getElementById('validationAlert');
 
         form.addEventListener('submit', function (event) {

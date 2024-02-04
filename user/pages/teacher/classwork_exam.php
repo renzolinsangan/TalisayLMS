@@ -13,37 +13,76 @@ if (isset($_GET['class_id'])) {
 include("config.php");
 $teacher_id = $_SESSION['user_id'];
 
-if (isset($_POST['setExam'])) {
-  $examTitle = $_POST['title'];
-  $examInstruction = $_POST['instruction'];
-  $class_name = $_POST['class_name'];
-  $student = $_POST['student'];
-  $examPoint = $_POST['point'];
-  $date = date('Y-m-d');
-  $dueDate = $_POST['due_date'];
-  $time = $_POST['time'];
-  $classTopic = $_POST['class_topic'];
-  $examStatus = "assigned";
+if (isset($_POST['createQuestion'])) {
+  $question = $_POST['question'];
+  $questionType = $_POST['questionType'];
+  $questionPoint = $_POST['questionPoint'];
+  $questionChoices = $_POST['choices'];
+  $questionAnswerKey = ""; 
 
-  $sqlSetQuiz = "INSERT INTO classwork_exam (examTitle, examInstruction, class_name, student, examPoint, 
-  date, dueDate, time, classTopic, class_id, teacher_id, examStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-  $stmtSetQuiz = $db->prepare($sqlSetQuiz);
-  $stmtSetQuiz->execute([
-    $examTitle,
-    $examInstruction,
-    $class_name,
-    $student,
-    $examPoint,
-    $date,
-    $dueDate,
-    $time,
-    $classTopic,
-    $class_id,
+  switch ($questionType) {
+    case 'multiple':
+      $questionAnswerKey = $_POST['multipleChoiceAnswerKey'];
+      break;
+    case 'truefalse':
+      $questionAnswerKey = $_POST['trueFalseAnswerKey'];
+      break;
+    case 'identification':
+      $questionAnswerKey = $_POST['identificationAnswerKey'];
+      break;
+  }
+  $questionStatus = "posted";
+  $teacher_id = $_SESSION['user_id'];
+  $class_id = $_GET['class_id'];
+
+  $serializedChoices = serialize($questionChoices);
+
+  $sqlCreateQuestion = "INSERT INTO classwork_examquestion (question, questionType, questionPoint, questionChoices, 
+  questionAnswerKey, questionStatus, teacher_id, class_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+  $stmtCreateQuestion = $db->prepare($sqlCreateQuestion);
+  $stmtCreateQuestion->execute([
+    $question,
+    $questionType,
+    $questionPoint,
+    $serializedChoices,
+    $questionAnswerKey,
+    $questionStatus,
     $teacher_id,
-    $examStatus
+    $class_id
   ]);
+
+  header("Location:classwork_exam.php?class_id=$class_id");
+}
+
+if (isset($_POST['setQuiz'])) {
+  $sqlSelectQuestion = "SELECT examQuestion_id, questionPoint FROM classwork_examquestion 
+  WHERE class_id = ? AND teacher_id = ? and questionStatus = 'posted'";
+  $stmtSelectQuestion = $db->prepare($sqlSelectQuestion);
+  $stmtSelectQuestion->execute([$class_id, $teacher_id]);
+  $questionResult = $stmtSelectQuestion->fetchAll(PDO::FETCH_ASSOC);
+
+  $examQuestionIds = array_column($questionResult, 'examQuestion_id');
+  $questionIdsJson = json_encode($examQuestionIds);
+  $questionPoints = array_column($questionResult, 'questionPoint');
+
+  $totalPoints = array_sum($questionPoints);
+
+  $examTitle = $_POST['examTitle'];
+  $examInstruction = $_POST['examInstruction'];
+  $due_date = $_POST['due_date'];
+  $class_topic = $_POST['class_topic'];
+  $teacher_id = $_SESSION['user_id'];
+
+  $sqlQuizCreate = "INSERT INTO classwork_exam (examTitle, examInstruction, questionIds, totalPoint, 
+  date, due_date, class_topic, exam_status, class_id, teacher_id) VALUES (?, ?, ?, ?, NOW(), ?, ?, 'assigned',?, ?)";
+  $stmtQuizCreate = $db->prepare($sqlQuizCreate);
+  $stmtQuizCreate->execute([$examTitle, $examInstruction, $questionIdsJson, $totalPoints, $due_date, $class_topic, $class_id, $teacher_id]);
+
+  $sqlUpdateStatus = "UPDATE classwork_examquestion SET questionStatus = 'submitted' WHERE examQuestion_id IN (" . implode(',', $examQuestionIds) . ")";
+  $stmtUpdateStatus = $db->prepare($sqlUpdateStatus);
+  $stmtUpdateStatus->execute();
+
   header("Location: class_classwork.php?class_id=$class_id");
-  exit;
 }
 ?>
 <!doctype html>
@@ -54,15 +93,15 @@ if (isset($_POST['setExam'])) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Talisay Senior High School LMS</title>
   <link rel="stylesheet" type="text/css" href="assets/css/virtual-select.min.css">
-  <link rel="stylesheet" type="text/css" href="assets/css/cw_question.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/classwork_exam.css">
   <link rel="shortcut icon" href="../../images/trace.svg" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
 </head>
-<body>
 
-  <form action="" method="post" style="width: 100%;">
+<body>
+  <form action="" method="post" id="createExamForm" style="width: 100%;">
     <nav class="navbar navbar-light fs-3 mb-5">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
@@ -72,8 +111,8 @@ if (isset($_POST['setExam'])) {
         </div>
         <div>
           <div class="btn-group">
-            <button type="submit" id="setExam" name="setExam" class="btn btn-success"
-              style="margin-right: 3px; width: 15vh; margin-bottom: 10px;">Create</button>
+            <button type="submit" id="setQuiz" name="setQuiz" class="btn btn-success"
+              style="margin-right: 3px; width: 15vh; margin-bottom: 20px;">Create</button>
             <button type="button" class="btn btn-success dropdown-toggle dropdown-toggle-split"
               data-bs-toggle="dropdown" aria-expanded="false"
               style="margin-right: 15px; width: 5vh; height: 38px; margin-bottom: 10px;">
@@ -91,109 +130,29 @@ if (isset($_POST['setExam'])) {
         </div>
       </div>
     </nav>
-
     <div class="wrapper">
       <div class="container">
-        <section class="row">
-          <div class="col-md-7 mb-4">
-            <div class="row" style="padding-bottom: 4vh">
-              <div class="col-md-1" style="margin-left: 3px; margin-right: 5px;">
-                <i class="bi bi-card-heading" style="font-size: 7vh;"></i>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card" style="padding: 30px; border-top: 20px solid green;">
+              <div class="col-md-4">
+                <input type="text" class="form-control" id="quizTitle" name="examTitle" placeholder="Exam title"
+                style="border-radius: 0;">
               </div>
-              <div class="col-md-7 mb-4" style="margin-left: 3px;">
-                <div class="form-floating">
-                  <textarea name="title" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Exam Title"></textarea>
-                  <label for="floatingInput">Exam Title</label>
+              <div class="col-md-9 mt-3">
+                <textarea type="text" class="form-control auto-resize" id="quizInstruction" name="examInstruction"
+                  placeholder="Exam instruction" style="border-radius: 0;"></textarea>
+              </div>
+              <div class="row mt-4">
+                <div class="col-md-4">
+                  <label>Due-Date</label>
+                  <input type="date" name="due_date" class="form-control" min="<?php echo date('Y-m-d'); ?>"
+                  style="border: none; border-bottom: 1px solid #ccc; outline: none; border-radius: 0;">
                 </div>
-              </div>
-            </div>
-            <div class="row" style="margin-top: -15px;">
-              <div class="col-md-1" style="margin-left: 3px; margin-right: 5px;">
-                <i class="bi bi-text-paragraph" style="font-size: 6vh;"></i>
-              </div>
-              <div class="col-md-10">
-                <div class="form-floating">
-                  <textarea name="instruction" class="form-control auto-resize" id="floatingInput"
-                    placeholder="Instructions" style="height: 200px;"></textarea>
-                  <label for="floatingInput">Instructions</label>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-1 border-end"
-            style="margin-top: -48px; margin-left: -20px; margin-right: 20px; height: 140vh;"></div>
-          <div class="col-md-4" id="right-content">
-            <div class="row">
-              <label class="text-body-secondary mb-3" style="font-size: 20px;">For</label>
-              <div class="col-md-10 mb-4">
-                <?php
-                include("db_conn.php");
-                $teacher_id = $_SESSION['user_id'];
-
-                $sql = "SELECT class_name FROM section WHERE teacher_id=$teacher_id AND class_id=$class_id";
-                $result = mysqli_query($conn, $sql);
-
-                while ($row = mysqli_fetch_assoc($result)) {
-                  $class_name = $row['class_name'];
-                  echo '<input type="text" name="class_name" class="form-control" value="' . $class_name . '" readonly/>';
-                }
-                ?>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-10 mb-4">
-                <select id="multipleSelect" multiple name="student" placeholder="Select Students" data-search="true"
-                  data-silent-initial-value-set="true" style="height: 45px;">
-                  <?php
-                  include("db_conn.php");
-                  $teacher_id = $_SESSION['user_id'];
-                  $class_name = '';
-
-                  $sql = "SELECT class_name FROM section WHERE teacher_id = $teacher_id AND class_id = $class_id";
-                  $result = mysqli_query($conn, $sql);
-
-                  while ($row = mysqli_fetch_assoc($result)) {
-                    $class_name = $row['class_name'];
-                  }
-
-                  $sql_students = "SELECT student_firstname, student_lastname FROM class_enrolled WHERE teacher_id = $teacher_id AND class_name = '$class_name'";
-                  $result_students = mysqli_query($conn, $sql_students);
-
-                  while ($row_students = mysqli_fetch_assoc($result_students)) {
-                    $student_firstname = $row_students['student_firstname'];
-                    $student_lastname = $row_students['student_lastname'];
-                    $selected = (preg_match('/^[A-ZÑ]/i', $student_firstname)) ? 'selected' : '';
-                    echo '<option value="' . $student_firstname . ' ' . $student_lastname . '" ' . $selected . '>' . $student_firstname . ' ' . $student_lastname . '</option>';
-                  }
-                  ?>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <label class="text-body-secondary mb-3" style="font-size: 20px;">Points</label>
-              <div class="col-md-6 mb-4">
-                <input type="text" name="point" class="form-control" style="padding: 10px;">
-              </div>
-            </div>
-            <div class="row">
-              <label class="text-body-secondary mb-3" style="font-size: 20px;">Due-date</label>
-              <div class="col-md-14 mb-4">
-                <input type="date" name="due_date" id="due_date" class="form-control"
-                  min="<?php echo date('Y-m-d'); ?>">
-              </div>
-            </div>
-            <div class="row">
-              <label class="text-body-secondary mb-3" style="font-size: 20px;">Time (AM/PM)</label>
-              <div class="col-md-6 mb-4">
-                <input type="text" name="time" class="form-control" style="padding: 10px;" value="11:59 PM">
-              </div>
-            </div>
-            <div class="row">
-              <label class="text-body-secondary mb-3" style="font-size: 20px;">For</label>
-              <div class="col-md-12 mb-4">
-                <select id="classTopicSelect" name="class_topic" placeholder="Select Topics" data-search="true"
-                  data-silent-initial-value-set="true" style="height: 45px;">
+                <div class="col-md-4">
+                  <label>For</label>
+                  <select id="classTopicSelect" name="class_topic" class="form-select" data-search="true"
+                  data-silent-initial-value-set="true" style="border: none; border-bottom: 1px solid #ccc; outline: none; border-radius: 0;">
                   <option value="" selected>No Topic</option>
                   <?php
                   include("db_conn.php");
@@ -208,87 +167,252 @@ if (isset($_POST['setExam'])) {
                   }
                   ?>
                 </select>
+                </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+        <div class="row">
+          <div class="col-md-4 mt-3">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#staticBackdrop">+ Add
+              Question</button>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col">
+            <div class="card">
+              <div class="card-header" style="border-bottom: none; margin-top: 10px; margin-bottom: -5px;">
+                <h2 style="color: green;">Questions Created</h2>
+              </div>
+              <div class="card-body">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col">Question</th>
+                      <th scope="col">Answer Key</th>
+                      <th scope="col">Type</th>
+                      <th scope="col">Point</th>
+                      <th scope="col">Choices</th>
+                    </tr>
+                  </thead>
+                  <?php
+                  include("config.php");
+
+                  $sqlQuestionsCreated = "SELECT * FROM classwork_examquestion
+                  WHERE class_id = ? AND teacher_id = ? AND questionStatus = 'posted'";
+                  $stmtQuestionsCreated = $db->prepare($sqlQuestionsCreated);
+                  $stmtQuestionsCreated->execute([$class_id, $teacher_id]);
+                  $questionsCreatedResult = $stmtQuestionsCreated->fetchAll(PDO::FETCH_ASSOC);
+
+                  if (!empty($questionsCreatedResult)) {
+                    foreach ($questionsCreatedResult as $questionInfo) {
+                      $question = $questionInfo['question'];
+                      $answerKey = $questionInfo['questionAnswerKey'];
+                      $questionType = $questionInfo['questionType'];
+                      $questionPoint = $questionInfo['questionPoint'];
+                      $questionChoices = unserialize($questionInfo['questionChoices']);
+
+                      ?>
+                      <tr>
+                        <td>
+                          <?php echo $question; ?>
+                        </td>
+                        <td>
+                          <?php echo $answerKey; ?>
+                        </td>
+                        <td>
+                          <?php echo $questionType; ?>
+                        </td>
+                        <td>
+                          <?php echo $questionPoint; ?>
+                        </td>
+                        <td>
+                          <?php
+                          echo implode(', ', $questionChoices);
+                          ?>
+                        </td>
+                      </tr>
+                      <?php
+                    }
+                  }
+                  ?>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <form action="" method="post">
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header" style="border-bottom: none;">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="col-md-8 mb-3">
+              <h3 class="mb-3">Question:</h3>
+              <input type="text" class="form-control" name="question" placeholder="Type your question here"
+                style="border:none; border-bottom: 1px solid #ccc; border-radius: 0;">
+            </div>
+            <div class="col mb-3">
+              <div class="d-flex justify-content-between">
+                <div class="col-md-4">
+                  <select name="questionType" id="questionType" class="form-select mt-3">
+                  <option value="multiple">Multiple Choice</option>
+                    <option value="truefalse">True or False</option>
+                    <option value="identification">Identification</option>
+                  </select>
+                </div>
+                <div class="col-md-2 mt-3 d-flex align-items-center">
+                  <span>Point</span>
+                  <input type="text" name="questionPoint" class="form-control"
+                    style="border: none; border-bottom: 1px solid #ccc; border-radius: 0; outline: none;">
+                </div>
+              </div>
+            </div>
+            <div id="multipleDiv">
+              <div class="col-md-5 d-flex justify-content-between" style="margin-left: 10px;">
+                <div class="form-check mb-2 d-flex align-items-center justify-content-between">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+                  <input class="form-control" type="text" name="choices[1]" placeholder="Choice 1" id="inputField1"
+                    style="border: none; border-bottom: 1px solid #ccc; border-radius: 0; outline: none;">
+                </div>
+              </div>
+              <div class="col-md-5 d-flex justify-content-between" style="margin-left: 10px;">
+                <div class="form-check mb-2 d-flex align-items-center justify-content-between">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+                  <input class="form-control" type="text" name="choices[2]" placeholder="Choice 2" id="inputField2"
+                    style="border: none; border-bottom: 1px solid #ccc; border-radius: 0; outline: none;">
+                </div>
+              </div>
+              <div class="col-md-5 d-flex justify-content-between" style="margin-left: 10px;">
+                <div class="form-check mb-2 d-flex align-items-center justify-content-between">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+                  <input class="form-control" type="text" name="choices[3]" placeholder="Choice 3" id="inputField3"
+                    style="border: none; border-bottom: 1px solid #ccc; border-radius: 0; outline: none;">
+                </div>
+              </div>
+              <div class="col-md-5 d-flex justify-content-between" style="margin-left: 10px;">
+                <div class="form-check mb-2 d-flex align-items-center justify-content-between">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault4">
+                  <input class="form-control" type="text" name="choices[4]" placeholder="Choice 4" id="inputField4"
+                    style="border: none; border-bottom: 1px solid #ccc; border-radius: 0; outline: none;">
+                </div>
+              </div>
+              <div class="col-md-4 mt-3 d-flex align-items-center justify-content-between" style="margin-left: 5px;">
+                <span><i class="bi bi-check-square-fill" style="color: green; font-size: 20px;"></i></span>
+                <input type="text" class="form-control" name="multipleChoiceAnswerKey"
+                  style="border: none; border-bottom: 1px solid #ccc; border-radius: 0; outline: none;"
+                  placeholder="Answer Key">
+              </div>
+            </div>      
+            <div id="truefalseDiv" style="display: none;">
+              <div class="col-md-5 mb-3 d-flex justify-content-between" style="margin-left: 10px;">
+                <div class="form-check mb-2 d-flex align-items-center justify-content-between">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
+                    style="margin-right: 15px;">
+                  <label>True</label>
+                </div>
+              </div>
+              <div class="col-md-5 d-flex justify-content-between" style="margin-left: 10px;">
+                <div class="form-check mb-2 d-flex align-items-center justify-content-between">
+                  <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
+                    style="margin-right: 15px;">
+                  <label>False</label>
+                </div>
+              </div>
+              <div class="col-md-4 mt-3 d-flex align-items-center justify-content-between" style="margin-left: 5px;">
+                <span><i class="bi bi-check-square-fill" style="color: green; font-size: 20px;"></i></span>
+                <input type="text" class="form-control" name="trueFalseAnswerKey"
+                  style="border: none; border-bottom: 1px solid #ccc; border-radius: 0; outline: none;"
+                  placeholder="Answer Key">
+              </div>
+            </div>
+            <div id="identificationDiv" style="display: none;">
+              <div class="col-md-4 mt-3 d-flex align-items-center justify-content-between" style="margin-left: 5px;">
+                <span><i class="bi bi-check-square-fill" style="color: green; font-size: 20px;"></i></span>
+                <input type="text" class="form-control" name="identificationAnswerKey"
+                  style="border: none; border-bottom: 1px solid #ccc; border-radius: 0; outline: none;"
+                  placeholder="Answer Key">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" style="border-top: none;">
+            <button type="submit" name="createQuestion" class="btn btn-success">Create Question</button>
+          </div>
+        </div>
       </div>
     </div>
   </form>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      var askButton = document.getElementById("setExam");
-      var form = document.querySelector('form');
+    document.getElementById('questionType').addEventListener('change', function () {
+      var selectedOption = this.value;
 
-      askButton.addEventListener('click', function (event) {
-        var examTitleInput = document.querySelector('[name="title"]');
-        var instructionInput = document.querySelector('[name="instruction"]');
-        var examLinkInput = document.querySelector('[name="link"]');
-        var pointInput = document.querySelector('[name="point"]');
-        var duedateInput = document.querySelector('[name="due_date"]');
+      document.getElementById('multipleDiv').style.display = 'none';
+      document.getElementById('truefalseDiv').style.display = 'none';
+      document.getElementById('identificationDiv').style.display = 'none';
 
-        var isEmpty = false;
-
-        if (examTitleInput.value.trim() === '') {
-          isEmpty = true;
-          examTitleInput.classList.add('is-invalid');
-        } else {
-          examTitleInput.classList.remove('is-invalid');
-        }
-
-        if (instructionInput.value.trim() === '') {
-          isEmpty = true;
-          instructionInput.classList.add('is-invalid');
-        } else {
-          instructionInput.classList.remove('is-invalid');
-        }
-
-        var googleFormsUrlPattern = /^https:\/\/(docs\.google\.com\/forms|forms\.gle)\/.*/;
-        if (!googleFormsUrlPattern.test(examLinkInput.value)) {
-          isEmpty = true;
-          examLinkInput.classList.add('is-invalid');
-        } else {
-          examLinkInput.classList.remove('is-invalid');
-        }
-
-
-        var pointValue = pointInput.value.trim();
-        if (pointValue === '' || isNaN(pointValue) || pointValue < 0 || pointValue > 100) {
-          isEmpty = true;
-          pointInput.classList.add('is-invalid');
-        } else {
-          pointInput.classList.remove('is-invalid');
-        }
-
-        if (pointValue.length > 3) {
-          isEmpty = true;
-          pointInput.classList.add('is-invalid');
-        }
-
-        if (duedateInput.value.trim() === '') {
-          isEmpty = true;
-          duedateInput.classList.add('is-invalid');
-        } else {
-          duedateInput.classList.remove('is-invalid');
-        }
-
-        if (isEmpty) {
-          event.preventDefault();
-        }
-      });
+      document.getElementById(selectedOption + 'Div').style.display = 'block';
     });
+  </script>
+  <script>
+    var form = document.getElementById('createExamForm');
+
+    form.addEventListener('submit', function (event) {
+
+      var examTitleInput = document.querySelector('input[name="examTitle"]');
+      var examInstructionInput = document.querySelector('textarea[name="examInstruction"]');
+      var examDueDateInput = document.querySelector('input[name="due_date"]');
+      var examTopicInput = document.querySelector('select[name="class_topic"]');
+
+      var isEmpty = false;
+
+      if (examTitleInput.value === '' || examInstructionInput.value === '' || 
+      examDueDateInput.value === '' || examTopicInput.value === '') {
+        isEmpty = true;
+      }
+
+      if (examTitleInput.value.trim() === '') {
+        isEmpty = true;
+        examTitleInput.classList.add('is-invalid');
+      } else {
+        examTitleInput.classList.remove('is-invalid');
+      }
+
+      if (examInstructionInput.value.trim() === '') {
+        isEmpty = true;
+        examInstructionInput.classList.add('is-invalid');
+      } else {
+        examInstructionInput.classList.remove('is-invalid');
+      }
+
+      if (examDueDateInput.value.trim() === '') {
+        isEmpty = true;
+        examDueDateInput.classList.add('is-invalid');
+      } else {
+        examDueDateInput.classList.remove('is-invalid');
+      }
+
+      if (examTopicInput.value.trim() === '') {
+        isEmpty = true;
+        examTopicInput.classList.add('is-invalid');
+      } else {
+        examTopicInput.classList.remove('is-invalid');
+      }
+
+      if (isEmpty) {
+        event.preventDefault();
+      }
+    })
   </script>
   <script type="text/javascript" src="js/virtual-select.min.js"></script>
-  <script>
-    VirtualSelect.init({
-      ele: '#multipleSelect'
-    });
-
-    VirtualSelect.init({
-      ele: '#classTopicSelect'
-    });
-  </script>
   <script>
     function goToClasswork(classId) {
       window.location.href = `class_classwork.php?class_id=${classId}`;

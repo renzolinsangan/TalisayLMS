@@ -29,7 +29,6 @@ if (isset($_POST['submit_code'])) {
   $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
   if ($row) {
-    // Check if section and grade_level match user's information
     if ($row['section'] === $student_section) {
       $_SESSION['class_id'] = $row['class_id'];
       $_SESSION['class_name'] = $row['class_name'];
@@ -67,12 +66,10 @@ if (isset($_POST['submit_code'])) {
         echo "Error: Unable to enroll in class.";
       }
     } else {
-      // Section or grade_level doesn't match, redirect with an error message
       header("Location: course.php?msg=You are not from that class, please try again!");
       exit;
     }
   } else {
-    // Class code not found, redirect with an error message
     header("Location: course.php?msg=Invalid class code, please try again!");
     exit;
   }
@@ -89,11 +86,9 @@ $stmt->closeCursor();
 <html lang="en">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Talisay Senior High School LMS User</title>
-  <!-- plugins:css -->
   <link rel="stylesheet" href="../../vendors/feather/feather.css">
   <link rel="stylesheet" href="../../vendors/ti-icons/css/themify-icons.css">
   <link rel="stylesheet" href="../../vendors/css/vendor.bundle.base.css">
@@ -107,7 +102,6 @@ $stmt->closeCursor();
 
 <body>
   <div class="container-scroller">
-    <!-- partial:../../partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
       <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/trace.svg" class="mr-2"
@@ -141,12 +135,8 @@ $stmt->closeCursor();
             $resultMaterialNotif = getMaterialNotifications($db, $studentFullName);
             $resultQuestionNotif = getQuestionNotification($db, $studentFullName);
             $resultAssignmentNotif = getAssignmentNotification($db, $studentFullName);
-            $resultQuizNotif = getQuizNotification($db, $studentFullName);
-            $resultExamNotif = getExamNotification($db, $studentFullName);
             $resultQuestionGradeNotif = getQuestionScoreNotification($db, $user_id);
             $resultAssignmentGradeNotif = getAssignmentScoreNotification($db, $user_id);
-            $resultQuizGradeNotif = getQuizScoreNotification($db, $user_id);
-            $resultExamGradeNotif = getExamScoreNotification($db, $user_id);
 
             $allNotifications = array_merge(
               $resultNewsNotif,
@@ -155,12 +145,8 @@ $stmt->closeCursor();
               $resultMaterialNotif,
               $resultQuestionNotif,
               $resultAssignmentNotif,
-              $resultQuizNotif,
-              $resultExamNotif,
               $resultQuestionGradeNotif,
               $resultAssignmentGradeNotif,
-              $resultQuizGradeNotif,
-              $resultExamGradeNotif
             );
             usort($allNotifications, function ($a, $b) {
               return strtotime($b['date']) - strtotime($a['date']);
@@ -192,13 +178,11 @@ $stmt->closeCursor();
                       <?php endif; ?>
                     </div>
                     <div class="preview-item-content">
-                    <?php if (isset($notification['title'])): ?>
+                      <?php if (isset($notification['title'])): ?>
                         <?php
                         $link = ($notification['type'] === 'news') ? 'news.php' : 'announcement.php';
 
                         $end_date = $notification['end_date'];
-
-                        // Check if the end_date has passed
                         $current_date = date('Y-m-d H:i:s');
                         $end_date_passed = ($current_date > $end_date);
                         ?>
@@ -261,46 +245,23 @@ $stmt->closeCursor();
                           </div>
                         <?php else: ?>
                           <?php if ($notification['notification_type'] === 'material'): ?>
-                            <div class="material-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="material-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a material in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'question'): ?>
-                            <div class="question-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="question-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted a question in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
                           <?php elseif ($notification['notification_type'] === 'assignment'): ?>
-                            <div class="assignment-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
+                            <div class="assignment-notification clickable" onclick="window.location.href='course.php'">
+                              <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                                 <?php echo $teacherName; ?> posted an assignment in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'quiz'): ?>
-                            <div class="quiz-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal"
-                              onclick="window.location.href='course.php'">
-                                <?php echo $teacherName; ?> posted a quiz in
-                                <?php echo $notification['class_name']; ?>.
-                              </h6>
-                            </div>
-                          <?php elseif ($notification['notification_type'] === 'exam'): ?>
-                            <div class="exam-notification clickable"
-                            onclick="window.location.href='course.php'">
-                              <h6 class="preview-subject font-weight-normal">
-                                <?php echo $teacherName; ?> posted an exam in
                                 <?php echo $notification['class_name']; ?>.
                               </h6>
                             </div>
@@ -311,16 +272,14 @@ $stmt->closeCursor();
                           </p>
                         <?php endif; ?>
                       <?php elseif (isset($notification['score'])): ?>
-                        <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='course.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='course.php'">
                           <?php if ($notification['scoreNotification_type'] === 'questionGrade'): ?>
                             <?php echo $notification['teacherFirstName'] ?>
                             posted your score in
                             <?php echo $notification['questionTitle']; ?>
                             (question).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -330,30 +289,7 @@ $stmt->closeCursor();
                           <?php echo $notification['assignmentTitle']; ?>
                           (assignment).
                           </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'quizGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['quizTitle']; ?>
-                          (quiz).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
-                            on
-                            <?php echo date('F j', strtotime($notification['date'])); ?>
-                          </p>
-                        <?php elseif ($notification['scoreNotification_type'] === 'examGrade'): ?>
-                          <?php echo $notification['teacherFirstName'] ?>
-                          posted your score in
-                          <?php echo $notification['examTitle']; ?>
-                          (exam).
-                          </h6>
-                          <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='course.php'">
+                          <p class="font-weight-light small-text mb-0 text-muted" onclick="window.location.href='course.php'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -389,7 +325,6 @@ $stmt->closeCursor();
         </button>
       </div>
     </nav>
-    <!-- partial -->
     <div class="container-fluid page-body-wrapper">
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
@@ -440,7 +375,6 @@ $stmt->closeCursor();
           </li>
         </ul>
       </nav>
-      <!-- partial -->
       <div class="main-panel">
         <div class="content-wrapper">
           <div class="row">
@@ -555,7 +489,8 @@ $stmt->closeCursor();
                 <div class="col-md-4 grid-margin transparent">
                   <div class="card card-tale text-center"
                     style="height: 50vh; flex-direction: column; justify-content: space-between;">
-                    <a href="class_course.php?class_id=<?php echo $row['class_id']; ?>&tc_id=<?php echo $row['tc_id'] ?>" class="course">
+                    <a href="class_course.php?class_id=<?php echo $row['class_id']; ?>&tc_id=<?php echo $row['tc_id'] ?>"
+                      class="course">
                       <div class="card-header"
                         style="text-align: left; background-image: url(../teacher/assets/image/<?php echo $theme ?>); background-color: green; background-size: cover;">
                         <div class="course-top">
@@ -620,7 +555,8 @@ $stmt->closeCursor();
                 <div class="card">
                   <div class="card-body">
                     <h3>No Enrolled Courses.</h3>
-                    <p class="text-body-secondary">Join from the course subject using the class code provided by your teachers.</p>
+                    <p class="text-body-secondary">Join from the course subject using the class code provided by your
+                      teachers.</p>
                     <p style="color: green;">Click the + button from the header to encode the class code.</p>
                   </div>
                 </div>
@@ -639,19 +575,12 @@ $stmt->closeCursor();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
       integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
       crossorigin="anonymous"></script>
-    <!-- container-scroller -->
-    <!-- plugins:js -->
     <script src="../../vendors/js/vendor.bundle.base.js"></script>
-    <!-- endinject -->
-    <!-- Plugin js for this page -->
-    <!-- End plugin js for this page -->
-    <!-- inject:js -->
     <script src="../../js/off-canvas.js"></script>
     <script src="../../js/hoverable-collapse.js"></script>
     <script src="../../js/template.js"></script>
     <script src="../../js/settings.js"></script>
     <script src="../../js/todolist.js"></script>
-    <!-- endinject -->
 </body>
 
 </html>

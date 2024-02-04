@@ -31,9 +31,9 @@ $result = $stmt_selectExam->fetchAll(PDO::FETCH_ASSOC);
 foreach ($result as $examRow) {
   $examTitle = $examRow['examTitle'];
   $examInstruction = $examRow['examInstruction'];
-  $examPoint = $examRow['examPoint'];
+  $examPoint = $examRow['totalPoint'];
   $date = $examRow['date'];
-  $examStatus = $examRow['examStatus'];
+  $examStatus = $examRow['exam_status'];
 }
 
 $sql_getStudents = "SELECT * FROM class_enrolled WHERE tc_id = ? AND teacher_id = ? ORDER BY student_firstname ASC";
@@ -51,30 +51,6 @@ foreach ($result as $studentRow) {
   $stmt_selectProfile = $db->prepare($sql_selectProfile);
   $stmt_selectProfile->execute([$student_id]);
   $otherProfile = $stmt_selectProfile->fetchColumn();
-}
-
-if (isset($_POST['examGrade'])) {
-  $examTitle = $_POST['examTitle'];
-  $studentFirstName = $_POST['studentFirstName'];
-  $studentLastName = $_POST['studentLastName'];
-  $score = $_POST['score'];
-  $examPoint = $_POST['examPoint'];
-  $student_id = $_POST['student_id'];
-
-  $sqlExamGrade = "INSERT INTO examGrade (examTitle, studentFirstName, studentLastname, date, score, 
-  examPoint, student_id, teacher_id, class_id, exam_id) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)";
-  $stmtExamGrade = $db->prepare($sqlExamGrade);
-  $examGradeResult = $stmtExamGrade->execute([
-    $examTitle,
-    $studentFirstName,
-    $studentLastName,
-    $score,
-    $examPoint,
-    $student_id,
-    $teacher_id,
-    $class_id,
-    $exam_id
-  ]);
 }
 
 if (isset($_POST['editGrade'])) {
@@ -208,7 +184,7 @@ if (isset($_POST['editGrade'])) {
                           <?php echo ucfirst($notification['type']); ?>)
                         </h6>
                         <p class="font-weight-light small-text mb-0 text-muted"
-                        onclick="window.location.href='<?php echo $link; ?>';">
+                          onclick="window.location.href='<?php echo $link; ?>';">
                           by
                           <?php echo $notification['name']; ?> on
                           <?php echo date('F j', strtotime($notification['date'])); ?>
@@ -221,8 +197,7 @@ if (isset($_POST['editGrade'])) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                        <h6 class="preview-subject font-weight-normal" 
-                        onclick="window.location.href='student.php'">
+                        <h6 class="preview-subject font-weight-normal" onclick="window.location.href='student.php'">
                           You added
                           <?php echo $studentName; ?> as student.
                         </h6>
@@ -251,13 +226,13 @@ if (isset($_POST['editGrade'])) {
                         $stmtStudentName->execute();
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
-                          <h6 class="preview-subject font-weight-normal"
+                        <h6 class="preview-subject font-weight-normal"
                           onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['question_course_status']; ?>
                           <?php echo $notification['title']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
+                            onclick="window.location.href='question_review.php?class_id=<?php echo $class_id ?>&question_id=<?php echo $notification['question_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -271,12 +246,12 @@ if (isset($_POST['editGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
+                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['assignment_course_status']; ?>
                           <?php echo $notification['title']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
+                            onclick="window.location.href='assignment_review.php?class_id=<?php echo $class_id ?>&assignment_id=<?php echo $notification['assignment_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -290,12 +265,12 @@ if (isset($_POST['editGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
+                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['quiz_course_status']; ?>
                           <?php echo $notification['quizTitle']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
+                            onclick="window.location.href='quiz_review.php?class_id=<?php echo $class_id ?>&quiz_id=<?php echo $notification['quiz_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -309,12 +284,12 @@ if (isset($_POST['editGrade'])) {
                         $studentName = $stmtStudentName->fetchColumn();
                         ?>
                         <h6 class="preview-subject font-weight-normal"
-                        onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
+                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                           <?php echo $studentName; ?>
                           <?php echo $notification['exam_course_status']; ?>
                           <?php echo $notification['examTitle']; ?>
                           <p class="font-weight-light small-text mb-0 text-muted"
-                          onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
+                            onclick="window.location.href='exam_review.php?class_id=<?php echo $class_id ?>&exam_id=<?php echo $notification['exam_id'] ?>'">
                             on
                             <?php echo date('F j', strtotime($notification['date'])); ?>
                           </p>
@@ -479,177 +454,171 @@ if (isset($_POST['editGrade'])) {
                         aria-labelledby="staticBackdropLabel_<?php echo $student_id; ?>" aria-hidden="true">
                         <div class="modal-dialog">
                           <?php
-                                  $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND exam_id = ?";
-                                  $stmtExamScore = $db->prepare($sqlExamScore);
-                                  $stmtExamScore->execute([$student_id, $exam_id]);
-                                  $examScoreResult = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+                          $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND exam_id = ?";
+                          $stmtExamScore = $db->prepare($sqlExamScore);
+                          $stmtExamScore->execute([$student_id, $exam_id]);
+                          $examScoreResult = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
 
-                                  if(empty($examScoreResult)) {
-                                    ?>
-                          <form action="" method="post">
-                            <div class="modal-content">
-                              <div class="modal-header" style="border: none; margin-bottom: -40px;">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
-                                  <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
-                                  <?php echo $examTitle ?> (
-                                  <?php echo $date ?>)
-                                  <input type="hidden" name="examTitle" value="<?php echo $examTitle ?>">
-                                  <p class="text-body-secondary">by
-                                    <?php echo $student_firstname . ' ' . $student_lastname ?>
-                                    <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
-                                    <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
-                                  </p>
-                                  <?php
-                                  if (!$hasTurnedInStatus) {
-                                    ?>
-                                    <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
-                                      <?php echo ucfirst($examStatus) ?>
+                          if (empty($examScoreResult)) {
+                            ?>
+                            <form action="" method="post">
+                              <div class="modal-content">
+                                <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                                  <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                    <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                    <?php echo $examTitle ?> (
+                                    <?php echo $date ?>)
+                                    <input type="hidden" name="examTitle" value="<?php echo $examTitle ?>">
+                                    <p class="text-body-secondary">by
+                                      <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                      <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                                      <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
                                     </p>
                                     <?php
-                                  }
-                                  ?>
-                                  <?php
-                                  $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND exam_id = ?";
-                                  $stmtExamScore = $db->prepare($sqlExamScore);
-                                  $stmtExamScore->execute([$student_id, $exam_id]);
-                                  $examScoreResult = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
-
-                                  if (empty($examScoreResult)) {
+                                    if (!$hasTurnedInStatus) {
+                                      ?>
+                                      <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                        <?php echo ucfirst($examStatus) ?>
+                                      </p>
+                                      <?php
+                                    }
                                     ?>
-                                    <p>
-                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;">
-                                      /
-                                      <?php echo $examPoint; ?>
-                                      <input type="hidden" name="examPoint" value="<?php echo $examPoint; ?>">
-                                    </p>
                                     <?php
-                                  } else {
-                                    $examScore = $examScoreResult['score'];
-                                    ?>
-                                    <p>
-                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                                    $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND exam_id = ?";
+                                    $stmtExamScore = $db->prepare($sqlExamScore);
+                                    $stmtExamScore->execute([$student_id, $exam_id]);
+                                    $examScoreResult = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+
+                                    if (empty($examScoreResult)) {
+                                      ?>
+                                      <p>
+                                        <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" readonly>
+                                        /
+                                        <?php echo $examPoint; ?>
+                                        <input type="hidden" name="examPoint" value="<?php echo $examPoint; ?>">
+                                      </p>
+                                      <?php
+                                    } else {
+                                      $examScore = $examScoreResult['score'];
+                                      ?>
+                                      <p>
+                                        <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
                         border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
-                                        value="<?php echo $examScore; ?>" readonly>
-                                      /
-                                      <?php echo $examPoint; ?>
-                                      <input type="hidden" name="examPoint" value="<?php echo $examPoint; ?>">
+                                          value="<?php echo $examScore; ?>" readonly>
+                                        /
+                                        <?php echo $examPoint; ?>
+                                        <input type="hidden" name="examPoint" value="<?php echo $examPoint; ?>">
+                                      </p>
+                                      <?php
+                                    }
+                                    ?>
+                                  </h1>
+                                </div>
+                                <div class="modal-body" style="margin-top: -10px;">
+                                  <?php foreach ($examResult as $examRow): ?>
+                                    <?php
+                                    $examCourseStatus = $examRow['exam_course_status'];
+                                    $statusColor = ($examCourseStatus === 'turned in') ? 'green' : 'red';
+                                    ?>
+                                    <span style="color: <?php echo $statusColor; ?>">
+                                      <?php echo ucfirst($examCourseStatus) ?>
+                                    </span>
+                                    <p class="mt-1">
+                                      Exam are taken through face-to-face. Please tell the student to turn-in to change the exam
+                                      status
+                                      and provide scores for the student.
                                     </p>
                                     <?php
-                                  }
-                                  ?>
-                                </h1>
-                              </div>
-                              <div class="modal-body" style="margin-top: -10px;">
-                                <?php foreach ($examResult as $examRow): ?>
-                                  <?php
-                                  $examCourseStatus = $examRow['exam_course_status'];
-                                  $statusColor = ($examCourseStatus === 'turned in') ? 'green' : 'red';
-                                  ?>
-                                  <span style="color: <?php echo $statusColor; ?>">
-                                    <?php echo ucfirst($examCourseStatus) ?>
-                                  </span>
-                                  <p class="mt-1">
-                                    Exam are taken through face-to-face. Please tell the student to turn-in to change the exam
-                                    status
-                                    and provide scores for the student.
-                                  </p>
-                                  <?php
-                                  ?>
-                                <?php endforeach; ?>
-                              </div>
-                              <div class="modal-footer" style="border: none;">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <?php
-                                if (empty($examScoreResult)) {
-                                  ?>
-                                  <button type="submit" name="examGrade" class="btn btn-success">Submit</button>
-                                  <?php
-                                }
-                                ?>
-                              </div>
-                            </div>
-                          </form>
-                                    <?php
-                                  } else {
                                     ?>
-                          <form action="" method="post">
-                            <div class="modal-content">
-                              <div class="modal-header" style="border: none; margin-bottom: -40px;">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
-                                  <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
-                                  <?php echo $examTitle ?> (
-                                  <?php echo $date ?>)
-                                  <input type="hidden" name="examTitle" value="<?php echo $examTitle ?>">
-                                  <p class="text-body-secondary">by
-                                    <?php echo $student_firstname . ' ' . $student_lastname ?>
-                                    <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
-                                    <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
-                                  </p>
-                                  <?php
-                                  if (!$hasTurnedInStatus) {
-                                    ?>
-                                    <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
-                                      <?php echo ucfirst($examStatus) ?>
+                                  <?php endforeach; ?>
+                                </div>
+                                <div class="modal-footer" style="border: none;">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                              </div>
+                            </form>
+                            <?php
+                          } else {
+                            ?>
+                            <form action="" method="post">
+                              <div class="modal-content">
+                                <div class="modal-header" style="border: none; margin-bottom: -40px;">
+                                  <h1 class="modal-title fs-5" id="staticBackdropLabel_<?php echo $student_id; ?>">
+                                    <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                    <?php echo $examTitle ?> (
+                                    <?php echo $date ?>)
+                                    <input type="hidden" name="examTitle" value="<?php echo $examTitle ?>">
+                                    <p class="text-body-secondary">by
+                                      <?php echo $student_firstname . ' ' . $student_lastname ?>
+                                      <input type="hidden" name="studentFirstName" value="<?php echo $student_firstname ?>">
+                                      <input type="hidden" name="studentLastName" value="<?php echo $student_lastname ?>">
                                     </p>
                                     <?php
-                                  }
-                                  ?>
-                                  <?php
-                                  $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND exam_id = ?";
-                                  $stmtExamScore = $db->prepare($sqlExamScore);
-                                  $stmtExamScore->execute([$student_id, $exam_id]);
-                                  $examScoreResult = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
+                                    if (!$hasTurnedInStatus) {
+                                      ?>
+                                      <p class="text-body-secondary mt-1 <?php echo $statusColorClass; ?>">
+                                        <?php echo ucfirst($examStatus) ?>
+                                      </p>
+                                      <?php
+                                    }
+                                    ?>
+                                    <?php
+                                    $sqlExamScore = "SELECT score FROM examgrade WHERE student_id = ? AND exam_id = ?";
+                                    $stmtExamScore = $db->prepare($sqlExamScore);
+                                    $stmtExamScore->execute([$student_id, $exam_id]);
+                                    $examScoreResult = $stmtExamScore->fetch(PDO::FETCH_ASSOC);
 
-                                  if (!empty($examScoreResult)) {
-                                    $exam_id = $_GET['exam_id'];
-                                    $score = $examScoreResult['score'];
+                                    if (!empty($examScoreResult)) {
+                                      $exam_id = $_GET['exam_id'];
+                                      $score = $examScoreResult['score'];
+                                      ?>
+                                      <p>
+                                        <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
+                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;"
+                                          value="<?php echo $score ?>">
+                                        /
+                                        <?php echo $examPoint; ?>
+                                        <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
+                                        <input type="hidden" name="exam_id" value="<?php echo $exam_id ?>">
+                                      </p>
+                                      <?php
+                                    }
                                     ?>
-                                    <p>
-                                      <input type="text" name="score" style="height: 4vh; width: 4vh; font-size: 13px; border: none;
-                        border-bottom: 1px solid #ccc; margin-bottom: 0; padding-bottom: 0;" value="<?php echo $score ?>">
-                                      /
-                                      <?php echo $examPoint; ?>
-                                      <input type="hidden" name="student_id" value="<?php echo $student_id ?>">
-                        <input type="hidden" name="exam_id" value="<?php echo $exam_id ?>">
+                                  </h1>
+                                </div>
+                                <div class="modal-body" style="margin-top: -10px;">
+                                  <?php foreach ($examResult as $examRow): ?>
+                                    <?php
+                                    $examCourseStatus = $examRow['exam_course_status'];
+                                    $statusColor = ($examCourseStatus === 'turned in') ? 'green' : 'red';
+                                    ?>
+                                    <span style="color: <?php echo $statusColor; ?>">
+                                      <?php echo ucfirst($examCourseStatus) ?>
+                                    </span>
+                                    <p class="mt-1">
+                                      Exam are taken through face-to-face. Please tell the student to turn-in to change the exam
+                                      status
+                                      and provide scores for the student.
                                     </p>
                                     <?php
-                                  }
-                                  ?>
-                                </h1>
-                              </div>
-                              <div class="modal-body" style="margin-top: -10px;">
-                                <?php foreach ($examResult as $examRow): ?>
+                                    ?>
+                                  <?php endforeach; ?>
+                                </div>
+                                <div class="modal-footer" style="border: none;">
+                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                   <?php
-                                  $examCourseStatus = $examRow['exam_course_status'];
-                                  $statusColor = ($examCourseStatus === 'turned in') ? 'green' : 'red';
-                                  ?>
-                                  <span style="color: <?php echo $statusColor; ?>">
-                                    <?php echo ucfirst($examCourseStatus) ?>
-                                  </span>
-                                  <p class="mt-1">
-                                    Exam are taken through face-to-face. Please tell the student to turn-in to change the exam
-                                    status
-                                    and provide scores for the student.
-                                  </p>
-                                  <?php
-                                  ?>
-                                <?php endforeach; ?>
-                              </div>
-                              <div class="modal-footer" style="border: none;">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <?php
-                                if (!empty($examScoreResult)) {
-                                  ?>
-                                  <button type="submit" name="editGrade" class="btn btn-success">Edit</button>
-                                  <?php
-                                }
-                                ?>
-                              </div>
-                            </div>
-                          </form>
+                                  if (!empty($examScoreResult)) {
+                                    ?>
+                                    <button type="submit" name="editGrade" class="btn btn-success">Edit</button>
                                     <?php
                                   }
+                                  ?>
+                                </div>
+                              </div>
+                            </form>
+                            <?php
+                          }
                           ?>
                         </div>
                       </div>

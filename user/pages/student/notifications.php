@@ -25,7 +25,8 @@ function getFriendNotifications($db, $user_id)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function getTeacherNotifications($db, $user_id) {
+function getTeacherNotifications($db, $user_id)
+{
     $sql = "SELECT name, user_id, teacher_id, date, 'teacher' as notification_type 
     FROM teacher WHERE user_id = :user_id";
     $stmt = $db->prepare($sql);
@@ -64,26 +65,6 @@ function getAssignmentNotification($db, $studentFullName)
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function getQuizNotification($db, $studentFullName)
-{
-    $sql = "SELECT class_name, student, teacher_id, date, 'quiz' as notification_type 
-    FROM classwork_quiz WHERE LOWER(student) LIKE :student";
-    $stmt = $db->prepare($sql);
-    $stmt->bindValue(':student', '%' . $studentFullName . '%');
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-function getExamNotification($db, $studentFullName)
-{
-    $sql = "SELECT class_name, student, teacher_id, date, 'exam' as notification_type 
-    FROM classwork_exam WHERE LOWER(student) LIKE :student";
-    $stmt = $db->prepare($sql);
-    $stmt->bindValue(':student', '%' . $studentFullName . '%');
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
 function getQuestionScoreNotification($db, $user_id)
 {
     $sql = "SELECT qg.questionTitle, qg.date, u.firstname as studentFirstName, u.lastname as studentLastName, 
@@ -106,36 +87,6 @@ function getAssignmentScoreNotification($db, $user_id)
             FROM assignmentgrade ag
             JOIN user_account u ON ag.student_id = u.user_id
             JOIN user_account t ON ag.teacher_id = t.user_id
-            WHERE u.user_id = :user_id";
-
-    $stmt = $db->prepare($sql);
-    $stmt->bindParam(':user_id', $user_id);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-function getQuizScoreNotification($db, $user_id)
-{
-    $sql = "SELECT qz.quizTitle, qz.date, u.firstname as studentFirstName, u.lastname as studentLastName, 
-            t.firstname as teacherFirstName, t.lastname as teacherLastname, qz.score as score, 'quizGrade' as scoreNotification_type 
-            FROM quizgrade qz
-            JOIN user_account u ON qz.student_id = u.user_id
-            JOIN user_account t ON qz.teacher_id = t.user_id
-            WHERE u.user_id = :user_id";
-
-    $stmt = $db->prepare($sql);
-    $stmt->bindParam(':user_id', $user_id);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-function getExamScoreNotification($db, $user_id)
-{
-    $sql = "SELECT eg.examTitle, eg.date, u.firstname as studentFirstName, u.lastname as studentLastName, 
-    t.firstname as teacherFirstName, t.lastname as teacherLastname, eg.score as score, 'examGrade' as scoreNotification_type 
-            FROM examgrade eg
-            JOIN user_account u ON eg.student_id = u.user_id
-            JOIN user_account t ON eg.teacher_id = t.user_id
             WHERE u.user_id = :user_id";
 
     $stmt = $db->prepare($sql);
